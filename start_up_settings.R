@@ -3,6 +3,7 @@ kornumsatz <- read.csv("~/Documents/Studium/Bachelor-Arbeit/R-paket/source/kornu
 Position <- 1:nrow(kornumsatz)
 kornumsatz <- cbind(Position, kornumsatz)
 kornumsatz$Datum <- as.Date(kornumsatz$Datum, format="%d/%m/%Y")
+kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 
 # Laden der zwei wichtigen Funktionen
 source(prepare.R)
@@ -31,7 +32,7 @@ ElephantBeans <- c("Kaffee Espresso", "Kaffee Geröstet", "Kaffe Espresso", "Kaf
 Sonnenobst <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse")
 Naturata <- c("Gemüsebrühe", "Kokosfett", "Olivenöl", "Penne semoltano", "Rübenzucker", "Spaghetti", "Spaghetti semoltano", "Spirelli", "Tomatenmark", "Tomaten Mark", "Tomatenpassata", "Tomaten Passata")
 Wolfgang <- c("Bohnen", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
-Großhandel <- c("Arborio Reis", "Back-/Bratöl, EU", "Basilikum", "Basitom", "Basmati Braun", "Basmati Weiß", "Blaumohn", "brauner Basmati", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Goldhirse", "Goldhirse Neu", "Grünkern", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rohrohrzucker", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Rote Linsen", "Rote Linsen Neu", "Samba", "Samba - Schokoaufstrich", "Schwarzkümmel", "Sendi", "Senfkörner", "Senfkörner Neu", "Sonnenblumenöl, EU ", "Thymian", "Weinbeeren", "weißer Basmati", "Zimt Gemahlen", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
+Grosshandel <- c("Arborio Reis", "Back-/Bratöl, EU", "Basilikum", "Basitom", "Basmati Braun", "Basmati Weiß", "Blaumohn", "brauner Basmati", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Goldhirse", "Goldhirse Neu", "Grünkern", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rohrohrzucker", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Rote Linsen", "Rote Linsen Neu", "Samba", "Samba - Schokoaufstrich", "Schwarzkümmel", "Sendi", "Senfkörner", "Senfkörner Neu", "Sonnenblumenöl, EU ", "Thymian", "Weinbeeren", "weißer Basmati", "Zimt Gemahlen", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
 spanischeKoop <- as.character(c("Olivenöl"))
 NepalVerein <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner Ganz", "Zimt Ganz", "Zimt Gemahlen")
 

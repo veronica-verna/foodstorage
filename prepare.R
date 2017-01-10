@@ -6,10 +6,25 @@ prepare <- function(name.of.product = "Sonnenblumenkerne",
                     plotting.options = list(comul.change = kornumsatz$MengeKum,
                                             food.storage = kornumsatz$Bestand_Einheit) ) {
   
-  # for is.Date; cheeck if vec.of.Dates is a Date ####
+  # at first: check if the input is correct! ####
+  # for is.Date; cheeck if vec.of.Dates is a Date 
   require(lubridate) 
   if (is.Date(vec.of.Dates) == FALSE) 
     stop("Your vector of Dates has to be in format as.Date()")
+  
+  # Only factors are allowed for the vector of products!
+  if (is.factor(vec.of.products) == FALSE) 
+    stop("Vector of products has to be a factor")
+  
+  # name of product has to be in vector of products!
+  lev <- levels(vec.of.products)
+  if (isTRUE(name.of.product %in% lev) == FALSE) 
+    stop("Name of product has to be in the vector of all products!")
+  
+  # possibilites for "what.plotting"
+  possibilities <- c("allall", "all.verzehr", "all.lager", "Verzehr", "Warenbestand")
+  if (isTRUE(what.plotting %in% possibilities) == FALSE) 
+    stop("what.plotting has to be a character: allall, all.verzehr, all.lager, Verzehr or Warenbestand")
   
   # create sortbydays ####
   Datum <- seq(from=range(vec.of.Dates)[1], 
@@ -20,13 +35,13 @@ prepare <- function(name.of.product = "Sonnenblumenkerne",
   
   
   # starting point: create a table with just "product==x" and their equivalent position ####
-  if (is.factor(vec.of.products) == FALSE) 
-    stop("Vector of products has to be a factor")
   
   # cbind "Produkt" with "Position" - create sortbypos ####
   Position <- 1:length(vec.of.products)
   sortbypos <- data.frame(Position = Position, Produkt = vec.of.products)
   sortbypos <- cbind(sortbypos, Datum = vec.of.Dates[sortbypos$Position])
+  
+  
   
   if (what.plotting == "allall") {
     sortbypos <- merge(sortbypos, sortbydays, by='Datum', all=T)

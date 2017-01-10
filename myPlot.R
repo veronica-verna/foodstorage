@@ -27,8 +27,6 @@ myPlot <- function(prepare,
   Tag_Nr <- data[,2]
   if (length(prepare) == 3) name.of.group <- prepare[[3]]
   
-  if (name.of.product == "ALLES") warning("Did you really specify: plot =='all' ?")
-  
   if (plot.all.together == TRUE) {
     Warenbestand <- data[, length(data)]
     LagerFuellen <- data[, length(data)-1]
