@@ -1,5 +1,5 @@
 # Sortieren der Daten, Hinzufügen von Spalten, etc. ####
-kornumsatz <- read.csv("~/Documents/Studium/Bachelor-Arbeit/R-paket/source/kornumsatz.csv", sep=";")
+kornumsatz <- read.csv("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/kornumsatz.csv", sep=";")
 Position <- 1:nrow(kornumsatz)
 kornumsatz <- cbind(Position, kornumsatz)
 kornumsatz$Datum <- as.Date(kornumsatz$Datum, format="%d/%m/%Y")
@@ -15,12 +15,18 @@ myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 # Plot Funktion hat noch viele grafische Parameter wie col_line, oder lty, lwd, col_points ....
 
 ### verschiedene Gruppen ####
+BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
 Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
+Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga")
+Hirse.Braun <- c("Braunhirse", "Hirse Braun")
+Bohnen.Borlotti <- c("Bohnen Borlotti", "Borlottibohnen")
 
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
 
 Luzernenhof <- c("Dinkel", "Hafer", "Roggen", "Weizen")
-BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
+
+
+
 OBEG <- c("Apfelessig", "Haferflocken", "Kürbiskerne", "Langkornreis Natur", "Leinsamen", "Rapsöl", "Rübenzucker Sack", "Rundkornreis", "Salz", "Sesam", "Sonnenblumenkerne", "Sonnenblumenöl") # unsicher bei Kichererbsen 2. Ladung, Rundkornreis, Sesam, Sonnenblumenkerne
 HakumaFood <- c("Senf Kirsche", "Senf Sarepta", "Senf Mango")
 HofgutStorzeln <- c("Dinkel Drink", "Drink Buchweizen", "Drink Dinkel", "Drink Hafer", "Drink Soja", "Hafer Drink", "Soja Drink")
