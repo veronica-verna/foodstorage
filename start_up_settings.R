@@ -15,6 +15,9 @@ myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 # Plot Funktion hat noch viele grafische Parameter wie col_line, oder lty, lwd, col_points ....
 
 ### verschiedene Gruppen ####
+all <- levels(kornumsatz$Produkt)
+
+
 BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
 Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
 Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga")

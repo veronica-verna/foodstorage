@@ -1,8 +1,6 @@
 # Plotten mit myPlot funktion ####
 myPlot <- function(prepare,
-                   plot.all.together = FALSE,
                    prod.name.for.plot = "",
-                   group_size = NA,
                    smoother = c("loess", "loess"),
                    span = c(0.1, 0.1),
                    degree = c(1,1),
@@ -35,62 +33,6 @@ myPlot <- function(prepare,
     if (isTRUE(colnames(data)[3] %in% pos) == FALSE) 
       stop("The 3rd column of your data frame has to be a character: Verzehr or Warenbestand")
   
-  if (plot.all.together == TRUE) {
-    Warenbestand <- data[, length(data)]
-    LagerFuellen <- data[, length(data)-1]
-    Verzehr <- data[,3]
-    
-    if (smoother[1] == "loess") {
-      lo_waren <- loess(Warenbestand ~ Tag_Nr, span = span[1])
-      preds_waren <- predict(lo_waren)
-    }
-    # bauen eines leeren 'Bilderrahmens'
-    par(mfrow=c(1,1), mar=c(2,4,2,4)+0.1)
-    plot(x = Datum, 
-         y = Warenbestand, 
-         xaxt = "n", 
-         yaxt = "n", 
-         ylab = "", 
-         xlab = "", 
-         ylim = c(range(preds_waren)[1] - 0.5, range(preds_waren)[2] + 0.5), 
-         pch = pch[1], 
-         main = paste("Verzehr & Warenbestand von", name.of.product), 
-         col = col_points[1])
-    
-    # jetzt erst wird gezeichnet, der Warenbestand zuerst
-    lines(x = Datum, y = preds_waren, col = col_line[1], lwd = lwd[1], lty = lty[1])
-    
-    # beschriften der y-Achse mit Warenbestand
-    axis(side = axis_side[1], las = las[1])
-    mtext(text = "Warenbestand in Kilo", side = axis_side[1], line = line[1])
-    
-    # jetzt den Verzehr dazuzeichnen
-    par(new=TRUE)
-    # berechnen der zukünftigen Verzehr-Kurve
-    if (smoother[2] == "loess") {
-      lo_verzehr <- loess(Verzehr ~ Tag_Nr, span = span[2])
-      preds_verzehr <- predict(lo_verzehr)
-    }
-    plot(x = Datum, 
-         y = Verzehr, 
-         xaxt = "n", 
-         yaxt = "n", 
-         ylab = "", 
-         xlab = "", 
-         ylim = c(range(preds_verzehr)[1], range(preds_verzehr)[2] + 0.2), 
-         pch = pch[2], 
-         main = "", 
-         col = col_points[2])
-    # jetzt erst wird gezeichnet, der Warenbestand zuerst
-    lines(x = Datum, y = preds_verzehr, col = col_line[2], lwd = lwd[2], lty = lty[2])
-    
-    # beschriften der y-Achse mit Warenbestand
-    axis(side = axis_side[2], las = las[2])
-    mtext(text = "Verzehr in Kilo", side = axis_side[2], line = line[2])
-    
-    legend("topleft", lty=c(lty[1], lty[2]), legend=c("Warenbestand", "Verzehr"), lwd=c(lwd[1], lwd[2]), col=c(col_line[1], col_line[2]))
-  } # schreit nach Überarbeitung
-  
   if (ncol(data) == 3) {
     if (smoother[1] == "loess") {
       lo <- loess(data[,3] ~ Tag_Nr, span = span[1], degree = degree[1])
@@ -99,7 +41,7 @@ myPlot <- function(prepare,
     
     # What do we have
     if (prod.name.for.plot == "") {
-      warning("It will look better if you give the product's name in prod.name.for.plot")
+      warning("Main will look better if you give the product's name in prod.name.for.plot")
       if (add == FALSE) par(mfrow = mfrow, mar = mar) 
       plot(x = Datum, 
            y = data[,3], 
@@ -140,52 +82,52 @@ myPlot <- function(prepare,
     
     # berechnen der zukünftigen Warenbestandskurve
     if (smoother[1] == "loess") {
-      lo_waren <- loess(data[,3] ~ Tag_Nr, span = span[1], degree = degree[1])
+      lo_waren <- loess(Warenbestand ~ Tag_Nr, span = span[1], degree = degree[1])
       preds_waren <- predict(lo_waren)
     }
     
-    if (length(prepare) == 2) {
-      plot(x = Datum, 
-           y = Warenbestand, 
-           xaxt = "n", 
-           yaxt = "n", 
-           ylab = "", 
-           xlab = "", 
-           ylim = c(range(preds_waren)[1] - 0.5, range(preds_waren)[2] + 0.5), 
-           pch = pch[1], 
-           main = paste("Verzehr & Warenbestand von", name.of.product, sep=" "), 
-           col = col_points[1])
-    } # Plot with main = name.of.product
-    
-    if (length(prepare) == 3) {
-      plot(x = Datum, 
-           y = Warenbestand, 
-           xaxt = "n", 
-           yaxt = "n", 
-           ylab = "", 
-           xlab = "", 
-           ylim = c(range(preds_waren)[1] - 0.5, range(preds_waren)[2] + 0.5), 
-           pch = pch[1], 
-           main = paste("Verzehr & Warenbestand von", name.of.group, sep=" "), 
-           col = col_points[1])
-    } # Plot with main = name.of.group
-    
-    # bauen eines leeren 'Bilderrahmens'
+    # build an empty plot
     par(mfrow=c(1,1), mar=c(2,4,2,4)+0.1)
     
+    if (prod.name.for.plot == "") {
+      warning("Main will look better if you give the product's name in prod.name.for.plot")
+      if (add == FALSE) par(mfrow = mfrow, mar = mar) 
+      plot(x = Datum, 
+           y = Warenbestand, 
+           xaxt = "n", 
+           yaxt = "n", 
+           ylab = "", 
+           xlab = "", 
+           ylim = c(range(preds_waren)[1] - 0.2, range(preds_waren)[2] + 0.2), 
+           pch = pch[1], 
+           main = paste("Warenbestand & Verzehr von", name.of.product), 
+           col = col_points[1])
+    } else {
+      if (add == FALSE) par(mfrow = mfrow, mar = mar) 
+      plot(x = Datum, 
+           y = Warenbestand, 
+           xaxt = "n", 
+           yaxt = "n", 
+           ylab = "", 
+           xlab = "", 
+           ylim = c(range(preds_waren)[1] - 0.2, range(preds_waren)[2] + 0.2), 
+           pch = pch[1], 
+           main = paste("Warenbestand & Verzehr von", prod.name.for.plot), 
+           col = col_points[1])
+    } # for lazy people filled prod.name.for.plot is not necessary!
     
-    # jetzt erst wird gezeichnet, der Warenbestand zuerst
+    # now storage is getting drawed
     lines(x = Datum, y = preds_waren, col = col_line[1], lwd = lwd[1], lty = lty[1])
     
-    # beschriften der y-Achse mit Warenbestand
+    # (left) y-axis gets its scription
     axis(side = axis_side[1], las = las[1])
     mtext(text = "Warenbestand in Kilo", side = axis_side[1], line = line[1])
     
-    # jetzt den Verzehr dazuzeichnen
+    # consumption is added
     par(new=TRUE)
-    # berechnen der zukünftigen Verzehr-Kurve
+    # predict the consumption
     if (smoother[2] == "loess") {
-      lo_verzehr <- loess(data[,4] ~ Tag_Nr, span = span[2])
+      lo_verzehr <- loess(Verzehr ~ Tag_Nr, span = span[2], degree = degree[2])
       preds_verzehr <- predict(lo_verzehr)
     }
     plot(x = Datum, 
@@ -198,10 +140,10 @@ myPlot <- function(prepare,
          pch = pch[2], 
          main = "", 
          col = col_points[2])
-    # jetzt erst wird gezeichnet, der Warenbestand zuerst
+    # now consumption is getting drawen
     lines(x = Datum, y = preds_verzehr, col = col_line[2], lwd = lwd[2], lty = lty[2])
     
-    # beschriften der y-Achse mit Warenbestand
+    # (right) y-axis gets its scription
     axis(side = axis_side[2], las = las[2])
     mtext(text = "Verzehr in Kilo", side = axis_side[2], line = line[2])
     
