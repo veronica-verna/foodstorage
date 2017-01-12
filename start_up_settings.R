@@ -14,22 +14,44 @@ myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 
 # Plot Funktion hat noch viele grafische Parameter wie col_line, oder lty, lwd, col_points ....
 
-### verschiedene Gruppen ####
+### verschiedene Produktnamen, aber gleiches Produkt, zusammengefasst ####
 all <- levels(kornumsatz$Produkt)
-
-
-BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
 Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
 Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga")
 Hirse.Braun <- c("Braunhirse", "Hirse Braun")
 Bohnen.Borlotti <- c("Bohnen Borlotti", "Borlottibohnen")
+VollkornreisItalien <- c("Arborio Reis", "Risottoreis")
+Bratoel <- c("Back-/Bratöl, EU")
+Basmati.Braun <- c("Basmati Braun", "brauner Basmati", "Langkornreis Natur")
+Basmati.Weiß <- c("Basmati Weiß", "weißer Basmati")
+Bohnen <- c("Bohnen", "Bohnen Borlotti", "Borlottibohnen")
+Drink.Dinkel <- c("Dinkel Drink", "Drink Dinkel")
+Drink.Hafer <- c("Drink Hafer", "Hafer Drink")
+Drink.Soja <- c("Drink Soja", "Soja Drink")
+Getrocknetes.Gemuese <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse")
+Honig <- c("Honig", "Sonnenblütenhonig")
+Espresso <- c("Kaffee Espresso", "Kaffe Espresso")
+Kaffee <- c("Kaffee Geröstet", "Kaffee Zumba", "Kaffe Zumba")
+Nudeln <- c("Penne semoltano", "Spirelli")
+Rosinen <- c("Rosinen", "Weinbeeren")
+Zucker <- c("Rohrohrzucker", "Rübenzucker", "Rübenzucker Sack")
+Samba <- c("Samba", "Samba - Schokoaufstrich")
+Senfkörner <- c("Senfkörner", "Senfkörner Ganz", "Senfkörner Neu")
+Sonnenblumenoel <- c("Sonnenblumenöl", "Sonnenblumenöl, EU ")
+Spaghetti <- c("Spaghetti", "Spaghetti semoltano")
+Spuelmittel.Hand <- c("Spülmittel", "Spülmittel Hand")
+Tomatenmark <- c("Tomatenmark", "Tomaten Mark")
+Tomatenpassata <- c("Tomatenpassata", "Tomaten Passata")
+Waschmittel.Pulver <- c("Waschmittel Normal", "Waschmittel Pulver")
 
+#### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
 
+
+#### Aufgesplittet nach Lieferant ####
+
+BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
 Luzernenhof <- c("Dinkel", "Hafer", "Roggen", "Weizen")
-
-
-
 OBEG <- c("Apfelessig", "Haferflocken", "Kürbiskerne", "Langkornreis Natur", "Leinsamen", "Rapsöl", "Rübenzucker Sack", "Rundkornreis", "Salz", "Sesam", "Sonnenblumenkerne", "Sonnenblumenöl") # unsicher bei Kichererbsen 2. Ladung, Rundkornreis, Sesam, Sonnenblumenkerne
 HakumaFood <- c("Senf Kirsche", "Senf Sarepta", "Senf Mango")
 HofgutStorzeln <- c("Dinkel Drink", "Drink Buchweizen", "Drink Dinkel", "Drink Hafer", "Drink Soja", "Hafer Drink", "Soja Drink")
