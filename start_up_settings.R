@@ -3,7 +3,7 @@ kornumsatz <- read.csv("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-sto
 Position <- 1:nrow(kornumsatz)
 kornumsatz <- cbind(Position, kornumsatz)
 kornumsatz$Datum <- as.Date(kornumsatz$Datum, format="%d/%m/%Y")
-kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
+kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 
 # Laden der zwei wichtigen Funktionen
 source(prepare.R)
@@ -16,33 +16,40 @@ myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 
 ### verschiedene Produktnamen, aber gleiches Produkt, zusammengefasst ####
 all <- levels(kornumsatz$Produkt)
-Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
-Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga")
-Hirse.Braun <- c("Braunhirse", "Hirse Braun")
-Bohnen.Borlotti <- c("Bohnen Borlotti", "Borlottibohnen")
-VollkornreisItalien <- c("Arborio Reis", "Risottoreis")
-Bratoel <- c("Back-/Bratöl, EU")
-Basmati.Braun <- c("Basmati Braun", "brauner Basmati", "Langkornreis Natur")
-Basmati.Weiß <- c("Basmati Weiß", "weißer Basmati")
-Bohnen <- c("Bohnen", "Bohnen Borlotti", "Borlottibohnen")
-Drink.Dinkel <- c("Dinkel Drink", "Drink Dinkel")
-Drink.Hafer <- c("Drink Hafer", "Hafer Drink")
-Drink.Soja <- c("Drink Soja", "Soja Drink")
-Getrocknetes.Gemuese <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse")
-Honig <- c("Honig", "Sonnenblütenhonig")
-Espresso <- c("Kaffee Espresso", "Kaffe Espresso")
-Kaffee <- c("Kaffee Geröstet", "Kaffee Zumba", "Kaffe Zumba")
-Nudeln <- c("Penne semoltano", "Spirelli")
-Rosinen <- c("Rosinen", "Weinbeeren")
-Zucker <- c("Rohrohrzucker", "Rübenzucker", "Rübenzucker Sack")
-Samba <- c("Samba", "Samba - Schokoaufstrich")
-Senfkörner <- c("Senfkörner", "Senfkörner Ganz", "Senfkörner Neu")
-Sonnenblumenoel <- c("Sonnenblumenöl", "Sonnenblumenöl, EU ")
-Spaghetti <- c("Spaghetti", "Spaghetti semoltano")
-Spuelmittel.Hand <- c("Spülmittel", "Spülmittel Hand")
-Tomatenmark <- c("Tomatenmark", "Tomaten Mark")
-Tomatenpassata <- c("Tomatenpassata", "Tomaten Passata")
-Waschmittel.Pulver <- c("Waschmittel Normal", "Waschmittel Pulver")
+more.than.1.list <- list(Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen"), 
+                         Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga"), 
+                         Hirse.Braun <- c("Braunhirse", "Hirse Braun"), 
+                         Bohnen.Borlotti <- c("Bohnen Borlotti", "Borlottibohnen"), 
+                         VollkornreisItalien <- c("Arborio Reis"), 
+                         Bratoel <- c("Back-/Bratöl, EU"), 
+                         Basmati.Braun <- c("Basmati Braun", "brauner Basmati", "Langkornreis Natur"),
+                         Basmati.Weiß <- c("Basmati Weiß", "weißer Basmati"),
+                         Bohnen <- c("Bohnen", "Bohnen Borlotti", "Borlottibohnen"), 
+                         Drink.Dinkel <- c("Dinkel Drink", "Drink Dinkel"),
+                         Drink.Hafer <- c("Drink Hafer", "Hafer Drink"),
+                         Drink.Soja <- c("Drink Soja", "Soja Drink"),
+                         Getrocknetes.Gemuese <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse"),
+                         Honig <- c("Honig", "Sonnenblütenhonig"),
+                         Espresso <- c("Kaffee Espresso", "Kaffe Espresso"),
+                         Kaffee <- c("Kaffee Geröstet", "Kaffee Zumba", "Kaffe Zumba"),
+                         Nudeln <- c("Penne semoltano", "Spirelli"),
+                         Rosinen <- c("Rosinen", "Weinbeeren"),
+                         Zucker <- c("Rohrohrzucker", "Rübenzucker", "Rübenzucker Sack"),
+                         Samba <- c("Samba", "Samba - Schokoaufstrich"),
+                         Senfkörner <- c("Senfkörner", "Senfkörner Ganz", "Senfkörner Neu"),
+                         Sonnenblumenoel <- c("Sonnenblumenöl", "Sonnenblumenöl, EU "),
+                         Spaghetti <- c("Spaghetti", "Spaghetti semoltano"),
+                         Spuelmittel.Hand <- c("Spülmittel", "Spülmittel Hand"),
+                         Tomatenmark <- c("Tomatenmark", "Tomaten Mark"),
+                         Tomatenpassata <- c("Tomatenpassata", "Tomaten Passata"),
+                         Waschmittel.Pulver <- c("Waschmittel Normal", "Waschmittel Pulver"))
+
+# Erstellen eines Produkts ####
+for (i in 1:length(more.than.1.list)) {
+  kornumsatz[kornumsatz$Produkt %in% more.than.1.list[i],]$Produkt <- "Linsen.Braun"
+}
+
+
 
 #### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
