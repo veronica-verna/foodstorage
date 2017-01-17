@@ -17,7 +17,9 @@ myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 ### verschiedene Produktnamen, aber gleiches Produkt, zusammengefasst ####
 more.than.1.list <- list(Linsen.Braun = c("Linsen Braun", "Braune Linsen", "Tellerlinsen"), 
                          Linsen.Beluga = c("Beluglinsen", "Linsen Beluga"), 
+                         Linsen.Rot = c("Rote Linsen", "Rote Linsen Neu"),
                          Hirse.Braun = c("Braunhirse", "Hirse Braun"), 
+                         Hirse.Gold = c("Goldhirse", "Goldhirse Neu"),
                          Bohnen.Borlotti = c("Bohnen Borlotti", "Borlottibohnen"), 
                          VollkornreisItalien = c("Arborio Reis"), 
                          Bratoel = c("Back-/Bratöl, EU"), 
@@ -47,7 +49,15 @@ more.than.1.list <- list(Linsen.Braun = c("Linsen Braun", "Braune Linsen", "Tell
 for (i in 1:length(more.than.1.list)) {
   kornumsatz[kornumsatz$Produkt %in% more.than.1.list[[i]],]$Produkt <- names(more.than.1.list)[i]
 }
+kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 
+dif_products <- levels(kornumsatz$Produkt)
+VPE_data.frame <- data.frame(dif_products = dif_products, VPE = numeric(length(dif_products)))
+VPE_data.frame[c(1,5,6),2] <- 25 # Normales Sackgebinde
+VPE_data.frame[c(2,),2] <- 10 # Öl + Essig
+VPE_data.frame[c(3,),2] <- 1 # Gewürze
+VPE_data.frame[c(4,),2] <- 6 # Aufstriche
+VPE_data.frame[c()]
 
 #### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
