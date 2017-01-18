@@ -29,9 +29,9 @@ prepare <- function(name.of.product,
     }
     
     # possibilites for "what.plotting"
-    possibilities <- c("allall", "alles", "Verzehr", "Warenbestand")
+    possibilities <- c("allall", "alles", "Verzehr", "Warenbestand", "regression")
     if (isTRUE(what.plotting %in% possibilities) == FALSE) 
-      stop("what.plotting has to be a character: allall, all.verzehr, all.lager, Verzehr or Warenbestand")
+      stop("what.plotting has to be a character: regression, allall, all.verzehr, all.lager, Verzehr or Warenbestand!")
   
   ##### create sortbydays and sortbypos ####
     Datum <- seq(from=range(vec.of.Dates)[1], 
@@ -58,7 +58,7 @@ prepare <- function(name.of.product,
       if (length(plotting.options$comul.change[sortbypos$Position]) != nrow(sortbypos)) 
         stop("length differ! Probably you didn't specify the product for comulative change")
       # checks only for storage and "all"
-      if (what.plotting == "alles" | what.plotting == "Warenbestand") {
+      if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         if (is.numeric(plotting.options$food.storage) == FALSE) 
           stop("If you want to plott food storage, you need a vector of storage. Of course, same length as the comulative one.")
         if (length(plotting.options$food.storage) != length(vec.of.Dates)) 
@@ -69,7 +69,7 @@ prepare <- function(name.of.product,
       sortbypos <- sortbypos[sortbypos$Produkt == name.of.product, ] 
       sortbypos <- cbind(sortbypos, 
                          MengeKum = plotting.options$comul.change[sortbypos$Position])
-      if (what.plotting == "alles" | what.plotting == "Warenbestand") {
+      if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         sortbypos <- cbind(sortbypos,
                            Bestand_Einheit=plotting.options$food.storage[sortbypos$Position]) 
       }
@@ -81,7 +81,7 @@ prepare <- function(name.of.product,
       
       # fill NAs with numbers
       sortbydays$MengeKum[is.na(sortbydays$MengeKum)] <- 0
-      if (what.plotting == "alles" | what.plotting == "Warenbestand") {
+      if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         for (i in 1:nrow(sortbydays)) sortbydays$Bestand_Einheit[i] <- sum(sortbydays$MengeKum[1:i])
       }
     
@@ -111,9 +111,16 @@ prepare <- function(name.of.product,
                             Warenbestand = sortbydays$Bestand_Einheit)
       }
       
+      if (what.plotting == "regression") {
+        table <- data.frame(Datum = sortbydays$Datum,
+                            Tag_Nr = sortbydays$Tag_Nr,
+                            Warenbestand = sortbydays$Bestand_Einheit,
+                            MengeDif = sortbydays$MengeKum)
+      }
+      
       result <- list(data = table, name.of.product = name.of.product)
       return(result)
-  } # one product - consumption | food.storage | both  
+  } # one product - consumption | food.storage | both | regression 
     else {
       group_size <- length(name.of.product)
       
