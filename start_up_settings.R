@@ -4,7 +4,6 @@ Position <- 1:nrow(kornumsatz)
 kornumsatz <- cbind(Position, kornumsatz)
 kornumsatz$Datum <- as.Date(kornumsatz$Datum, format="%d/%m/%Y")
 kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
-kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 
 # Laden der zwei wichtigen Funktionen
 source(prepare.R)
@@ -53,7 +52,7 @@ for (i in 1:length(more.than.1.list)) {
 kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 
 dif_products <- levels(kornumsatz$Produkt)
-VPE_data.frame <- data.frame(dif_products = dif_products, VPE = numeric(length(dif_products)))
+VPE_data.frame <- data.frame(Produkt = dif_products, VPE = numeric(length(dif_products)))
 VPE_data.frame[c(1,5,6,9,10,12,14,16,18,27,28,30,31,32,38,46,48,49,50,51,59,61,62,66,71,79,80,88,89,94,97),2] <- 25 # Normales Sackgebinde
 VPE_data.frame[21,2] <- 150 # Hafer Drink
 VPE_data.frame[20,2] <- 100 # Dinkel Drink
@@ -69,7 +68,8 @@ VPE_data.frame[c(4,17,53,65,74,98),2] <- 6 # Aufstriche
 VPE_data.frame[c(7,24,35,45,75,77,78), 2] <- 5 # manche Gewürze + Kaffee + Senf
 VPE_data.frame[c(3,8,13,15,34,36,37,40,41,42,43,44,47,56,57,58,64,73,76,85,95,96),2] <- 1 # Gewürze
 
-
+kornumsatz_merged <- merge(kornumsatz, VPE_data.frame, by='Produkt', all = T)
+kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)), ]
 #########
 all <- levels(kornumsatz$Produkt)
 Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
@@ -99,7 +99,6 @@ Spuelmittel.Hand <- c("Spülmittel", "Spülmittel Hand")
 Tomatenmark <- c("Tomatenmark", "Tomaten Mark")
 Tomatenpassata <- c("Tomatenpassata", "Tomaten Passata")
 Waschmittel.Pulver <- c("Waschmittel Normal", "Waschmittel Pulver")
->>>>>>> bf0957381e81530d602df079fc1d5121192a1375
 
 #### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
