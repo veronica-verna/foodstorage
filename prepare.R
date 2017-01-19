@@ -116,10 +116,14 @@ prepare <- function(name.of.product,
                             Tag_Nr = sortbydays$Tag_Nr,
                             Warenbestand = sortbydays$Bestand_Einheit,
                             MengeDif = sortbydays$MengeKum)
+        return(table)
       }
       
-      result <- list(data = table, name.of.product = name.of.product)
-      return(result)
+      if (what.plotting != "regression") {
+        result <- list(data = table, name.of.product = name.of.product)
+        return(result)
+      }
+      
   } # one product - consumption | food.storage | both | regression 
     else {
       group_size <- length(name.of.product)
