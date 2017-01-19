@@ -22,9 +22,10 @@ fun_reg <- function(product,
   head(prod_df.reg)
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
-  date_reg <- seq(from = range(prod_df.reg$Datum)[1], to = as.Date(x_end, origin = "1970-01-01"), by = 'day')
-  preds_reg <- predict(fm, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
+  date_reg <- seq(from = range(prod_df.reg$Datum)[1], to = as.Date(x_end, origin = "1970-01-01"), by = 'day')
+  preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
+  
   # plot it
   par(col.axis = "black")
   plot(prod_df$Datum, 

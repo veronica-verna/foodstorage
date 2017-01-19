@@ -1,13 +1,15 @@
 # Sortieren der Daten, Hinzufügen von Spalten, etc. ####
-kornumsatz <- read.csv("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/kornumsatz.csv", sep=";")
+setwd("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage")
+kornumsatz <- read.csv("kornumsatz.csv", sep=";")
 Position <- 1:nrow(kornumsatz)
 kornumsatz <- cbind(Position, kornumsatz)
 kornumsatz$Datum <- as.Date(kornumsatz$Datum, format="%d/%m/%Y")
 kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 
 # Laden der zwei wichtigen Funktionen
-source(prepare.R)
-source(myPlot.R)
+source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/prepare.R")
+source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/myPlot.R")
+source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/conv.date.R")
 
 # plotten eines beliebigen Produkts
 myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
