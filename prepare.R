@@ -12,7 +12,7 @@ prepare <- function(name.of.product,
     require(lubridate) 
     if (is.Date(vec.of.Dates) == FALSE) 
       stop("Your vector of Dates has to be in format as.Date()")
-    
+  
     # Only factors are allowed for the vector of products!
     if (is.factor(vec.of.products) == FALSE) 
       stop("Vector of products has to be a factor")
@@ -74,8 +74,8 @@ prepare <- function(name.of.product,
         sortbypos <- cbind(sortbypos,
                            Bestand_Einheit=plotting.options$food.storage[sortbypos$Position]) 
       }
-      if (what.plotting == "regression") VPE <- plotting.options$food.storage[sortbypos$Position][1]
-    
+      if (what.plotting == "regression") VPE <- plotting.options$VPE[sortbypos$Position][1]
+      
     #### join daily change to sortbypos ####
       # merge sortbypos and sortbydays, by days of course
       require(data.table) # v1.9.5+
@@ -86,7 +86,9 @@ prepare <- function(name.of.product,
       if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         for (i in 1:nrow(sortbydays)) sortbydays$Bestand_Einheit[i] <- sum(sortbydays$MengeKum[1:i])
       }
-    
+      # looking for an error ##
+      if(class(look.for.errors(sortbydays$Datum, sortbydays)) == "Date")
+        return(look.for.errors(sortbydays$Datum, sortbydays))
     #### Create the consumption ####
       MengeKonsum <- numeric(nrow(sortbydays))
       for (i in sortbydays$Tag_Nr) {

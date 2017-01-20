@@ -10,9 +10,10 @@ kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/prepare.R")
 source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/myPlot.R")
 source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/conv.date.R")
+source("~/Documents/Studium/Bachelor-Arbeit/R-paket/foodcoop-storage/look.for.errors.R")
 
 # plotten eines beliebigen Produkts
-myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
+#myPlot(prepare("Dinkel", what.plotting = "Verzehr"))
 
 # Plot Funktion hat noch viele grafische Parameter wie col_line, oder lty, lwd, col_points ....
 
@@ -61,10 +62,10 @@ VPE_data.frame[20,2] <- 100 # Dinkel Drink
 VPE_data.frame[22,2] <- 100 # Soja Drink
 VPE_data.frame[29,2] <- 75 # Haferflocken
 VPE_data.frame[19,2] <- 50 # Buchweizen Drink + Sonnenblumenkerne
-VPE_data.frame[c(26,54,55,67,68,69,70,81,82,86,87),2] <- 30 # getrocknetes Gemüse, Nudeln, Olivenöl, Saft, SB-Öl, Tomatenzeugs
+VPE_data.frame[c(26,54,55,67,68,69,70,82,86,87),2] <- 30 # getrocknetes Gemüse, Nudeln, Olivenöl, Saft, SB-Öl, Tomatenzeugs
 VPE_data.frame[c(83,90,92,93),2] <- 20 # Spüli + Waschmittel
 VPE_data.frame[33,2] <- 15 # Honig
-VPE_data.frame[c(2,11,23,25,39,52,60,63,84,91),2] <- 10 # Öl + Essig + Erdnuss-Mandelmus + Gemüsebrühe + Kokosfett + Rosinen + SpüliMaschine
+VPE_data.frame[c(2,11,23,25,39,52,60,63,81,84,91),2] <- 10 # Öl + Essig + Erdnuss-Mandelmus + Gemüsebrühe + Kokosfett + Rosinen + SpüliMaschine
 VPE_data.frame[72,2] <- 8 # Samba
 VPE_data.frame[c(4,17,53,65,74,98),2] <- 6 # Aufstriche
 VPE_data.frame[c(7,24,35,45,75,77,78), 2] <- 5 # manche Gewürze + Kaffee + Senf
