@@ -41,9 +41,6 @@ prepare <- function(name.of.product,
     Tag_Nr <- 1:length(Datum)
     sortbydays <- data.frame(Datum, Tag_Nr)
     
-    
-    # starting point: create a table with just "product==x" and their equivalent position ####
-    
     # create sortbypos - cbind "Produkt" with "Position" ####
     Position <- 1:length(vec.of.products)
     sortbypos <- data.frame(Position = Position, Produkt = vec.of.products)
@@ -86,9 +83,19 @@ prepare <- function(name.of.product,
       if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         for (i in 1:nrow(sortbydays)) sortbydays$Bestand_Einheit[i] <- sum(sortbydays$MengeKum[1:i])
       }
-      # looking for an error ##
-      if(class(look.for.errors(sortbydays$Datum, sortbydays)) == "Date")
-        return(look.for.errors(sortbydays$Datum, sortbydays))
+      # looking for an error - each row should represent one date ##
+      # two same dates behind each other are not allowed ###
+      if(class(look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE)) == "Date") {
+        double.date <- look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE) 
+        days.to.correct <- unique(double.date)
+        for (i in 1:length(days.to.correct)) {
+          sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum[1] <- sum(sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum) # replace storage changing
+          nr <- nrow(sortbydays[sortbydays$Datum == days.to.correct[i],])
+          sortbydays <- sortbydays[-which(sortbydays$Datum == days.to.correct[i])[(2:nr)], ]
+          sortbydays[sortbydays$Datum == days.to.correct[i],]$Bestand_Einheit <- sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum + sortbydays[sortbydays$Datum == days.to.correct[i] - 1,]$Bestand_Einheit # replace food.storage
+        }
+      }
+         
     #### Create the consumption ####
       MengeKonsum <- numeric(nrow(sortbydays))
       for (i in sortbydays$Tag_Nr) {

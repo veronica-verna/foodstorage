@@ -1,6 +1,6 @@
 ### looking for errors in prepare ###
 
-look.for.errors <- function(date.vec, table) {
+look.for.errors <- function(date.vec, table, warnings = TRUE) {
   dates <- seq(from = range(date.vec)[1], to = range(date.vec)[2], by = 'day')
   if (nrow(table) != length(dates)) {
     double_date <- as.Date(numeric(nrow(table)-length(dates)), origin = "1970-01-01")
@@ -11,7 +11,7 @@ look.for.errors <- function(date.vec, table) {
         if (is.na(z)) stop("there is another double date, but double date vector is full")
       }
     } 
-    warning("Length differ: at least for one product exists more than one date")
+    if (warnings == TRUE) warning("Length differ: at least for one product exists more than one date")
     return(double_date)
   }
 }
