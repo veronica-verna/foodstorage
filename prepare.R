@@ -5,7 +5,9 @@ prepare <- function(name.of.product,
                     vec.of.names = lieferanten_namen,
                     plotting.options = list(comul.change = kornumsatz$MengeKum,
                                             food.storage = kornumsatz$Bestand_Einheit,
-                                            VPE = kornumsatz$VPE) ) {
+                                            VPE = kornumsatz$VPE),
+                    from = "",
+                    to = "") {
   
   ##### at first: check if the input is correct! ####
     # for is.Date; cheeck if vec.of.Dates is a Date 
@@ -130,10 +132,34 @@ prepare <- function(name.of.product,
                             Warenbestand = sortbydays$Bestand_Einheit,
                             MengeDif = sortbydays$MengeKum,
                             VPE = rep(VPE, nrow(sortbydays)))
+        #### check if from/to is set ####
+        if (from != "") {
+          if (is.character(from) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
+          from <- as.Date(from, origin = "1970-01-01")
+          table <- table[table$Datum >= from,]
+          if (to != "") {
+            if (is.character(to) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
+            to <- as.Date(to, origin = "1970-01-01")
+            if (from > to) stop("'From' must be before 'to'")
+            table <- table[table$Datum <= to,]
+          }
+        }
         return(table)
       }
       
       if (what.plotting != "regression") {
+        #### check if from/to is set ####
+        if (from != "") {
+          if (is.character(from) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
+          from <- as.Date(from, origin = "1970-01-01")
+          table <- table[table$Datum >= from,]
+          if (to != "") {
+            if (is.character(to) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
+            to <- as.Date(to, origin = "1970-01-01")
+            if (from > to) stop("'From' must be before 'to'")
+            table <- table[table$Datum <= to,]
+          }
+        }
         result <- list(data = table, name.of.product = name.of.product)
         return(result)
       }

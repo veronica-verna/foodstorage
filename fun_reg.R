@@ -1,6 +1,8 @@
 ### function for calculating a regression ###
 
 fun_reg <- function(product,
+                    from = "",
+                    to = "",
                     type = "p",
                     col_points = "grey",
                     pch = 16,
@@ -19,7 +21,7 @@ fun_reg <- function(product,
                     lty = c(1,1,2)) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  prod_df <- prepare(product, "regression")
+  prod_df <- prepare(product, "regression", from = from, to = to)
   
   # get 85% of VPE
   procent20 <- prod_df$VPE[1] * 0.7
@@ -37,6 +39,17 @@ fun_reg <- function(product,
     lo <- loess(Warenbestand ~ Tag_Nr, data = prod_df, span = span, degree = degree)
     preds_lo <- predict(lo)
   }
+  
+  ## which time do we wanna plot? ##
+  start_1st_date <- min(prod_df$Datum)
+  day(start_1st_date) <- 01
+  if (month(start_1st_date) == 12) {
+    year(start_1st_date) <- year(start_1st_date) + 1
+    month(start_1st_date) <- 1
+  } else { month(start_1st_date) <- month(start_1st_date) + 1
+  }
+  end_date <- as.Date(x_end, origin = "1970-01-01")
+  date1st <- seq(from = as.Date(start_1st_date), to = end_date, by = '1 month')
   
   # plot it
   # # how many years do we wanna plot?
@@ -97,19 +110,11 @@ fun_reg <- function(product,
   par(col.axis = col_20)
   axis(side = 1, at = x_20procent, labels = conv.date(x_20procent), col.ticks = col_20)
   abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
-  text(x = prod_df.reg$Datum[15], y = 0.2 * prod_df.reg$Warenbestand[1] + 3, labels = "20% der letzten Bestellung")
+  text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
   par(col.axis = "black")
   
+  
   # write/draw x-axis
-  start_1st_date <- min(prod_df$Datum)
-  day(start_1st_date) <- 01
-  if (month(start_1st_date) == 12) {
-    year(start_1st_date) <- year(start_1st_date) + 1
-    month(start_1st_date) <- 1
-    } else { month(start_1st_date) <- month(start_1st_date) + 1
-    }
-  end_date <- as.Date(x_end, origin = "1970-01-01")
-  date1st <- seq(from = as.Date(start_1st_date), to = end_date, by = '1 month')
   # do the writing, but first check where is x_20procent!
   day_in_num <- c(as.numeric(day(x_20procent)),
                   as.numeric(month(x_20procent)),
