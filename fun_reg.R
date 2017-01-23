@@ -8,9 +8,15 @@ fun_reg <- function(product,
                     ylab = "Warenbestand in Kilo",
                     xlab = "",
                     las = 1,
-                    col_line = "green",
+                    col_reg = "green",
                     col_conv = "green",
-                    col_20 = "red") {
+                    col_20 = "red",
+                    col_past = "black",
+                    smoother = "loess",
+                    span = 0.1,
+                    degree = 1,
+                    lwd = c(1,1,1),
+                    lty = c(1,1,2)) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   prod_df <- prepare(product, "regression")
@@ -26,6 +32,11 @@ fun_reg <- function(product,
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
   date_reg <- seq(from = range(prod_df.reg$Datum)[1], to = as.Date(x_end, origin = "1970-01-01"), by = 'day')
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
+  # calculate loess #
+  if (smoother == "loess") {
+    lo <- loess(Warenbestand ~ Tag_Nr, data = prod_df, span = span, degree = degree)
+    preds_lo <- predict(lo)
+  }
   
   # plot it
   # # how many years do we wanna plot?
@@ -75,9 +86,12 @@ fun_reg <- function(product,
          xlim = c(range(prod_df$Datum)[1], x_end),
          main = paste("Warenbestand von", main_header))
   }
-  lines(x = date_reg, y = preds_reg$fit, col = col_line)
-  lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = 2, col = col_conv)
-  lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = 2, col = col_conv)
+  # at first draw loess #
+  lines(x = prod_df$Datum, y = preds_lo, col = col_past, lwd = lwd[1], lty = lty[1])
+  # and now the regression #
+  lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
+  lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
+  lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
   x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   abline(v = x_20procent, lty=3, col = col_20)
   par(col.axis = col_20)

@@ -1,5 +1,5 @@
 prepare <- function(name.of.product,
-                    what.plotting,
+                    what.plotting = "regression",
                     vec.of.products = kornumsatz$Produkt,
                     vec.of.Dates  = kornumsatz$Datum,
                     vec.of.names = lieferanten_namen,
