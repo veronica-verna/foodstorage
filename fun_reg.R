@@ -17,7 +17,7 @@ fun_reg <- function(product,
                     smoother = "loess",
                     span = 0.1,
                     degree = 1,
-                    lwd = c(1,1,1),
+                    lwd = c(2,2,1),
                     lty = c(1,1,2),
                     nec.dates = 10) {
   
@@ -37,11 +37,16 @@ fun_reg <- function(product,
       last.refill <- highest_storage
     } else stop("too less data for calculation a regression")
   } else {
-    # normal usecase! At first look for refilling the storage
+    # how many refills do we have?
+    num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
+    # normal usecase: Last refill is older than 10 days
     last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]),]$Datum
     # But take the refill before because there are too less dates since the storage was refilled the last time
     if (last.refill >= prod_df[nrow(prod_df), ]$Datum - nec.dates) {
-      last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
+      # Is there another refill before?
+      if (num_refill > 1) {
+        last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
+      } else stop("There are too less dates for only one existing 'refill'")
     }
   }
   
@@ -99,7 +104,7 @@ fun_reg <- function(product,
          xlab = xlab, 
          ylab = ylab, 
          las = las, 
-         ylim = c(0, range(prod_df$Warenbestand)[2] + 3), 
+         ylim = c(0, range(prod_df$Warenbestand)[2]), 
          xlim = c(range(prod_df$Datum)[1], x_end),
          main = paste("Warenbestand von", product))
     warning("Your plot will look better if you fill 'main_header'")
@@ -130,6 +135,9 @@ fun_reg <- function(product,
   abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
   text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
   par(col.axis = "black")
+  
+  # make the legend
+  legend("topright", col = c("black", "green"), legend = c("Bereits geschehen", "Zukunftsprognose"), lty = c(1,1), lwd =c(2,2))
   
   
   # write/draw x-axis
