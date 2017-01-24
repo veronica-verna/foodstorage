@@ -18,15 +18,33 @@ fun_reg <- function(product,
                     span = 0.1,
                     degree = 1,
                     lwd = c(1,1,1),
-                    lty = c(1,1,2)) {
+                    lty = c(1,1,2),
+                    nec.dates = 10) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   prod_df <- prepare(product, "regression", from = from, to = to)
   
-  # get 85% of VPE
-  procent20 <- prod_df$VPE[1] * 0.7
-  # only storage refill
-  last.refill <- prod_df[prod_df$MengeDif > procent20, ][nrow(prod_df[prod_df$MengeDif > procent20,]),]$Datum
+  # get 70% of VPE
+  procent70 <- prod_df$VPE[1] * 0.7
+  procent20 <- prod_df$VPE[1] * 0.2
+  # only refill of storage
+  if (nrow(prod_df[prod_df$MengeDif > procent70, ]) == 0) {
+    # if storage isn't refilled take the highest point of storage in this time
+    highest_storage <- prod_df[max(prod_df$Warenbestand), ]$Datum
+    # how much data do we have above 20%
+    above_20_procent <- nrow(prod_df[prod_df$MengeDif > procent20, ])
+    if (above_20_procent > nec.dates) {
+      last.refill <- highest_storage
+    } else stop("too less data for calculation a regression")
+  } else {
+    # normal usecase! At first look for refilling the storage
+    last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]),]$Datum
+    # But take the refill before because there are too less dates since the storage was refilled the last time
+    if (last.refill >= prod_df[nrow(prod_df), ]$Datum - nec.dates) {
+      last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
+    }
+  }
+  
   prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
   head(prod_df.reg)
   # calculate regression #

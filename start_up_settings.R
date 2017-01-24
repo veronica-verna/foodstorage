@@ -73,7 +73,7 @@ VPE_data.frame[c(3,8,13,15,34,36,37,40,41,42,43,44,47,56,57,58,64,73,76,85,95,96
 
 kornumsatz_merged <- merge(kornumsatz, VPE_data.frame, by='Produkt', all = T)
 kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)), ]
-rm(kornumsatz_merged)
+rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list)
 #########
 all <- levels(kornumsatz$Produkt)
 Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
