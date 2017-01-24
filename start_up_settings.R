@@ -25,7 +25,7 @@ more.than.1.list <- list(Linsen.Braun = c("Linsen Braun", "Braune Linsen", "Tell
                          Hirse.Gold = c("Goldhirse", "Goldhirse Neu"),
                          Bohnen.Borlotti = c("Bohnen Borlotti", "Borlottibohnen"), 
                          VollkornreisItalien = c("Arborio Reis"), 
-                         Bratoel = c("Back-/Bratöl, EU"), 
+                         BratoelDavert = c("Back-/Bratöl, EU"), 
                          Basmati.Braun = c("Basmati Braun", "brauner Basmati", "Langkornreis Natur"),
                          Basmati.Weiß = c("Basmati Weiß", "weißer Basmati"),
                          Bohnen = c("Bohnen", "Bohnen Borlotti", "Borlottibohnen"), 
@@ -76,33 +76,6 @@ kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)),
 rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list)
 #########
 all <- levels(kornumsatz$Produkt)
-Linsen.Braun <- c("Linsen Braun", "Braune Linsen", "Tellerlinsen")
-Linsen.Beluga <- c("Beluglinsen", "Linsen Beluga")
-Hirse.Braun <- c("Braunhirse", "Hirse Braun")
-Bohnen.Borlotti <- c("Bohnen Borlotti", "Borlottibohnen")
-VollkornreisItalien <- c("Arborio Reis", "Risottoreis")
-Bratoel <- c("Back-/Bratöl, EU")
-Basmati.Braun <- c("Basmati Braun", "brauner Basmati", "Langkornreis Natur")
-Basmati.Weiß <- c("Basmati Weiß", "weißer Basmati")
-Bohnen <- c("Bohnen", "Bohnen Borlotti", "Borlottibohnen")
-Drink.Dinkel <- c("Dinkel Drink", "Drink Dinkel")
-Drink.Hafer <- c("Drink Hafer", "Hafer Drink")
-Drink.Soja <- c("Drink Soja", "Soja Drink")
-Getrocknetes.Gemuese <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse")
-Honig <- c("Honig", "Sonnenblütenhonig")
-Espresso <- c("Kaffee Espresso", "Kaffe Espresso")
-Kaffee <- c("Kaffee Geröstet", "Kaffee Zumba", "Kaffe Zumba")
-Nudeln <- c("Penne semoltano", "Spirelli")
-Rosinen <- c("Rosinen", "Weinbeeren")
-Zucker <- c("Rohrohrzucker", "Rübenzucker", "Rübenzucker Sack")
-Samba <- c("Samba", "Samba - Schokoaufstrich")
-Senfkörner <- c("Senfkörner", "Senfkörner Ganz", "Senfkörner Neu")
-Sonnenblumenoel <- c("Sonnenblumenöl", "Sonnenblumenöl, EU ")
-Spaghetti <- c("Spaghetti", "Spaghetti semoltano")
-Spuelmittel.Hand <- c("Spülmittel", "Spülmittel Hand")
-Tomatenmark <- c("Tomatenmark", "Tomaten Mark")
-Tomatenpassata <- c("Tomatenpassata", "Tomaten Passata")
-Waschmittel.Pulver <- c("Waschmittel Normal", "Waschmittel Pulver")
 
 #### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")
@@ -110,22 +83,22 @@ Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen
 
 #### Aufgesplittet nach Lieferant ####
 
-BioHofLex <- c("Beluglinsen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
+BioHofLex <- c("Bohnen.Borlotti", "Braune Linsen", "Braunhirse", "Buchweizen", "Hirse Braun", "Linsen Beluga", "Linsen Braun", "Polenta", "Tellerlinsen")
 Luzernenhof <- c("Dinkel", "Hafer", "Roggen", "Weizen")
 OBEG <- c("Apfelessig", "Haferflocken", "Kürbiskerne", "Langkornreis Natur", "Leinsamen", "Rapsöl", "Rübenzucker Sack", "Rundkornreis", "Salz", "Sesam", "Sonnenblumenkerne", "Sonnenblumenöl") # unsicher bei Kichererbsen 2. Ladung, Rundkornreis, Sesam, Sonnenblumenkerne
 HakumaFood <- c("Senf Kirsche", "Senf Sarepta", "Senf Mango")
-HofgutStorzeln <- c("Dinkel Drink", "Drink Buchweizen", "Drink Dinkel", "Drink Hafer", "Drink Soja", "Hafer Drink", "Soja Drink")
+HofgutStorzeln <- c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja")
 HofgutUnterbach <- c("Haselnüsse geschält", "Walnüsse")
 Erich <- c("Honig", "Sonnenblütenhonig")
 Cashew4you <- c("Cashews")
 Sonett <- as.character(c("Allesreiniger", "Spülmittel", "Spülmittel Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel Normal", "Waschmittel Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv"))
-ElephantBeans <- c("Kaffee Espresso", "Kaffee Geröstet", "Kaffe Espresso", "Kaffee Zumba", "Kaffe Zumba")
+ElephantBeans <- c("Espresso", "Kaffee Zumba", "Kaffe Zumba")
 Sonnenobst <- c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse")
 Naturata <- c("Gemüsebrühe", "Kokosfett", "Olivenöl", "Penne semoltano", "Rübenzucker", "Spaghetti", "Spaghetti semoltano", "Spirelli", "Tomatenmark", "Tomaten Mark", "Tomatenpassata", "Tomaten Passata")
 Wolfgang <- c("Bohnen", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
-Grosshandel <- c("Arborio Reis", "Back-/Bratöl, EU", "Basilikum", "Basitom", "Basmati Braun", "Basmati Weiß", "Blaumohn", "brauner Basmati", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Goldhirse", "Goldhirse Neu", "Grünkern", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rohrohrzucker", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Rote Linsen", "Rote Linsen Neu", "Samba", "Samba - Schokoaufstrich", "Schwarzkümmel", "Sendi", "Senfkörner", "Senfkörner Neu", "Sonnenblumenöl, EU ", "Thymian", "Weinbeeren", "weißer Basmati", "Zimt Gemahlen", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
+Grosshandel <- c("Basilikum", "Basitom", "Basmati.Braun", "Basmati.Weiß", "Blaumohn", "BratoelDavert", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Grünkern", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rohrohrzucker", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Rote Linsen", "Rote Linsen Neu", "Samba", "Samba - Schokoaufstrich", "Schwarzkümmel", "Sendi", "Senfkörner", "Senfkörner Neu", "Sonnenblumenöl, EU ", "Thymian", "Weinbeeren", "weißer Basmati", "Zimt Gemahlen", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
 spanischeKoop <- as.character(c("Olivenöl"))
-NepalVerein <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner Ganz", "Zimt Ganz", "Zimt Gemahlen")
+SahanaEliya <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner Ganz", "Zimt Ganz", "Zimt Gemahlen")
 
 lieferanten <- list(BioHofLex, Erich, Luzernenhof, OBEG, HakumaFood, HofgutStorzeln, HofgutUnterbach, Sonett, ElephantBeans, Naturata, Sonnenobst, Wolfgang, Großhandel, NepalVerein)
 
