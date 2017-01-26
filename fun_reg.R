@@ -3,6 +3,7 @@
 fun_reg <- function(product,
                     from = "",
                     to = "",
+                    graphics = TRUE,
                     type = "p",
                     col_points = "grey",
                     pch = 16,
@@ -55,8 +56,14 @@ fun_reg <- function(product,
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
+  end_date <- as.Date(x_end, origin = "1970-01-01")
   date_reg <- seq(from = range(prod_df.reg$Datum)[1], to = as.Date(x_end, origin = "1970-01-01"), by = 'day')
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
+  x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
+  
+  if (graphics == FALSE) return(list(product, x_20procent, end_date))
+  
+  
   # calculate loess #
   if (smoother == "loess") {
     lo <- loess(Warenbestand ~ Tag_Nr, data = prod_df, span = span, degree = degree)
@@ -71,8 +78,8 @@ fun_reg <- function(product,
     month(start_1st_date) <- 1
   } else { month(start_1st_date) <- month(start_1st_date) + 1
   }
-  end_date <- as.Date(x_end, origin = "1970-01-01")
   date1st <- seq(from = as.Date(start_1st_date), to = end_date, by = '1 month')
+  
   
   # plot it
   # # how many years do we wanna plot?
@@ -128,7 +135,6 @@ fun_reg <- function(product,
   lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
   lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
   lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-  x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   abline(v = x_20procent, lty=3, col = col_20)
   par(col.axis = col_20)
   axis(side = 1, at = x_20procent, labels = conv.date(x_20procent), col.ticks = col_20)

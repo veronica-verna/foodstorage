@@ -123,7 +123,6 @@ prepare <- function(name.of.product,
                             Tag_Nr = sortbydays$Tag_Nr, 
                             Warenbestand = sortbydays$Bestand_Einheit)
       }
-      
       if (what.plotting == "regression") {
         if (is.numeric(plotting.options$VPE) == FALSE) 
           stop("VPE must be a numeric vector with same length than all other vectors.")
@@ -132,37 +131,22 @@ prepare <- function(name.of.product,
                             Warenbestand = sortbydays$Bestand_Einheit,
                             MengeDif = sortbydays$MengeKum,
                             VPE = rep(VPE, nrow(sortbydays)))
-        #### check if from/to is set ####
-        if (from != "") {
-          if (is.character(from) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
-          from <- as.Date(from, origin = "1970-01-01")
-          table <- table[table$Datum >= from,]
-          if (to != "") {
-            if (is.character(to) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
-            to <- as.Date(to, origin = "1970-01-01")
-            if (from > to) stop("'From' must be before 'to'")
-            table <- table[table$Datum <= to,]
-          }
-        }
-        return(table)
       }
       
-      if (what.plotting != "regression") {
-        #### check if from/to is set ####
-        if (from != "") {
-          if (is.character(from) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
-          from <- as.Date(from, origin = "1970-01-01")
-          table <- table[table$Datum >= from,]
-          if (to != "") {
-            if (is.character(to) == FALSE) stop("From must be a character string in format 'yyyy-mm-dd'")
-            to <- as.Date(to, origin = "1970-01-01")
-            if (from > to) stop("'From' must be before 'to'")
-            table <- table[table$Datum <= to,]
-          }
+      #### check if from/to is set ####
+      if (from != "") {
+        if (is.character(from) == FALSE) stop("'From' must be a character string in format 'yyyy-mm-dd'")
+        from <- as.Date(from, origin = "1970-01-01")
+        table <- table[table$Datum >= from,]
+        if (to != "") {
+          if (is.character(to) == FALSE) stop("'To' must be a character string in format 'yyyy-mm-dd'")
+          to <- as.Date(to, origin = "1970-01-01")
+          if (from > to) stop("'From' must be before 'to'")
+          table <- table[table$Datum <= to,]
         }
-        result <- list(data = table, name.of.product = name.of.product)
-        return(result)
       }
+      
+      return(table)
       
   } # one product - consumption | food.storage | both | regression 
     else {
