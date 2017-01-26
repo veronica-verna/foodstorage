@@ -7,7 +7,9 @@ prepare <- function(name.of.product,
                                             food.storage = kornumsatz$Bestand_Einheit,
                                             VPE = kornumsatz$VPE),
                     from = "",
-                    to = "") {
+                    to = "",
+                    correction = 0.05, 
+                    more.than = 15) {
   
   ##### at first: check if the input is correct! ####
     # for is.Date; cheeck if vec.of.Dates is a Date 
@@ -96,6 +98,34 @@ prepare <- function(name.of.product,
           sortbydays <- sortbydays[-which(sortbydays$Datum == days.to.correct[i])[(2:nr)], ]
           sortbydays[sortbydays$Datum == days.to.correct[i],]$Bestand_Einheit <- sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum + sortbydays[sortbydays$Datum == days.to.correct[i] - 1,]$Bestand_Einheit # replace food.storage
         }
+      }
+      
+    
+      ## make the '5% correction' ##
+      if (what.plotting == "regression") {
+        Prozent5 <- correction * VPE
+        candidates <- sortbydays[abs(sortbydays$Bestand_Einheit) < Prozent5,]
+        candidates_dif <- unique(candidates$Bestand_Einheit)
+        dates <- as.Date(character())
+        for (i in 1:length(candidates_dif)) {
+          if (nrow(candidates[candidates$Bestand_Einheit == candidates_dif[i],]) > more.than) {
+            dates_new <- candidates[candidates$Bestand_Einheit == candidates_dif[i],]$Datum
+            dates <- c(dates, dates_new)
+          }
+        }
+        dif.storage <- unique(candidates[which(candidates$Datum %in% dates),]$Bestand_Einheit)
+        for (i in 1:length(dif.storage)) {
+          MengeKum <- candidates[which(candidates$Datum %in% dates) & candidates$Bestand_Einheit == dif.storage[i],]$MengeKum[1]
+          
+          # 4 possibilities, but result is the same
+           # case: storage was refilled, but too much -> MengeKum gets smaller
+           # case: storage was refilled, but too less --> MengeKum gets bigger
+           # case: storage was cleared, but too much
+           # case: storage was cleared, but too less
+          sortbydays[which(sortbydays$Datum %in% dates) & sortbydays$Bestand_Einheit == dif.storage[i],]$MengeKum[1] <- MengeKum - dif.storage[i]
+          sortbydays[which(sortbydays$Datum %in% dates) & sortbydays$Bestand_Einheit == dif.storage[i],]$Bestand_Einheit <- 0
+        }
+        
       }
          
     #### Create the consumption ####

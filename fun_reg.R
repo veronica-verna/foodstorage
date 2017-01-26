@@ -20,10 +20,11 @@ fun_reg <- function(product,
                     degree = 1,
                     lwd = c(2,2,1),
                     lty = c(1,1,2),
-                    nec.dates = 10) {
+                    nec.dates = 10,
+                    more.than = 15) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  prod_df <- prepare(product, "regression", from = from, to = to)
+  prod_df <- prepare(product, "regression", from = from, to = to, more.than = more.than)
   
   # get 70% of VPE
   procent70 <- prod_df$VPE[1] * 0.7
@@ -36,23 +37,26 @@ fun_reg <- function(product,
     above_20_procent <- nrow(prod_df[prod_df$MengeDif > procent20, ])
     if (above_20_procent > nec.dates) {
       last.refill <- highest_storage
+      prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
     } else stop("too less data for calculation a regression")
   } else {
     # how many refills do we have?
     num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
     # normal usecase: Last refill is older than 10 days
     last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]),]$Datum
+    prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
     # But take the refill before because there are too less dates since the storage was refilled the last time
     if (last.refill >= prod_df[nrow(prod_df), ]$Datum - nec.dates) {
       # Is there another refill before?
       if (num_refill > 1) {
-        last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
+        used.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
+        prod_df.reg <- prod_df[prod_df$Datum >= used.refill & prod_df$Datum < last.refill, ]
       } else stop("There are too less dates for only one existing 'refill'")
     }
   }
+  #return(tail(prod_df_reg))
   
-  prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
-  head(prod_df.reg)
+  
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
@@ -61,7 +65,7 @@ fun_reg <- function(product,
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   
-  if (graphics == FALSE) return(list(product, x_20procent, end_date))
+  if (graphics == FALSE) return(list(x_20procent, end_date))
   
   
   # calculate loess #
