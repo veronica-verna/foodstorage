@@ -8,7 +8,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
   
   if (len > 12 | list == TRUE) {
     # create an empty data.frame and empty name vector
-    table <- data.frame(Prozent20 = as.Date(character()), Ende = as.Date(character()))
+    table <- data.frame(Noch4Wochen = as.Date(character()), Ende = as.Date(character()))
     Produkt <- c()
     
     for (i in 1:len) {

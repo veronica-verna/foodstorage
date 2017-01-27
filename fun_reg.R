@@ -30,7 +30,9 @@ fun_reg <- function(product,
   procent70 <- prod_df$VPE[1] * 0.7
   procent20 <- prod_df$VPE[1] * 0.2
   # only refill of storage
-  if (nrow(prod_df[prod_df$MengeDif > procent70, ]) == 0) {
+  # how many refills do we have?
+  num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
+  if (num_refill == 0) {
     # if storage isn't refilled take the highest point of storage in this time
     highest_storage <- prod_df[max(prod_df$Warenbestand), ]$Datum
     # how much data do we have above 20%
@@ -40,11 +42,10 @@ fun_reg <- function(product,
       prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
     } else stop("too less data for calculation a regression")
   } else {
-    # how many refills do we have?
-    num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
     # normal usecase: Last refill is older than 10 days
-    last.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]),]$Datum
+    last.refill <- prod_df[prod_df$MengeDif > procent70, ][num_refill,]$Datum
     prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
+    
     # But take the refill before because there are too less dates since the storage was refilled the last time
     if (last.refill >= prod_df[nrow(prod_df), ]$Datum - nec.dates) {
       # Is there another refill before?
@@ -55,17 +56,29 @@ fun_reg <- function(product,
     }
   }
   #return(tail(prod_df_reg))
-  
+  if (0 %in% prod_df.reg$Warenbestand) {
+    storage.is.zero <- prod_df.reg[prod_df.reg$Warenbestand == 0 & prod_df.reg$MengeDif != 0,]$Datum
+    pos.dates <- seq(from = storage.is.zero, to = storage.is.zero + more.than, by = 'day')
+    dif.storage <- unique(prod_df.reg[which(prod_df.reg$Datum %in% pos.dates), ]$Warenbestand)
+    if (length(dif.storage) != 1) stop("There is a mistake")
+    prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero, ]
+  } 
   
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
+  if (exists("used.refill") == TRUE) {
+    newIntercept <- prod_df[prod_df$Datum == last.refill,]$Warenbestand - (fm_reg$coefficients[2] * as.numeric(ymd(last.refill)))
+    fm_reg$coefficients[1] <- as.numeric(as.character(newIntercept))
+  }
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
   end_date <- as.Date(x_end, origin = "1970-01-01")
-  date_reg <- seq(from = range(prod_df.reg$Datum)[1], to = as.Date(x_end, origin = "1970-01-01"), by = 'day')
+  date_reg <- seq(from = last.refill, to = end_date, by = 'day')
+  #x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
-  x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   
-  if (graphics == FALSE) return(list(x_20procent, end_date))
+  four_weeks <- as.Date(as.character(end_date)) %m-% months(1)
+  
+  if (graphics == FALSE) return(list(four_weeks, end_date))
   
   
   # calculate loess #
@@ -139,11 +152,12 @@ fun_reg <- function(product,
   lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
   lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
   lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-  abline(v = x_20procent, lty=3, col = col_20)
+  abline(v = four_weeks, lty=3, col = col_20)
   par(col.axis = col_20)
-  axis(side = 1, at = x_20procent, labels = conv.date(x_20procent), col.ticks = col_20)
-  abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
-  text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
+  axis(side = 1, at = four_weeks, labels = conv.date(four_weeks), col.ticks = col_20)
+  # other solution: four_weeks warning instead of 20%
+  # abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
+  # text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
   par(col.axis = "black")
   
   # make the legend
@@ -152,18 +166,18 @@ fun_reg <- function(product,
   
   # write/draw x-axis
   # do the writing, but first check where is x_20procent!
-  day_in_num <- c(as.numeric(day(x_20procent)),
-                  as.numeric(month(x_20procent)),
-                  as.numeric(year(x_20procent)))
+  day_in_num <- c(as.numeric(day(four_weeks)),
+                  as.numeric(month(four_weeks)),
+                  as.numeric(year(four_weeks)))
   pos.days <- c(1:31)
   
-  if (day(x_20procent) %in% pos.days[1:15]) {
+  if (day(four_weeks) %in% pos.days[1:15]) {
     without <- which(month(date1st) == day_in_num[2] & as.numeric(year(date1st)) == day_in_num[3])
-    if (day(x_20procent) %in% pos.days[c(14,15)]) without <- c(without, without + 1)
+    if (day(four_weeks) %in% pos.days[c(14,15)]) without <- c(without, without + 1)
     }
-  if (day(x_20procent) %in% pos.days[16:31]) {
+  if (day(four_weeks) %in% pos.days[16:31]) {
     without <- which(month(date1st) == day_in_num[2] & as.numeric(year(date1st)) == day_in_num[3]) + 1
-    if (day(x_20procent) %in% pos.days[16]) without <- c(without - 1, without)
+    if (day(four_weeks) %in% pos.days[16]) without <- c(without - 1, without)
   }
   axis(1, at=date1st[-without], labels=month.abb[month(as.POSIXlt(date1st[-without], format="%Y-%m-%d"))])
 }
