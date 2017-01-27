@@ -84,6 +84,17 @@ rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list)
 
 
 #########
+## erstmal alle Produkte ##
+alle <- levels(kornumsatz$Produkt)
+
+# müssen nochmal überprüft werden, Stand 27.01.2017:
+# Bugs: BratoelDavert, Gemüsebrühe, Getrocknetes Gemüse, Grünkern, Hafer, Roggen
+# Bugs: Haselnüsse geschält, Kaffee roh, Mepfel Pfeffer Schwarz Ganz,Polenta, Rote Beete Merretich
+# Bugs: Saft Apfel, Saft Apfel-Birne, Saft Apfel-Möhre, Sendi, SEnf MAngo, Sesam, Spaghetti, Spüli Maschine
+# Bugs: Waschmittel Lavendel, Waschmittel Sensitiv, Weizen
+# sind komisch aus: Buchweizenmehl, Aufstriche, Kaffee, Zwiebelschmelz
+# spannend: Cashews
+# schön zu sehen: Waschmittel Pulver, 
 
 #### Aufgesplittet nach Produktart ####
 Huelsenfruechte <- c("Beluglinsen", "Bohnen", "Bohnen Borlotti", "Borlottibohnen", "Braune Linsen", "Linsen Beluga", "Linsen Braun", "Rote Linsen", "Rote Linsen Neu", "Tellerlinsen")

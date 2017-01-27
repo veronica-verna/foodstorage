@@ -161,7 +161,10 @@ fun_reg <- function(product,
   par(col.axis = "black")
   
   # make the legend
-  legend("topright", col = c("black", "green"), legend = c("Bereits geschehen", "Zukunftsprognose"), lty = c(1,1), lwd =c(2,2))
+  legend("topright", 
+         col = c("black", "green", "red"), 
+         legend = c("Bereits geschehen", "Zukunftsprognose", "4 Wochen vor Ende"), 
+         lty = c(1,1,3), lwd =c(2,2,2))
   
   
   # write/draw x-axis
