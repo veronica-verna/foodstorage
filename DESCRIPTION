@@ -7,4 +7,6 @@ Depends: R (>= 3.0.0)
 License: GPL
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 6.0.0
+Import: lubridate (>= 1.6.0), shiny (>= 0.14.2)
+Suggests: testthat

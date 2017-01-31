@@ -1,4 +1,30 @@
-### function for calculating a regression ###
+#' function for calculating a regression 
+#' 
+#' @param product Need to be a character string
+#' @param from As default plot will be generated for the last year
+#' @param to As default end of time serie is the date of last backup import
+#' @param graphics logical. If it's true, a plot will be the result. Otherwise a dataframe containing dates
+#' @param type Choose type how points shall be drawn. Visible as default. 
+#' @param col_points If points are drawn, choose color here. Default is grey.
+#' @param pch same as usual... As default filled points are drawn.
+#' @param main_header Not necessary, but it's recommended for German language
+#' @param ylab As default 'food storage in kilo' in German
+#' @param xlab Can be choosen, but not necessary. It's generated automatically
+#' @param las Of course numbers of y-axis are rotated about 90 degrees
+#' @param col_reg Optional: Choose regression line's color
+#' @param col_conv Optional: Choose color of lines of confidential interval
+#' @param col_20 Optional: Choose 'run-out' line's color
+#' @param col_past Optional: Choose the color for loess line
+#' @param smoother At this moment there is implemented only loess
+#' @param span Attributes for loess. As default it's set as 0.1
+#' @param degree As default it's 1
+#' @param lwd Three numbers in one vector are necessary. Order is loess-regression-conf.interval
+#' @param lty Same as lwd
+#' @param nec.dates How many days do you want at least for calculating a regression?
+#' @param more.than Important for correct giving data. Default should be ok
+#' @return If graphics is true (default), the result will be a plot. X-axis consists of a time serie, y-axis consists of the daily food storage. If graphics is false, a list is spewed containing two dates: The second one is the date, when your storage will run out of the giving product. And the first one is the date four weeks before end.
+#' 
+
 
 fun_reg <- function(product,
                     from = "",
@@ -24,45 +50,7 @@ fun_reg <- function(product,
                     more.than = 15) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  prod_df <- prepare(product, "regression", from = from, to = to, more.than = more.than)
-  
-  # get 70% of VPE
-  procent70 <- prod_df$VPE[1] * 0.7
-  procent20 <- prod_df$VPE[1] * 0.2
-  # only refill of storage
-  # how many refills do we have?
-  num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
-  if (num_refill == 0) {
-    # if storage isn't refilled take the highest point of storage in this time
-    highest_storage <- prod_df[max(prod_df$Warenbestand), ]$Datum
-    # how much data do we have above 20%
-    above_20_procent <- nrow(prod_df[prod_df$MengeDif > procent20, ])
-    if (above_20_procent > nec.dates) {
-      last.refill <- highest_storage
-      prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
-    } else stop("too less data for calculation a regression")
-  } else {
-    # normal usecase: Last refill is older than 10 days
-    last.refill <- prod_df[prod_df$MengeDif > procent70, ][num_refill,]$Datum
-    prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
-    
-    # But take the refill before because there are too less dates since the storage was refilled the last time
-    if (last.refill >= prod_df[nrow(prod_df), ]$Datum - nec.dates) {
-      # Is there another refill before?
-      if (num_refill > 1) {
-        used.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
-        prod_df.reg <- prod_df[prod_df$Datum >= used.refill & prod_df$Datum < last.refill, ]
-      } else stop("There are too less dates for only one existing 'refill'")
-    }
-  }
-  #return(tail(prod_df_reg))
-  if (0 %in% prod_df.reg$Warenbestand) {
-    storage.is.zero <- prod_df.reg[prod_df.reg$Warenbestand == 0 & prod_df.reg$MengeDif != 0,]$Datum
-    pos.dates <- seq(from = storage.is.zero, to = storage.is.zero + more.than, by = 'day')
-    dif.storage <- unique(prod_df.reg[which(prod_df.reg$Datum %in% pos.dates), ]$Warenbestand)
-    if (length(dif.storage) != 1) stop("There is a mistake")
-    prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero, ]
-  } 
+  prod_df.reg <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)
   
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
