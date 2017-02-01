@@ -104,8 +104,11 @@ prepare <- function(name.of.product,
       ## make the '5% correction' ##
       if (what.plotting == "regression") {
         Prozent5 <- correction * VPE
+        # evaluating candidates for 'correcting operation': storage below 5 percent (--> probably booking error)
         candidates <- sortbydays[abs(sortbydays$Bestand_Einheit) < Prozent5,]
+        # how many candidates do we have?
         candidates_dif <- unique(candidates$Bestand_Einheit)
+        # only filter those who stay at the same food storage for 'more.than' 15 (default) days
         dates <- as.Date(character())
         for (i in 1:length(candidates_dif)) {
           if (nrow(candidates[candidates$Bestand_Einheit == candidates_dif[i],]) > more.than) {
@@ -113,17 +116,18 @@ prepare <- function(name.of.product,
             dates <- c(dates, dates_new)
           }
         }
+        # and how many different candidates do we have now?
         dif.storage <- unique(candidates[which(candidates$Datum %in% dates),]$Bestand_Einheit)
         for (i in 1:length(dif.storage)) {
-          MengeKum <- candidates[which(candidates$Datum %in% dates) & candidates$Bestand_Einheit == dif.storage[i],]$MengeKum[1]
+          MengeKum <- candidates[which(candidates$Datum %in% dates & candidates$Bestand_Einheit == dif.storage[i]) ,]$MengeKum[1]
           
           # 4 possibilities, but result is the same
            # case: storage was refilled, but too much -> MengeKum gets smaller
            # case: storage was refilled, but too less --> MengeKum gets bigger
            # case: storage was cleared, but too much
            # case: storage was cleared, but too less
-          sortbydays[which(sortbydays$Datum %in% dates) & sortbydays$Bestand_Einheit == dif.storage[i],]$MengeKum[1] <- MengeKum - dif.storage[i]
-          sortbydays[which(sortbydays$Datum %in% dates) & sortbydays$Bestand_Einheit == dif.storage[i],]$Bestand_Einheit <- 0
+          sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
+          sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
         }
         
       }

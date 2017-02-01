@@ -24,7 +24,7 @@ OBEG <- c("Apfelessig", "Haferflocken", "Kürbiskerne", "Leinsamen", "Rapsöl", 
 HakumaFood <- c("Senf Kirsche", "Senf Sarepta", "Senf Mango")
 HofgutStorzeln <- c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja")
 HofgutUnterbach <- c("Haselnüsse geschält", "Walnüsse")
-Erich <- c("Honig")
+Erik <- c("Honig")
 Cashew4you <- c("Cashews")
 Sonett <- as.character(c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv"))
 ElephantBeans <- c("Espresso", "Kaffee")
@@ -34,7 +34,7 @@ Wolfgang <- c("Bohnen", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "
 Grosshandel <- c("Basilikum", "Basitom", "Basmati.Braun", "Basmati.Weiß", "Blaumohn", "BratoelDavert", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Grünkern", "Hirse.Gold", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Linsen.Rot", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Salz", "Samba", "Schwarzkümmel", "Sendi", "Senfkörner", "Sesam", "Thymian", "VollkornreisItalien", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
 SahanaEliya <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner Ganz", "Zimt Ganz", "Zimt Gemahlen")
 
-lieferanten <- list(BioHofLex, Erich, Luzernenhof, OBEG, HakumaFood, HofgutStorzeln, HofgutUnterbach, Sonett, ElephantBeans, Naturata, Sonnenobst, Wolfgang, Großhandel, NepalVerein)
+lieferanten <- c(BioHofLex, Erik, Luzernenhof, OBEG, HakumaFood, HofgutStorzeln, HofgutUnterbach, Sonett, ElephantBeans, Naturata, Sonnenobst, Wolfgang, Bode, SehanaEliya)
 
 lieferanten_namen <- c(deparse(substitute(BioHofLex)), deparse(substitute(Erich)), deparse(substitute(Luzernenhof)), deparse(substitute(OBEG)), deparse(substitute(HakumaFood)), deparse(substitute(HofgutStorzeln)), deparse(substitute(HofgutUnterbach)), deparse(substitute(Sonett)), deparse(substitute(ElephantBeans)), deparse(substitute(Naturata)), deparse(substitute(Sonnenobst)), deparse(substitute(Wolfgang)), deparse(substitute(Großhandel)), deparse(substitute(NepalVerein)), deparse(substitute(Cashew4you)), deparse(substitute(spanischeKoop)))
 verzehr_sum <- numeric()

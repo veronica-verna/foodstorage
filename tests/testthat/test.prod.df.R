@@ -11,3 +11,22 @@ for (i in 1:length(alle)) {
 }
 
 
+for (i in 1:length(alle)) {
+  print(alle[i])
+  if (is.list(prod.df.reg(alle[i])) == FALSE) next
+}
+
+list.of.works <- vector("list", length(alle))
+for (i in 1:length(alle)) {
+  list.of.works[i] <- try(prod.df.reg(alle[i]))
+}
+
+class(list.of.works[[]])
+list.of.works[which(class(list.of.works) == "character")]
+sapply(list.of.works, "[[", is.character())
+### exception handling
+inputs = list(1, 2, 4, -5, 'oops', 0, 10)
+
+(for(input in inputs) {
+  print(paste("log of", input, "=", log(input)))
+}

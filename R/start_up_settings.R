@@ -25,7 +25,7 @@ startup.settings <- function(table) {
                            VollkornreisItalien = c("Arborio Reis", "Rundkornreis"), 
                            BratoelDavert = c("Back-/Bratöl, EU"), 
                            Basmati.Braun = c("Basmati Braun", "brauner Basmati", "Langkornreis Natur"),
-                           Basmati.Weiß = c("Basmati Weiß", "weißer Basmati"),
+                           Basmati.Weiss = c("Basmati Weiß", "weißer Basmati"),
                            Bohnen = c("Bohnen", "Bohnen Borlotti", "Borlottibohnen"), 
                            Drink.Dinkel = c("Dinkel Drink", "Drink Dinkel"),
                            Drink.Hafer = c("Drink Hafer", "Hafer Drink"),
