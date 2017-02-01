@@ -12,8 +12,8 @@ prepare <- function(name.of.product,
                     more.than = 15) {
   
   ##### at first: check if the input is correct! ####
-    # for is.Date; cheeck if vec.of.Dates is a Date 
-    require(lubridate) 
+    require(lubridate)
+    # for is.Date; cheeck if vec.of.Dates is a Date
     if (is.Date(vec.of.Dates) == FALSE) 
       stop("Your vector of Dates has to be in format as.Date()")
   

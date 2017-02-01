@@ -50,7 +50,9 @@ fun_reg <- function(product,
                     more.than = 15) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  prod_df.reg <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)
+  prod_df <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big
+  prod_df.reg <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df
+  last.refill <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$last.refill
   
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
