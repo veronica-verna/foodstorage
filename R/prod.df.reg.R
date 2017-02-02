@@ -1,6 +1,6 @@
 ### function to generate the dataframe you need for calculating the regression ####
 
-prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates = 10, refill.percent = 0.7, data.num.percent = 0.2) {
+prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates = 10, refill.percent = 0.7, data.num.percent = 0.2, works = FALSE) {
   
   prod_df <- prepare(name.of.product = product, "regression", from = from, to = to, more.than = more.than)
   
@@ -41,5 +41,6 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
     if (length(dif.storage) != 1) stop("There is a mistake")
     prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero, ]
   }
+  if (works == TRUE) return("yes")
   return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill))
 }

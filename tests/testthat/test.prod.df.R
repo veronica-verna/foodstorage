@@ -17,9 +17,15 @@ for (i in 1:length(alle)) {
 }
 
 list.of.works <- vector("list", length(alle))
+names(list.of.works) <- alle
 for (i in 1:length(alle)) {
-  list.of.works[i] <- try(prod.df.reg(alle[i]))
+  if (try(prod.df.reg(alle[i], works = TRUE)) == "yes") {
+    list.of.works <- list.of.works[-i]
+  }
+  list.of.works[i] <- try(prod.df.reg(alle[i], works = TRUE))
 }
+list.of.works[[which()]]
+
 
 class(list.of.works[[]])
 list.of.works[which(class(list.of.works) == "character")]
