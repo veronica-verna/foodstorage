@@ -12,8 +12,16 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
     Produkt <- c()
     
     for (i in 1:len) {
-      table[i, ] <- fun_reg(group[i], graphics = FALSE)
-      Produkt <- c(Produkt, group[i])
+      # ERROR HANDLING
+      possibleError <- tryCatch(fun_reg(group[i], graphics = FALSE), error = function(e) e)
+      
+      if (!inherits(possibleError, "error")) {
+        # REAL WORK
+        table[i, ] <- fun_reg(group[i], graphics = FALSE)
+        Produkt <- c(Produkt, group[i])
+      }
+      
+      
     }
     
     table <- cbind(Produkt, table)

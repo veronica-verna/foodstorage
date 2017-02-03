@@ -72,8 +72,13 @@ fun_reg <- function(product,
   #storage.at.end <- prod_df.reg$Warenbestand[prod_df.reg$Datum == as.character(end_date)]
   if (prod_df.reg$Warenbestand[nrow(prod_df.reg)] == 0) {
     date_reg <- seq(from = last.refill, to = end_date, by = 'day')
-  } else date_reg <- seq(from = prod_df$Datum[nrow(prod_df)], to = end_date, by = 'day')
-  
+  } else {
+    if (end_date > prod_df$Datum[nrow(prod_df)]) {
+      date_reg <- seq(from = prod_df$Datum[nrow(prod_df)], to = end_date, by = 'day')
+    } else {
+      date_reg <- seq(from = last.refill, to = prod_df$Datum[nrow(prod_df)], by = 'day')
+    }
+  }
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   
   four_weeks <- as.Date(as.character(end_date)) %m-% months(1)
