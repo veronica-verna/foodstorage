@@ -6,6 +6,7 @@ conv.date <- function (date) {
   
   day_nr <- as.character(day(date))
   mon_word <- month.abb[month(date)]
+  year_nr <- year(date)
   
-  return(paste(day_nr, mon_word, sep = ". "))
+  return(paste(paste(day_nr, mon_word, sep = ". "),year_nr))
 }

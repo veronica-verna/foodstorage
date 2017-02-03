@@ -42,5 +42,6 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
     prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero, ]
   }
   if (test == TRUE) return("yes")
+  if (exists("used.refill") == TRUE) return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill, used.refill = used.refill))
   return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill))
 }

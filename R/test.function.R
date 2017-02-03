@@ -14,5 +14,5 @@ test.functions <- function(fun, products = levels(kornumsatz$Produkt)) {
     }  
   }
   if (length(list.of.errors) == 0) return("everything works")
-  tryCatch(return(list.of.errors), error = function(e) {})
+  return(list.of.errors)
 }
