@@ -22,6 +22,7 @@
 #' @param lty Same as lwd
 #' @param nec.dates How many days do you want at least for calculating a regression?
 #' @param more.than Important for correct giving data. Default should be ok
+#' @param test logical. If TRUE you can test fun_reg by test_function {foodstorage}
 #' @return If graphics is true (default), the result will be a plot. X-axis consists of a time serie, y-axis consists of the daily food storage. If graphics is false, a list is spewed containing two dates: The second one is the date, when your storage will run out of the giving product. And the first one is the date four weeks before end.
 #' 
 
@@ -47,7 +48,8 @@ fun_reg <- function(product,
                     lwd = c(2,2,1),
                     lty = c(1,1,2),
                     nec.dates = 10,
-                    more.than = 15) {
+                    more.than = 15,
+                    test = FALSE) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   prod_df <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big
@@ -108,7 +110,8 @@ fun_reg <- function(product,
     }
   }
   par(col.axis = "black")
-  if (main_header == "") {
+  if (test == FALSE) {
+    if (main_header == "") {
     plot(prod_df$Datum, 
          prod_df$Warenbestand,
          type = type, 
@@ -122,39 +125,41 @@ fun_reg <- function(product,
          xlim = c(range(prod_df$Datum)[1], x_end),
          main = paste("Warenbestand von", product))
     warning("Your plot will look better if you fill 'main_header'")
-  } else {
-    plot(prod_df$Datum, 
-         prod_df$Warenbestand,
-         type = type, 
-         pch = pch,
-         col = col_points,
-         xaxt = "n",
-         xlab = xlab, 
-         ylab = ylab, 
-         las = las, 
-         ylim = c(0, range(prod_df$Warenbestand)[2] + 3), 
-         xlim = c(range(prod_df$Datum)[1], x_end),
-         main = paste("Warenbestand von", main_header))
+    } else {
+      plot(prod_df$Datum, 
+           prod_df$Warenbestand,
+           type = type, 
+           pch = pch,
+           col = col_points,
+           xaxt = "n",
+           xlab = xlab, 
+           ylab = ylab, 
+           las = las, 
+           ylim = c(0, range(prod_df$Warenbestand)[2] + 3), 
+           xlim = c(range(prod_df$Datum)[1], x_end),
+           main = paste("Warenbestand von", main_header))
+    }
+    # at first draw loess #
+    lines(x = prod_df$Datum, y = preds_lo, col = col_past, lwd = lwd[1], lty = lty[1])
+    # and now the regression #
+    lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
+    lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
+    lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
+    abline(v = four_weeks, lty=3, col = col_20)
+    par(col.axis = col_20)
+    axis(side = 1, at = four_weeks, labels = conv.date(four_weeks), col.ticks = col_20)
+    # other solution: four_weeks warning instead of 20%
+    # abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
+    # text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
+    par(col.axis = "black")
+    
+    # make the legend
+    legend("topright", 
+           col = c("black", "green", "red"), 
+           legend = c("Bereits geschehen", "Zukunftsprognose", "4 Wochen vor Ende"), 
+           lty = c(1,1,3), lwd =c(2,2,2))
   }
-  # at first draw loess #
-  lines(x = prod_df$Datum, y = preds_lo, col = col_past, lwd = lwd[1], lty = lty[1])
-  # and now the regression #
-  lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
-  lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-  lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-  abline(v = four_weeks, lty=3, col = col_20)
-  par(col.axis = col_20)
-  axis(side = 1, at = four_weeks, labels = conv.date(four_weeks), col.ticks = col_20)
-  # other solution: four_weeks warning instead of 20%
-  # abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
-  # text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
-  par(col.axis = "black")
   
-  # make the legend
-  legend("topright", 
-         col = c("black", "green", "red"), 
-         legend = c("Bereits geschehen", "Zukunftsprognose", "4 Wochen vor Ende"), 
-         lty = c(1,1,3), lwd =c(2,2,2))
   
   
   # write/draw x-axis
@@ -172,5 +177,8 @@ fun_reg <- function(product,
     without <- which(month(date1st) == day_in_num[2] & as.numeric(year(date1st)) == day_in_num[3]) + 1
     if (day(four_weeks) %in% pos.days[16]) without <- c(without - 1, without)
   }
-  axis(1, at=date1st[-without], labels=month.abb[month(as.POSIXlt(date1st[-without], format="%Y-%m-%d"))])
+  if (test == FALSE) axis(1, at=date1st[-without], labels=month.abb[month(as.POSIXlt(date1st[-without], format="%Y-%m-%d"))])
+  
+  ## test case
+  if (test == TRUE) return("yes")
 }

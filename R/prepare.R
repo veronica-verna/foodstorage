@@ -9,7 +9,8 @@ prepare <- function(name.of.product,
                     from = "",
                     to = "",
                     correction = 0.05, 
-                    more.than = 15) {
+                    more.than = 15,
+                    test = FALSE) {
   
   ##### at first: check if the input is correct! ####
     require(lubridate)
@@ -180,6 +181,7 @@ prepare <- function(name.of.product,
         }
       }
       
+      if (test == TRUE) return("yes")
       return(table)
       
   } # one product - consumption | food.storage | both | regression 
