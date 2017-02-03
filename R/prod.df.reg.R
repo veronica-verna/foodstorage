@@ -36,10 +36,11 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
   #return(tail(prod_df_reg))
   if (0 %in% prod_df.reg$Warenbestand) {
     storage.is.zero <- prod_df.reg[prod_df.reg$Warenbestand == 0 & prod_df.reg$MengeDif != 0,]$Datum
-    pos.dates <- seq(from = storage.is.zero, to = storage.is.zero + more.than, by = 'day')
+    pos.dates <- seq(from = storage.is.zero[1], to = storage.is.zero[1] + more.than, by = 'day')
     dif.storage <- unique(prod_df.reg[which(prod_df.reg$Datum %in% pos.dates), ]$Warenbestand)
     if (length(dif.storage) != 1) stop("There is a mistake")
-    prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero, ]
+    prod_df.reg <- prod_df.reg[prod_df.reg$Datum <= storage.is.zero[1], ]
+    if (length(storage.is.zero) != 1) warning("Since the last refill, more than one time storage is empty for at least 15 days")
   }
   if (test == TRUE) return("yes")
   if (exists("used.refill") == TRUE) return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill, used.refill = used.refill))

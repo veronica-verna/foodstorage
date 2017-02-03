@@ -119,18 +119,19 @@ prepare <- function(name.of.product,
         }
         # and how many different candidates do we have now?
         dif.storage <- unique(candidates[which(candidates$Datum %in% dates),]$Bestand_Einheit)
-        for (i in 1:length(dif.storage)) {
-          MengeKum <- candidates[which(candidates$Datum %in% dates & candidates$Bestand_Einheit == dif.storage[i]) ,]$MengeKum[1]
-          
-          # 4 possibilities, but result is the same
-           # case: storage was refilled, but too much -> MengeKum gets smaller
-           # case: storage was refilled, but too less --> MengeKum gets bigger
-           # case: storage was cleared, but too much
-           # case: storage was cleared, but too less
-          sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
-          sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
+        if (length(dif.storage) != 0) {
+          for (i in 1:length(dif.storage)) {
+            MengeKum <- candidates[which(candidates$Datum %in% dates & candidates$Bestand_Einheit == dif.storage[i]) ,]$MengeKum[1]
+            
+            # 4 possibilities, but result is the same
+            # case: storage was refilled, but too much -> MengeKum gets smaller
+            # case: storage was refilled, but too less --> MengeKum gets bigger
+            # case: storage was cleared, but too much
+            # case: storage was cleared, but too less
+            sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
+            sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
+          }
         }
-        
       }
          
     #### Create the consumption ####

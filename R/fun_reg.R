@@ -53,11 +53,12 @@ fun_reg <- function(product,
                     test_pred = FALSE) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  prod_df <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big
-  prod_df.reg <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df
-  last.refill <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$last.refill
+  # one warning for the same is enough
+  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big)
+  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df)
+  last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$last.refill) 
   if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)) == 4) {
-    used.refill <- prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$used.refill
+    used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$used.refill)
   }
   
   # calculate regression #
@@ -68,7 +69,8 @@ fun_reg <- function(product,
   }
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
   end_date <- as.Date(x_end, origin = "1970-01-01")
-  date_reg <- seq(from = prod_df$Datum[nrow(prod_df)], to = end_date, by = 'day')
+  storage.at.end <- prod_df.reg$Warenbestand[prod_df.reg$Datum == as.character(end_date)]
+  date_reg <- seq(from = last.refill, to = end_date, by = 'day')
   #x_20procent <- as.Date((0.2 * prod_df.reg$Warenbestand[1] - fm_reg$coefficients[1]) / fm_reg$coefficients[2], origin = "1970-01-01")
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   
@@ -144,11 +146,21 @@ fun_reg <- function(product,
     }
     # at first draw loess #
     lines(x = prod_df$Datum, y = preds_lo, col = col_past, lwd = lwd[1], lty = lty[1])
-    # and now the regression for the future#
-    lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
-    lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-    lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
-    abline(v = four_weeks, lty=3, col = col_20)
+    # and now the regression for the future, but only if there is a future...
+    if (length(storage.at.end) == 0) {
+      date_reg <- seq(from = prod_df$Datum[nrow(prod_df)], to = end_date, by = 'day')
+      preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
+      lines(x = date_reg, y = preds_reg$fit, col = col_reg, lty = lty[2], lwd = lwd[2])
+      lines(x = date_reg, y = preds_reg$fit + 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
+      lines(x = date_reg, y = preds_reg$fit - 2 * preds_reg$se.fit, lty = lty[3], lwd = lwd[3], col = col_conv)
+      abline(v = four_weeks, lty=3, col = col_20)
+      # make the legend
+      legend("topright", 
+             col = c(col_past, col_reg, col_20, col_20), 
+             legend = c("Bereits geschehen", "Zukunftsprognose", "4 Wochen vor Ende", as.character(conv.date(four_weeks))), 
+             lty = c(1,1,3, 0), lwd =c(2,2,2,0), pch = c(NA,NA,NA,25), pt.bg = col_20)
+    }
+    
     #par(col.axis = col_20)
     #axis(side = 1, at = four_weeks, labels = conv.date(four_weeks), col.ticks = col_20)
     # other solution: four_weeks warning instead of 20%
@@ -156,11 +168,7 @@ fun_reg <- function(product,
     # text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
     par(col.axis = "black")
     
-    # make the legend
-    legend("topright", 
-           col = c(col_past, col_reg, col_20, col_20), 
-           legend = c("Bereits geschehen", "Zukunftsprognose", "4 Wochen vor Ende", as.character(conv.date(four_weeks))), 
-           lty = c(1,1,3, 0), lwd =c(2,2,2,0), pch = c(NA,NA,NA,25), pt.bg = col_20)
+    
   }
   
   
