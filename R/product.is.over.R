@@ -24,7 +24,7 @@ product.is.over <- function(product) {
       #message("Here's the original error message:")
       #nachricht <- message(cond)
       # Choose a return value in case of error
-      return(list(product, cond))
+      return(list(product, cond$call, cond$message))
     },
     warning=function(cond) {
       message(paste("PRODUCT caused a warning:", product))
