@@ -82,7 +82,7 @@ fun_reg <- function(product,
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   
   four_weeks <- as.Date(as.character(end_date)) %m-% months(1)
-  if (graphics == FALSE) return(list(four_weeks, end_date))
+  if (graphics == FALSE) return(data.frame(Produkt = product, Noch4Wochen = four_weeks, Ende = end_date))
   
   
   # calculate loess #

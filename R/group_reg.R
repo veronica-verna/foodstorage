@@ -8,22 +8,19 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
   
   if (len > 12 | list == TRUE) {
     # create an empty data.frame and empty name vector
-    table <- data.frame(Noch4Wochen = as.Date(character()), Ende = as.Date(character()))
-    Produkt <- c()
-    
+    table <- data.frame(Produkt = character(), Noch4Wochen = as.Date(character()), Ende = as.Date(character()))
+    big.list <- lapply(group, product.is.over)
+    all.errors <- vector("list", length = 0)
+    # seperate 'works' from 'errors'
     for (i in 1:len) {
-      # ERROR HANDLING
-      possibleError <- tryCatch(fun_reg(group[i], graphics = FALSE), error = function(e) e)
-      
-      if (!inherits(possibleError, "error")) {
-        # REAL WORK
-        table[i, ] <- fun_reg(group[i], graphics = FALSE)
-        Produkt <- c(Produkt, group[i])
+      if (is.data.frame(big.list[[i]]) == TRUE) {
+        table <- rbind(table, big.list[[i]])
+      } else {
+        all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
-      
-      
     }
-    
+    # next step: which different errors do we have and give each of them a number
+    dif.errors <- unique(all.errors)
     table <- cbind(Produkt, table)
     
     return(table)

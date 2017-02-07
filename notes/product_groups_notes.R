@@ -31,8 +31,8 @@ ElephantBeans <- c("Espresso", "Kaffee")
 Sonnenobst <- c("Getrocknetes.Gemuese")
 Naturata <- c("Gemüsebrühe", "Kokosfett", "Nudeln", "Olivenöl", "Spaghetti", "Tomatenmark", "Tomatenpassata", "Zucker")
 Wolfgang <- c("Bohnen", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
-Grosshandel <- c("Basilikum", "Basitom", "Basmati.Braun", "Basmati.Weiß", "Blaumohn", "BratoelDavert", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Grünkern", "Hirse.Gold", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Linsen.Rot", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Salz", "Samba", "Schwarzkümmel", "Sendi", "Senfkörner", "Sesam", "Thymian", "VollkornreisItalien", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
-SahanaEliya <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner Ganz", "Zimt Ganz", "Zimt Gemahlen")
+Grosshandel <- c("Basilikum", "Basitom", "Basmati.Braun", "Basmati.Weiss", "Blaumohn", "BratoelDavert", "Buchweizenmehl", "Couscous", "Currychini", "Erdnussmus", "Grünkern", "Hirse.Gold", "Kichererbsen", "Kräuter der Provence", "Kümmel", "Linsen.Rot", "Mandelmus", "Mepfel", "Oregano", "Paprika Edelsüß", "Risottoreis", "Rosinen", "Rosmarin", "Rote Beete Meerettich", "Salz", "Samba", "Schwarzkümmel", "Sendi", "Senfkörner", "Sesam", "Thymian", "VollkornreisItalien", "Zwiebelschmelz") # SB-Kerne + Zimt Gemahlen, evtl Sesam
+SahanaEliya <- c("Bockshornklee Ganz", "Chilli Gemahlen", "Ingwer Gemahlen", "Kaffee roh", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kurkuma Gemahlen", "Pfeffer Schwarz Ganz", "Senfkörner", "Zimt Ganz", "Zimt Gemahlen")
 
 lieferanten <- c(BioHofLex, Erik, Luzernenhof, OBEG, HakumaFood, HofgutStorzeln, HofgutUnterbach, Sonett, ElephantBeans, Naturata, Sonnenobst, Wolfgang, Bode, SehanaEliya)
 
