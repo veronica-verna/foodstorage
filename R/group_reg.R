@@ -19,18 +19,32 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
     }
+    # now first output is finished: table.works
     # next step: which different errors do we have and give each of them a number
-    dif.error.calls <- unique(unlist(lapply(all.errors, '[[', 2)))
+    all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2)))
+    dif.error.calls <- unique(all.error.calls)
     dif.error.messages <- unique(unlist(lapply(all.errors, '[[', 3)))
-    table.errors <- data.frame(Produkt = character(), error.call = character(), error.message = character())
+    
     ## put error categories in a table!
+    products <- unlist(lapply(all.errors, '[[', 1))
+    call.vector <- character()
+    message.vector <- character()
     for (i in 1:length(all.errors)) {
-      table.errors[i, 1] <- all.errors[[i]][[1]]
+      call.vector[i] <- paste0("Call", which(dif.error.calls %in% all.error.calls[i]))
+      message.vector[i] <- paste0("Message", which(dif.error.messages %in% all.errors[[i]][[3]])) 
     }
+    table.errors <- data.frame(Produkt = products, error.call = call.vector, error.message = message.vector)
+    # now second output is finished: table.errors
+    # next step: make a legend
+    dif.calls <- unique(call.vector)
+    dif.messages <- unique(message.vector)
+    calls <- vector('list', 0)
+    messages <- vector('list', 0)
+    for (i in 1:length(dif.error.calls)) calls[length(calls) + 1] <- paste(dif.calls[i], dif.error.calls[i], sep = " = ")
+    for (i in 1:length(dif.error.messages)) messages[length(messages) + 1] <- paste(dif.messages[i], dif.error.messages[i], sep = " = ")
+    legend <- list(calls = calls, messages = messages) # and that's the last output
     
-    table <- cbind(Produkt, table)
-    
-    return(table)
+    return(list(Funktioniert = table.works, Fehler = table.errors, FehlerLegende = legend))
   } 
   
   ### plot-window settings ###
@@ -40,5 +54,5 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
   
   # now plotting ##
   for (i in 1:len) fun_reg(group[i], from = from, to = to)
-  par(mfrow = c(1,1))
+  par(mfrow = c(1,1)) # for resetting settings
 }
