@@ -1,6 +1,6 @@
 #### function for calculating regressions for groups ####
 
-group_reg <- function(group, from = "", to = "", list = FALSE) {
+group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4) {
   
   len <- length(group)
   
@@ -8,20 +8,27 @@ group_reg <- function(group, from = "", to = "", list = FALSE) {
   
   if (len > 12 | list == TRUE) {
     # create an empty data.frame and empty name vector
-    table.works <- data.frame(Produkt = character(), Noch4Wochen = as.Date(character()), Ende = as.Date(character()))
+    table.works <- data.frame(Produkt = character(), 
+                              Noch4Wochen = as.Date(character()), 
+                              Ende = as.Date(character()), 
+                              LetzterDatenpunkt = as.Date(character()))
     big.list <- lapply(group, product.is.over)
     all.errors <- vector("list", length = 0)
     # seperate 'works' from 'errors'
     for (i in 1:len) {
-      if (is.data.frame(big.list[[i]]) == TRUE) {
+      if (is.data.frame(big.list[[i]]) == TRUE) { # data.frame, because 'works' returns a data.frame with 3 columns
         table.works <- rbind(table.works, big.list[[i]])
       } else {
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
     }
-    # now first output is finished: table.works
+    # now first output is finished: table.works; but: filter only the important one
+    if (filter == TRUE) {
+      last.data.point <- max(table.works$LetzterDatenpunkt) # counts 4 weeks beginning from the last data point
+      table.works[table.works$Ende <]
+    }
     # next step: which different errors do we have and give each of them a number
-    all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2)))
+    all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2))) # seperate calls and change them to character
     dif.error.calls <- unique(all.error.calls)
     dif.error.messages <- unique(unlist(lapply(all.errors, '[[', 3)))
     

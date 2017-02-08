@@ -53,9 +53,9 @@ fun_reg <- function(product,
                     test_pred = FALSE) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
-  # one warning for the same is enough
-  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big)
-  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df)
+  # one warning for the same is enough -> suppresWarnings
+  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big) # data points
+  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df) # data.frame since last refill
   last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$last.refill) 
   if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)) == 4) {
     used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$used.refill)
@@ -82,7 +82,10 @@ fun_reg <- function(product,
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   
   four_weeks <- as.Date(as.character(end_date)) %m-% months(1)
-  if (graphics == FALSE) return(data.frame(Produkt = product, Noch4Wochen = four_weeks, Ende = end_date))
+  if (graphics == FALSE) return(data.frame(Produkt = product, 
+                                           Noch4Wochen = four_weeks, 
+                                           Ende = end_date,
+                                           LetzterDatenpunkt = prod_df$Datum[nrow(prod_df)]))
   
   
   # calculate loess #
