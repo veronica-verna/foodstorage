@@ -12,9 +12,9 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
   num_refill <- nrow(prod_df[prod_df$MengeDif > procent70, ])
   if (num_refill == 0) {
     # if storage isn't refilled take the highest point of storage in this time
-    highest_storage <- prod_df[max(prod_df$Warenbestand), ]$Datum
+    highest_storage <- prod_df[which(prod_df$Warenbestand == max(prod_df$Warenbestand)),]$Datum[1]
     # how much data do we have above 20%
-    above_20_procent <- nrow(prod_df[prod_df$MengeDif > procent20, ])
+    above_20_procent <- nrow(prod_df[prod_df$Warenbestand > procent20, ])
     if (above_20_procent > nec.dates) {
       last.refill <- highest_storage
       prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]

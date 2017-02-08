@@ -2,7 +2,6 @@ prepare <- function(name.of.product,
                     what.plotting = "regression",
                     vec.of.products = kornumsatz$Produkt,
                     vec.of.Dates  = kornumsatz$Datum,
-                    vec.of.names = lieferanten_namen,
                     plotting.options = list(comul.change = kornumsatz$MengeKum,
                                             food.storage = kornumsatz$Bestand_Einheit,
                                             VPE = kornumsatz$VPE),
@@ -174,14 +173,16 @@ prepare <- function(name.of.product,
         if (is.character(from) == FALSE) stop("'From' must be a character string in format 'yyyy-mm-dd'")
         from <- as.Date(from, origin = "1970-01-01")
         table <- table[table$Datum >= from,]
-        if (to != "") {
-          if (is.character(to) == FALSE) stop("'To' must be a character string in format 'yyyy-mm-dd'")
-          to <- as.Date(to, origin = "1970-01-01")
-          if (from > to) stop("'From' must be before 'to'")
-          table <- table[table$Datum <= to,]
-        }
+      } else { # means: standard/usual case
+        from <- table$Datum[nrow(table)] %m-% months(6)
+        table <- table[table$Datum >= from, ]
       }
-      
+      if (to != "") {
+        if (is.character(to) == FALSE) stop("'To' must be a character string in format 'yyyy-mm-dd'")
+        to <- as.Date(to, origin = "1970-01-01")
+        if (from > to) stop("'From' must be before 'to'")
+        table <- table[table$Datum <= to,]
+      }
       if (test == TRUE) return("yes")
       return(table)
       

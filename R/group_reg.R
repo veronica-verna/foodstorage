@@ -24,8 +24,11 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     }
     # now first output is finished: table.works; but: filter only the important one
     if (filter == TRUE) {
-      last.data.point <- max(table.works$LetzterDatenpunkt) # counts 4 weeks beginning from the last data point
-      table.works[table.works$Ende <]
+      # beginning from last data point, show all products which will be over in the next '4' weeks
+      last.data.point <- max(table.works$LetzterDatenpunkt)
+      referre.date <- last.data.point + weeks(weeks)
+      table.works <- table.works[table.works$Ende <= referre.date,]
+      table.works <- table.works[with(table.works, order(Ende)), ]
     }
     # next step: which different errors do we have and give each of them a number
     all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2))) # seperate calls and change them to character
@@ -40,7 +43,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
       call.vector[i] <- paste0("Call", which(dif.error.calls %in% all.error.calls[i]))
       message.vector[i] <- paste0("Message", which(dif.error.messages %in% all.errors[[i]][[3]])) 
     }
-    table.errors <- data.frame(Produkt = products, error.call = call.vector, error.message = message.vector)
+    table.errors <- data.frame(Produkt = products, Fehlerort = call.vector, Fehlermeldung = message.vector)
     # now second output is finished: table.errors
     # next step: make a legend
     dif.calls <- unique(call.vector)
