@@ -68,7 +68,7 @@ fun_reg <- function(product,
     fm_reg$coefficients[1] <- as.numeric(as.character(newIntercept))
   }
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
-  end_date <- as.Date(x_end, origin = "1970-01-01")
+  end_date <- as.Date(as.character(as.Date(x_end, origin = "1970-01-01")))
   #storage.at.end <- prod_df.reg$Warenbestand[prod_df.reg$Datum == as.character(end_date)]
   if (prod_df.reg$Warenbestand[nrow(prod_df.reg)] == 0) {
     date_reg <- seq(from = last.refill, to = end_date, by = 'day')
@@ -82,7 +82,8 @@ fun_reg <- function(product,
   preds_reg <- predict(fm_reg, newdata = data.frame("Datum"=date_reg), se.fit = TRUE)
   
   four_weeks <- as.Date(as.character(end_date)) %m-% months(1)
-  if (graphics == FALSE) return(data.frame(Produkt = product, 
+  if (graphics == FALSE) return(data.frame(Produkt = product,
+                                           LetztesAuffuellen = last.refill, # probably here will be an error afterwards...
                                            Noch4Wochen = four_weeks, 
                                            Ende = end_date,
                                            LetzterDatenpunkt = prod_df$Datum[nrow(prod_df)]))

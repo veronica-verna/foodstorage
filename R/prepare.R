@@ -9,6 +9,7 @@ prepare <- function(name.of.product,
                     to = "",
                     correction = 0.05, 
                     more.than = 15,
+                    current.storage = FALSE,
                     test = FALSE) {
   
   ##### at first: check if the input is correct! ####

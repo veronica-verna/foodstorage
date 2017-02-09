@@ -1,4 +1,4 @@
-#### function for calculating regressions for groups ####
+1#### function for calculating regressions for groups ####
 
 group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4) {
   
@@ -9,6 +9,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
   if (len > 12 | list == TRUE) {
     # create an empty data.frame and empty name vector
     table.works <- data.frame(Produkt = character(), 
+                              LetztesAuffuellen = as.Date(character()),
                               Noch4Wochen = as.Date(character()), 
                               Ende = as.Date(character()), 
                               LetzterDatenpunkt = as.Date(character()))
@@ -22,14 +23,35 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
     }
-    # now first output is finished: table.works; but: filter only the important one
+    # Let's filter table.works
     if (filter == TRUE) {
       # beginning from last data point, show all products which will be over in the next '4' weeks
       last.data.point <- max(table.works$LetzterDatenpunkt)
       referre.date <- last.data.point + weeks(weeks)
       table.works <- table.works[table.works$Ende <= referre.date,]
       table.works <- table.works[with(table.works, order(Ende)), ]
+      
+      # now seperate: which product is completely over?
+      if (nrow(table.works[table.works$Ende <= last.data.point,]) >= 1) {
+        table.works.over <- table.works[table.works$Ende <= last.data.point,]
+        already.over <- data.frame(Produkt = table.works.over$Produkt, 
+                                   Bezeichnung1 = rep("ist leer seit", len = nrow(table.works.over)),
+                                   Ende = table.works.over$Ende,
+                                   Bezeichnung2 = rep("und hielt für", len = nrow(table.works.over)),
+                                   Dauer = as.numeric(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
+                                                      units = "days"),
+                                   Einheit = rep("Tage", nrow(table.works.over)))
+        table.works.over.soon <- table.works[table.works$Ende > last.data.point, ]
+        will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
+                                        Bezeichnung1 = rep("wird leer sein am", len = nrow(table.works.over.soon)),
+                                        Ende = table.works.over.soon$Ende,
+                                        Bezeichnung2 = rep("also in", len = nrow(table.works.over.soon)),
+                                        Dauer = as.numeric(table.works.over.soon$Ende - last.data.point, units = "days"),
+                                        Einheit = rep("Tage", len = nrow(table.works.over.soon)))
+      } # only if there is a 'already-finished-product'
     }
+    
+    
     # next step: which different errors do we have and give each of them a number
     all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2))) # seperate calls and change them to character
     dif.error.calls <- unique(all.error.calls)
@@ -54,7 +76,11 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     for (i in 1:length(dif.error.messages)) messages[length(messages) + 1] <- paste(dif.messages[i], dif.error.messages[i], sep = " = ")
     legend <- list(calls = calls, messages = messages) # and that's the last output
     
-    return(list(Funktioniert = table.works, Fehler = table.errors, FehlerLegende = legend))
+    if (exists("already.over") == TRUE) return(list(schon.leer = already.over,
+                                                    bald.leer = will.be.over.soon,
+                                                    manuell.checken = table.errors,
+                                                    FehlerLegende = legend))
+    return(list(bald.leer = table.works, manuell.checken = table.errors, FehlerLegende = legend))
   } 
   
   ### plot-window settings ###
