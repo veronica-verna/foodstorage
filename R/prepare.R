@@ -259,6 +259,16 @@ prepare <- function(name.of.product,
       remove <- sort(MengeKumCol)
       table <- sortbydays[, -remove]
       
+      if (current.storage == TRUE) {
+        cols <- 3:ncol(table)
+        table <- table[, !(cols%%2==0)] # without consumption
+        table <- table[,-ncol(table)] # minus the sum of all products
+        
+        
+        table <- table[table$Datum == table$Datum[nrow(table)], ] # only last day
+        
+      }
+      
       if (what.plotting == "allall") {
         result <- list(data = table, name.of.product = name.of.product, name.of.group = deparse(substitute(name.of.product)))
         return(result)
