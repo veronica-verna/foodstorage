@@ -55,7 +55,7 @@ prepare <- function(name.of.product,
   ##### What do you wanna plot? #####
     # only one product or a group?
   if (length(name.of.product) == 1) {
-    # first at all: security checks ##
+    # first of all: security checks ##
       if (is.numeric(plotting.options$comul.change) == FALSE) 
         stop("To plot consumption, at least daily change is necessary (as data type numeric)")
       if (length(plotting.options$comul.change[sortbypos$Position]) != nrow(sortbypos)) 
