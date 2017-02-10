@@ -76,5 +76,5 @@ startup.settings <- function(table, z) {
   kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)), ]
   rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list, i, Position)
   kornumsatz <- reduceONE(kornumsatz)
-  return(nrow(kornumsatz))
+  return(kornumsatz)
 }
