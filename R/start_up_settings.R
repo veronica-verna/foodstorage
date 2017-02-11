@@ -1,6 +1,6 @@
 # sort data, add columns, adapt product names, etc ####
 
-startup.settings <- function(table, z) {
+startup.settings <- function(table, reduce = TRUE) {
   
   kornumsatz <- table
   Position <- 1:nrow(kornumsatz)
@@ -24,13 +24,17 @@ startup.settings <- function(table, z) {
                            Bohnen.Borlotti = c("Bohnen Borlotti", "Borlottibohnen"), 
                            VollkornreisItalien = c("Arborio Reis", "Rundkornreis"), 
                            BratoelDavert = c("Back-/Bratöl, EU"), 
-                           Basmati.Braun = c("Basmati Braun", "brauner Basmati", "Langkornreis Natur"),
+                           Basmati.Braun = c("Basmati Braun", 
+                                             "brauner Basmati", 
+                                             "Langkornreis Natur"),
                            Basmati.Weiss = c("Basmati Weiß", "weißer Basmati"),
                            Bohnen = c("Bohnen", "Bohnen Borlotti", "Borlottibohnen"), 
                            Drink.Dinkel = c("Dinkel Drink", "Drink Dinkel"),
                            Drink.Hafer = c("Drink Hafer", "Hafer Drink"),
                            Drink.Soja = c("Drink Soja", "Soja Drink"),
-                           Getrocknetes.Gemuese = c("Getrocknete Äpfel", "Getrocknete Paprika", "Getrocknetes Gemüse"),
+                           Getrocknetes.Gemuese = c("Getrocknete Äpfel", 
+                                                    "Getrocknete Paprika", 
+                                                    "Getrocknetes Gemüse"),
                            Honig = c("Honig", "Sonnenblütenhonig"),
                            Espresso = c("Kaffee Espresso", "Kaffe Espresso"),
                            Kaffee = c("Kaffee Geröstet", "Kaffee Zumba", "Kaffe Zumba"),
@@ -75,6 +79,6 @@ startup.settings <- function(table, z) {
   kornumsatz_merged <- merge(kornumsatz, VPE_data.frame, by='Produkt', all = T)
   kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)), ]
   rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list, i, Position)
-  kornumsatz <- reduceONE(kornumsatz)
+  if (reduce == TRUE) kornumsatz <- reduceONE(kornumsatz)
   return(kornumsatz)
 }

@@ -88,51 +88,10 @@ prepare <- function(name.of.product,
       if (what.plotting == "alles" | what.plotting == "Warenbestand" | what.plotting == "regression") {
         for (i in 1:nrow(sortbydays)) sortbydays$Bestand_Einheit[i] <- sum(sortbydays$MengeKum[1:i])
       }
-      # looking for an error - each row should represent one date ##
-      # two same dates behind each other are not allowed ###
-      if(class(look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE)) == "Date") {
-        double.date <- look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE) 
-        days.to.correct <- unique(double.date)
-        for (i in 1:length(days.to.correct)) {
-          sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum[1] <- sum(sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum) # replace storage changing
-          nr <- nrow(sortbydays[sortbydays$Datum == days.to.correct[i],])
-          sortbydays <- sortbydays[-which(sortbydays$Datum == days.to.correct[i])[(2:nr)], ]
-          sortbydays[sortbydays$Datum == days.to.correct[i],]$Bestand_Einheit <- sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum + sortbydays[sortbydays$Datum == days.to.correct[i] - 1,]$Bestand_Einheit # replace food.storage
-        }
-      }
       
     
-      ## make the '5% correction' ##
-      if (what.plotting == "regression") {
-        Prozent5 <- correction * VPE
-        # evaluating candidates for 'correcting operation': storage below 5 percent (--> probably booking error)
-        candidates <- sortbydays[abs(sortbydays$Bestand_Einheit) < Prozent5,]
-        # how many candidates do we have?
-        candidates_dif <- unique(candidates$Bestand_Einheit)
-        # only filter those who stay at the same food storage for 'more.than' 15 (default) days
-        dates <- as.Date(character())
-        for (i in 1:length(candidates_dif)) {
-          if (nrow(candidates[candidates$Bestand_Einheit == candidates_dif[i],]) > more.than) {
-            dates_new <- candidates[candidates$Bestand_Einheit == candidates_dif[i],]$Datum
-            dates <- c(dates, dates_new)
-          }
-        }
-        # and how many different candidates do we have now?
-        dif.storage <- unique(candidates[which(candidates$Datum %in% dates),]$Bestand_Einheit)
-        if (length(dif.storage) != 0) {
-          for (i in 1:length(dif.storage)) {
-            MengeKum <- candidates[which(candidates$Datum %in% dates & candidates$Bestand_Einheit == dif.storage[i]) ,]$MengeKum[1]
-            
-            # 4 possibilities, but result is the same
-            # case: storage was refilled, but too much -> MengeKum gets smaller
-            # case: storage was refilled, but too less --> MengeKum gets bigger
-            # case: storage was cleared, but too much
-            # case: storage was cleared, but too less
-            sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
-            sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
-          }
-        }
-      }
+      ## make the '5% correction' if necessary##
+      if (what.plotting == "regression") sortbydays <- correction(sortbydays, VPE)
          
     #### Create the consumption ####
       MengeKonsum <- numeric(nrow(sortbydays))
