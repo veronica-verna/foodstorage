@@ -21,14 +21,14 @@ look.for.errors <- function(date.vec, table, warnings = TRUE) {
 ## no more necessary, but the following code was part of prepare
 # looking for an error - each row should represent one date ##
 # two same dates behind each other are not allowed ###
-if(class(look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE)) == "Date") {
-  double.date <- look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE) 
-  return(double.date)
-  days.to.correct <- unique(double.date)
-  for (i in 1:length(days.to.correct)) {
-    sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum[1] <- sum(sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum) # replace storage changing
-    nr <- nrow(sortbydays[sortbydays$Datum == days.to.correct[i],])
-    sortbydays <- sortbydays[-which(sortbydays$Datum == days.to.correct[i])[(2:nr)], ]
-    sortbydays[sortbydays$Datum == days.to.correct[i],]$Bestand_Einheit <- sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum + sortbydays[sortbydays$Datum == days.to.correct[i] - 1,]$Bestand_Einheit # replace food.storage
-  }
-}
+#if(class(look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE)) == "Date") {
+#  double.date <- look.for.errors(sortbydays$Datum, sortbydays, warnings = FALSE) 
+#  return(double.date)
+#  days.to.correct <- unique(double.date)
+#  for (i in 1:length(days.to.correct)) {
+#    sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum[1] <- sum(sortbydays[sortbydays$Datum == days.to.correct[i],]$MengeKum) # replace storage changing
+#    nr <- nrow(sortbydays[sortbydays$Datum == days.to.correct[i],])
+#    sortbydays <- sortbydays[-which(sortbydays$Datum == days.to.correct[i])[(2:nr)], ]
+#    sortbydays[sortbydays$Datum == days.to.correct[i],]$Bestand_Einheit <- sortbydays[sortbyday#s$Datum == days.to.correct[i],]$MengeKum + sortbydays[sortbydays$Datum == days.to.correct[i] - 1,]$Bestand_Einheit # replace food.storage
+#  }
+#}
