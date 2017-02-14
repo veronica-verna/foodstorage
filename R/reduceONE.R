@@ -1,6 +1,7 @@
 ### one date, two rows -> reduce them to one row
 
 reduceONE <- function(table, pro) {
+  require(lubridate)
   #naming vectors
   if (is.data.frame(table) == FALSE) stop("table has to be a data frame")
   dates <- table$Datum
