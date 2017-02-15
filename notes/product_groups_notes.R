@@ -32,7 +32,7 @@ Oelsaaten <- c(Oelsaaten, Nuesse)
 Gewuerze
 Putzequipment
 Oel.Essig
-Getreideprodukte <- c(Getreideprodukte, Reis)
+Grundnahrungsmittel <- c(Getreideprodukte, Reis)
 Getraenke <- c(Getreidedrinks, Saefte)
 Aufstriche
 Sonstiges

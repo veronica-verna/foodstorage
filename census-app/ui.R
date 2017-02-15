@@ -3,7 +3,7 @@ library(shinythemes)
 
 # Define UI for application that draws a histogram
 shinyUI(navbarPage("Kornkammer",
-                   theme = shinytheme("united"),
+                   #theme = shinytheme("united"),
                    
                    tabPanel("Warenbestand",
                             titlePanel("Warenbestand der Kornkammer"),
