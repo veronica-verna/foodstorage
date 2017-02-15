@@ -5,7 +5,8 @@ multiply <- function(FUN,
                      par = list(), 
                      data = kornumsatz, 
                      current.storage = TRUE, 
-                     reduce = FALSE) {
+                     reduce = FALSE,
+                     test = FALSE) {
   
   if (is.data.frame(data) == FALSE)
     stop("data must be a data frame with 10 columns. For details type help(prepare).")
@@ -52,16 +53,23 @@ multiply <- function(FUN,
       if (reduce == TRUE) table <- data.frame(Datum = table[,1], 
                                                Warenbestand = rowSums(table[, 3:ncol(table)]))
       
-      if (current.storage == TRUE) {
+      if (reduce == FALSE && current.storage == TRUE) {
         Warenbestand <- t(table[,-c(1,2)])
         colnames(Warenbestand)[1] <- "Kilo"
         #return(class(Warenbestand))
-        full <- Warenbestand[Warenbestand[,1] > 0, ]
-        empty <- Warenbestand[Warenbestand[,1] == 0, ]
+        full <- Warenbestand[Warenbestand[,1] > 0.03, ]
+        empty <- Warenbestand[Warenbestand[,1] <= 0.03, ]
+        if (length(empty) == 1) {
+          all.names <- names(Warenbestand[,1])
+          names.full <- names(full)
+          empty <- suppressWarnings(all.names[!all.names == names.full])
+        }
         return(list(Warenbestand = full, Leer = empty, Datum = table$Datum[1]))
       }
     }
     
+  
+    if (test == TRUE) return("yes")
     return(table)
   #}
 }
