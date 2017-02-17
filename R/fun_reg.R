@@ -151,7 +151,7 @@ fun_reg <- function(product,
            xlab = xlab, 
            ylab = ylab, 
            las = las, 
-           ylim = c(0, range(prod_df$Warenbestand)[2] + 3), 
+           ylim = c(0, range(prod_df$Warenbestand)[2]), 
            xlim = c(range(prod_df$Datum)[1], x_end),
            main = paste("Warenbestand von", main_header))
     }

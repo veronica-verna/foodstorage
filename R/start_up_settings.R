@@ -1,6 +1,7 @@
 # sort data, add columns, adapt product names, etc ####
 
-startup.settings <- function(table, reduce = TRUE, prod.list = FALSE) {
+startup.settings <- function(table, reduce = TRUE) {
+  
   
   kornumsatz <- table
   Position <- 1:nrow(kornumsatz)
@@ -79,7 +80,7 @@ startup.settings <- function(table, reduce = TRUE, prod.list = FALSE) {
   kornumsatz_merged <- merge(kornumsatz, VPE_data.frame, by='Produkt', all = T)
   kornumsatz <- kornumsatz_merged[with(kornumsatz_merged, order(Datum, Position)), ]
   rm(kornumsatz_merged, VPE_data.frame, dif_products, more.than.1.list, i, Position)
-  if (prod.list == TRUE) return(lapply(dif.products, '['))
+  
   # one date, two rows -> reduce them to one
   if (reduce == TRUE) kornumsatz <- reduceONE(kornumsatz)
   return(kornumsatz)

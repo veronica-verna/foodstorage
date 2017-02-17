@@ -1,27 +1,88 @@
 
 shinyServer(function(input, output){
-  # read the data
-  kornumsatz <- read.csv("data/kornumsatz.csv", sep =";")
-  kornumsatz <- startup.settings(kornumsatz)
+  ### Argument names:
+  ArgNames <- reactive({
+    Names <- names(formals(read.csv2)[-1])
+    Names <- Names[Names!="..."]
+    return(Names)
+  })
   
-  ## create product groups
-  Huelsenfruechte <- c("Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot")
-  Oelsaaten <- c("Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam")
-  Nuesse <- c("Cashews", "Haselnüsse geschält", "Walnüsse")
-  Gewuerze <- c("Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen")
-  Putzequipment <- c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv")
-  Oel.Essig <- c("Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel")
-  Reis <- c("Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis")
-  Getreideprodukte <- c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen")
-  Getreidedrinks <- c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja")
-  Aufstriche <- c("Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz")
-  Sonstiges <- c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker")
-  Saefte <- c("Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
-  ## merging
-  Oelsaaten <- c(Oelsaaten, Nuesse)
-  Grundnahrungsmittel <- c(Getreideprodukte, Reis)
-  Getraenke <- c(Getreidedrinks, Saefte)
-  Zusammenfassung <- c(Huelsenfruechte, Oelsaaten, Gewuerze, Putzequipment, Oel.Essig, Getreideprodukte, Getraenke, Aufstriche, Sonstiges)
+  ### Argument names German:
+  ArgGerman <- reactive({
+    ger <- c("Überschrift", "Feldtrenner", "quote", "Dezimaltrenner", "fill", "comment.char")
+    return(ger)
+  })
+  
+  # Argument selector:
+  output$ArgSelect <- renderUI({
+    if (length(ArgNames())==0) return(NULL)
+    selectInput("arg","Argumente:", 
+                choices = c("Standard" = "default", ArgNames()))
+  })
+  
+  ## Arg text field:
+  output$ArgText <- renderUI({
+    Defaults <- formals(read.csv2)
+    arg <- names(formals(read.csv2))[-c(1, length(Defaults)-1, length(Defaults))]
+    def <- Defaults[-c(1, length(Defaults)-1, length(Defaults))]
+    
+    ## which paramter do you wanna change?
+    if (input$arg == "header") {
+      radioButtons("head",
+                   "Überschrift",
+                   choices = list("Ja" = 0, "Nein" = 1),
+                   selected = 0)
+    } else {
+      if (input$arg == "sep") {
+        radioButtons("seperator", 
+                     "Textfeldtrenner",
+                     choices = list(";" = 0, "," = 1, "." = 2, " " = 3),
+                     selected = 0)
+      } else {
+        if (input$arg == "dec") {
+          radioButtons("decimal",
+                      "Dezimaltrenner",
+                      choices = list("." = 0, "," = 1))
+        } else {
+          if (input$arg == "default") 
+            actionButton("read", "'Kornumsatz' einlesen")
+        }
+      }
+    }
+  
+    
+    
+      
+    
+    #if (input$arg == "quote")
+      
+    
+    
+    
+    
+  })
+  
+  ### Data import:
+  Dataset <- reactive({
+    if (is.null(input$file)) {
+      # User has not uploaded a file yet
+      return(data.frame())
+    }
+    
+    args <- grep(paste0("^","read.csv","__"), names(input), value = TRUE)
+    
+    argList <- list()
+    for (i in seq_along(args))
+    {
+      argList[[i]] <- eval(parse(text=input[[args[i]]]))
+    }
+    names(argList) <- gsub(paste0("^",input$readFunction,"__"),"",args)
+    
+    argList <- argList[names(argList) %in% ArgNames()]
+    
+    Dataset <- as.data.frame(do.call(input$readFunction,c(list(input$file$datapath),argList)))
+    return(Dataset)
+  })
   
   output$prodPlot  <- renderPlot({
     fun_reg(product = input$product, main_header = input$product)
