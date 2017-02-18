@@ -49,8 +49,7 @@ fun_reg <- function(product,
                     lty = c(1,1,2),
                     nec.dates = 10,
                     more.than = 15,
-                    test = FALSE,
-                    test_pred = FALSE) {
+                    test = FALSE) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   # one warning for the same is enough -> suppresWarnings
