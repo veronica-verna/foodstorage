@@ -62,7 +62,7 @@ shinyUI(fluidPage(
                                      value = FALSE),
                        conditionalPanel(condition = "input.settings == true",
                                         checkboxGroupInput("optional", label ="",
-                                                           choices = formals("fun_reg")[-c(1, length(formals(fun_reg)))] ))),
+                                                           choices = formals("fun_reg")[-c(1, length(formals(fun_reg)))] )))),
       
     
     mainPanel(
