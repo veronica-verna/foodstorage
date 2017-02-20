@@ -1,7 +1,7 @@
 library(shiny)
 library(lubridate)
 library(data.table)
-product.group <- list("Biite auswählen" = "Bitte auswaehlen",
+product.group <- list("Bitte wählen" = "Bitte waehlen",
                       "Zusammenfassung",
                       "Hülsenfrüchte" = "Huelsenfruechte", 
                       "Ölsaaten" = "Oelsaaten", 
@@ -12,6 +12,7 @@ product.group <- list("Biite auswählen" = "Bitte auswaehlen",
                       "Getränke" = "Getraenke", 
                       "Aufstriche",
                       "Sonstiges")
+
 
 shinyUI(fluidPage(
   titlePanel("Kornkammer"),
@@ -62,14 +63,6 @@ shinyUI(fluidPage(
                        conditionalPanel(condition = "input.settings == true",
                                         checkboxGroupInput("optional", label ="",
                                                            choices = formals("fun_reg")[-c(1, length(formals(fun_reg)))] ))),
-      
-      # Argument selecter:
-      htmlOutput("ArgSelect"),
-      # Argument field:
-      htmlOutput("ArgText")
-      
-      
-      ),
       
     
     mainPanel(
