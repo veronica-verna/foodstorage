@@ -13,7 +13,23 @@ product.group <- list("Bitte wählen" = "Bitte waehlen",
                       "Getränke" = "Getraenke", 
                       "Aufstriche",
                       "Sonstiges")
-
+data.pars <- c("from", "to")
+data.list <- list("Von" = "from", "Bis" = "to")
+graphic.pars <- c("type", "pch", "las", "lwd", "lty")
+graphic.list <- list("Plot-Typ" = "type", "Punktart" = "pch", "Ausrichtung y-Achse" = "las", "Liniendicke" = "lwd", "Linientyp" = "lty")
+scription.pars <- c("main_header", "xlab", "ylab")
+scription.list <- list("Überschrift" = "main_header", "x-Achse" = "xlab", "y-Achse" = "ylab")
+col.pars <- c("col_points", "col_reg", "col_conv", "col_20", "col_past")
+col.list <- list("Punkte" = "col_points", "Zukunft-Mitte" = "col_reg", "Konvidenzintervalle" = "col_conv", "Farbe-4-Wochen" = "col_20", "Vergangenheit" = "col_past")
+which.smoother <- c("smoother")
+smoother.pars <- c("span", "degree")
+advanced.pars <- c("nec.dates", "more.than", which.smoother, smoother.pars)
+fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pars)
+fun_reg.list <- list("Zeitangaben" = "data.pars", 
+                     "Graphische Parameter" = "graphic.pars",
+                     "Beschriftung" = "scription.pars",
+                     "Farben" = "col.pars",
+                     "Für Fortgeschrittene" = "advanced.pars")
 
 shinyUI(fluidPage(
   titlePanel("Kornkammer"),
@@ -59,16 +75,23 @@ shinyUI(fluidPage(
       
       conditionalPanel(condition = "input.number != 0 | input.numbStock != 0",
                        checkboxInput("settings",
-                                     label = "Grafikoptionen",
+                                     label = "Erweiterte Einstellungen",
                                      value = FALSE),
                        conditionalPanel(condition = "input.settings == true",
-                                        checkboxGroupInput("graphical", label ="",
-                                                           choices = names(formals("fun_reg")[-c(1, length(formals(fun_reg)))]) ),
-                                        checkboxInput('works', "Funktionierts?")
+                                        checkboxGroupInput("pars", label ="Parametergruppen",
+                                                           choices = fun_reg.list),
+                                        conditionalPanel(condition = "input.pars == 'data.pars'",
+                                                         checkboxGroupInput("data", "Zeitangaben", data.list)),
+                                        conditionalPanel(condition = "input.pars == 'graphic.pars'",
+                                                         checkboxGroupInput("graphics", "Grafikeinstellungen", graphic.list)),
+                                        conditionalPanel(condition = "input.pars == 'scription.pars'",
+                                                         checkboxGroupInput('scription', "Beschriftung", scription.list)),
+                                        conditionalPanel(condition = "input.pars == 'col.pars'",
+                                                         checkboxGroupInput('cols', "Farben", col.list))
                                         )),
-      conditionalPanel(condition = "input.graphical.includes('from')",
+      conditionalPanel(condition = "input.data.includes('from')",
                        dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
-      conditionalPanel(condition = "input.graphical.includes('col_points')",
+      conditionalPanel(condition = "input.cols.includes('col_points')",
                        colourInput("col_points", "Farbe der Punkte", value = "lightgrey"))
       ),
       
