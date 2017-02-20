@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 library(lubridate)
 library(data.table)
 product.group <- list("Bitte wählen" = "Bitte waehlen",
@@ -61,12 +62,20 @@ shinyUI(fluidPage(
                                      label = "Grafikoptionen",
                                      value = FALSE),
                        conditionalPanel(condition = "input.settings == true",
-                                        checkboxGroupInput("optional", label ="",
-                                                           choices = formals("fun_reg")[-c(1, length(formals(fun_reg)))] )))),
+                                        checkboxGroupInput("graphical", label ="",
+                                                           choices = names(formals("fun_reg")[-c(1, length(formals(fun_reg)))]) ),
+                                        checkboxInput('works', "Funktionierts?")
+                                        )),
+      conditionalPanel(condition = "input.graphical.includes('from')",
+                       dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
+      conditionalPanel(condition = "input.graphical.includes('col_points')",
+                       colourInput("col_points", "Farbe der Punkte", value = "lightgrey"))
+      ),
       
     
     mainPanel(
-      plotOutput("prodPlot")
+      plotOutput("prodPlot")#,
+      #verbatimTextOutput("class")
     )
   )
   
