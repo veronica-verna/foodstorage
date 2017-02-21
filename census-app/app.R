@@ -11,24 +11,6 @@ library(data.table)
 #kornumsatz <- startup.settings(kornumsatz)
 
 ##################################### product groups ######################
-Huelsenfruechte <- c("Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot")
-Oelsaaten <- c("Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam")
-Nuesse <- c("Cashews", "Haselnüsse geschält", "Walnüsse")
-Gewuerze <- c("Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen")
-Putzequipment <- c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv")
-Oel.Essig <- c("Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel")
-Reis <- c("Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis")
-Getreideprodukte <- c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen")
-Getreidedrinks <- c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja")
-Aufstriche <- c("Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz")
-Sonstiges <- c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker")
-Saefte <- c("Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
-### merging together ##
-Oelsaaten <- c(Oelsaaten, Nuesse)
-Grundnahrungsmittel <- c(Getreideprodukte, Reis)
-Getraenke <- c(Getreidedrinks, Saefte)
-Zusammenfassung <- c(Huelsenfruechte, Oelsaaten, Gewuerze, Putzequipment, Oel.Essig, Grundnahrungsmittel, Getraenke, Aufstriche, Sonstiges)
-
 product.group <- list("Bitte wählen" = "Bitte waehlen",
                       "Zusammenfassung", 
                       "Grundnahrungsmittel",
@@ -40,6 +22,18 @@ product.group <- list("Bitte wählen" = "Bitte waehlen",
                       "Getränke" = "Getraenke", 
                       "Aufstriche",
                       "Sonstiges")
+groups.long <- list("Grundnahrungsmittel" = c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen", "Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis"),
+                    "Huelsenfruechte" = c("Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot"),
+                    "Oelsaaten" = c("Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam", "Cashews", "Haselnüsse geschält", "Walnüsse"),
+                    "Gewuerze" = c("Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen"),
+                    "Oel.Essig" = c("Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel"),
+                    "Putzequipment" = c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv"),
+                    "Getraenke" = c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben"),
+                    "Aufstriche" = c("Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz"),
+                    "Sonstiges" = c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker"),
+                    "Zusammenfassung" = c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen", "Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis", "Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot", "Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam", "Cashews", "Haselnüsse geschält", "Walnüsse", "Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen", "Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel", "Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv", "Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben", "Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz", "Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker"))
+
+
 
 ########### Parameters of fun_reg #############
 data.list <- list("Von" = "from", "Bis" = "to")
@@ -95,9 +89,13 @@ ui <- shinyUI(fluidPage(
                                                                         placeholder = lapply(levels(kornumsatz$Produkt), '['),
                                                                         maxItems = 1))),
                          conditionalPanel(condition = "input.number == 2",
-                                          selectInput("group",
+                                          selectInput("groupFuture",
                                                       "Produktgruppen",
-                                                      choices = product.group))),
+                                                      choices = product.group)),
+                         conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
+                                          helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                          numericInput('weeks', 'Wochen', value = 4, min = 1))),
+        #################### Aktueller Warenbestand #################################
         conditionalPanel(condition = "input.what == 'present'",
                          selectInput("numbStock",
                                      "Nach Gruppe oder Lieferant?",
@@ -105,7 +103,7 @@ ui <- shinyUI(fluidPage(
                                                     "Produktgruppe" = 1,
                                                     "Lieferant" = 2)),
                          conditionalPanel(condition = "input.numbStock == 1",
-                                          selectInput("group",
+                                          selectInput("groupPresent",
                                                       "Produktgruppen",
                                                       choices = product.group))),
         
@@ -134,12 +132,17 @@ ui <- shinyUI(fluidPage(
       
       
       mainPanel(
-        plotOutput("prodPlot")#,
-        #verbatimTextOutput("class")
+        plotOutput("prodPlot"),
+        plotOutput("groupStock")
       )
     )
     
   ))
+
+######################################################################################################################
+####################################### Shiny Server #################################################################
+######################################################################################################################
+
 
 server <- shinyServer(function(input, output){
     observeEvent(input$submit, {
@@ -152,11 +155,15 @@ server <- shinyServer(function(input, output){
         fun_reg(product = input$product, main_header = input$product)
       }
     })
-    output$class <- renderText({
-      if (input$settings == TRUE && 'from' %in% input$graphical) {
-        #c(class(input$from), as.character(input$from), as.character(as.Date(input$from, origin = "1970-01-01")))
+    
+    output$groupStock <- renderPlot({
+      if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
+        group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+        names(group) <- c()
+        group_reg(group = group, weeks = input$weeks)
       }
     })
+    
   })
 
 shinyApp(ui, server)

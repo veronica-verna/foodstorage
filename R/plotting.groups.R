@@ -1,6 +1,6 @@
 ## fun_reg in tryCatch
 
-product.is.over <- function(product) {
+plotting.groups <- function(product, from = "", to = "") {
   out <- tryCatch(
     {
       # Just to highlight: if you want to use more than one 
@@ -11,7 +11,7 @@ product.is.over <- function(product) {
       
       #message("This is the 'try' part")
       
-      suppressWarnings(fun_reg(product))  
+      suppressWarnings(fun_reg(product, from = from, to = to))  
       # The return value of `fun_reg()` is the actual value 
       # that will be returned in case there is no condition 
       # (e.g. warning or error). 
@@ -24,7 +24,7 @@ product.is.over <- function(product) {
       #message("Here's the original error message:")
       #nachricht <- message(cond)
       # Choose a return value in case of error
-      return(list(product, cond$call, cond$message))
+      return(empty.plot(product))
     },
     warning=function(cond) {
       message(paste("PRODUCT caused a warning:", product))

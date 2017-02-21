@@ -99,6 +99,6 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
   if (len >= 5) par(mfrow=c(ceiling(len/3), 3))
   
   # now plotting ##
-  for (i in 1:len) fun_reg(group[i], from = from, to = to)
+  for (i in 1:len) plotting.groups(group[i], from = from, to = to)
   par(mfrow = c(1,1)) # for resetting settings
 }
