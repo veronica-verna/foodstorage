@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(colourpicker)
 library(lubridate)
 library(data.table)
 
@@ -20,34 +21,43 @@ product.group <- list("Bitte wählen" = "Bitte waehlen",
                       "Getränke" = "Getraenke", 
                       "Aufstriche",
                       "Sonstiges")
-data.pars <- c("from", "to")
+
+########### Parameters of fun_reg #############
 data.list <- list("Von" = "from", "Bis" = "to")
-graphic.pars <- c("type", "pch", "las", "lwd", "lty")
+data.pars <- c("from", "to")
 graphic.list <- list("Plot-Typ" = "type", "Punktart" = "pch", "Ausrichtung y-Achse" = "las", "Liniendicke" = "lwd", "Linientyp" = "lty")
-scription.pars <- c("main_header", "xlab", "ylab")
+graphic.pars <- c("type", "pch", "las", "lwd", "lty")
 scription.list <- list("Überschrift" = "main_header", "x-Achse" = "xlab", "y-Achse" = "ylab")
-col.pars <- c("col_points", "col_reg", "col_conv", "col_20", "col_past")
+scription.pars <- c("main_header", "xlab", "ylab")
 col.list <- list("Punkte" = "col_points", "Zukunft-Mitte" = "col_reg", "Konvidenzintervalle" = "col_conv", "Farbe-4-Wochen" = "col_20", "Vergangenheit" = "col_past")
+col.pars <- c("col_points", "col_reg", "col_conv", "col_20", "col_past")
 which.smoother <- c("smoother")
 smoother.pars <- c("span", "degree")
 advanced.pars <- c("nec.dates", "more.than", which.smoother, smoother.pars)
-fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pars)
 fun_reg.list <- list("Zeitangaben" = "data.pars", 
                      "Graphische Parameter" = "graphic.pars",
                      "Beschriftung" = "scription.pars",
                      "Farben" = "col.pars",
                      "Für Fortgeschrittene" = "advanced.pars")
+fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pars)
 
+
+###############################################################################################
+################################## Shiny UI ###################################################
+###############################################################################################
 ui <- shinyUI(fluidPage(
     titlePanel("Kornkammer"),
     
     sidebarLayout(
       sidebarPanel(
         width = 3,
+        ###################### stepwise opening parameter settings ######################
         radioButtons("what", 
                      label = "Aktuell  oder Zukunft?",
                      choices = list("Aktueller Warenbestand" = 'present', 
                                     "Zukunftsprognose" = 'future')),
+        
+        ############## Zukunftsprognose ########################################
         conditionalPanel(condition = "input.what == 'future'",
                          selectInput("number",
                                      "Einzelnes Produkt oder eine Gruppe?",
@@ -87,13 +97,13 @@ ui <- shinyUI(fluidPage(
                          conditionalPanel(condition = "input.settings == true",
                                           checkboxGroupInput("pars", label ="Parametergruppen",
                                                              choices = fun_reg.list),
-                                          conditionalPanel(condition = "input.pars == 'data.pars'",
+                                          conditionalPanel(condition = "input.pars.includes('data.pars')",
                                                            checkboxGroupInput("data", "Zeitangaben", data.list)),
-                                          conditionalPanel(condition = "input.pars == 'graphic.pars'",
+                                          conditionalPanel(condition = "input.pars.includes('graphic.pars')",
                                                            checkboxGroupInput("graphics", "Grafikeinstellungen", graphic.list)),
-                                          conditionalPanel(condition = "input.pars == 'scription.pars'",
+                                          conditionalPanel(condition = "input.pars.includes('scription.pars')",
                                                            checkboxGroupInput('scription', "Beschriftung", scription.list)),
-                                          conditionalPanel(condition = "input.pars == 'col.pars'",
+                                          conditionalPanel(condition = "input.pars.includes('col.pars')",
                                                            checkboxGroupInput('cols', "Farben", col.list)),
                                           actionButton("submit", "Übernehmen")
                          )),
@@ -113,11 +123,11 @@ ui <- shinyUI(fluidPage(
   ))
 
 server <- shinyServer(function(input, output){
-    observeEvent(input$submit) {
+    observeEvent(input$submit, {
       output$prodPlot  <- renderPlot({
         fun_reg(product = input$product, main_header = input$product)
       })
-    }
+    }) 
     output$prodPlot  <- renderPlot({
       if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
         fun_reg(product = input$product, main_header = input$product)
