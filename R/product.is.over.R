@@ -1,6 +1,6 @@
 ## fun_reg in tryCatch
 
-product.is.over <- function(product) {
+product.is.over <- function(product, from = "", to = "") {
   out <- tryCatch(
     {
       # Just to highlight: if you want to use more than one 
@@ -11,7 +11,7 @@ product.is.over <- function(product) {
       
       #message("This is the 'try' part")
       
-      suppressWarnings(fun_reg(product, graphics = FALSE))  
+      suppressWarnings(fun_reg(product, graphics = FALSE, from = from, to = to))  
       # The return value of `fun_reg()` is the actual value 
       # that will be returned in case there is no condition 
       # (e.g. warning or error). 
