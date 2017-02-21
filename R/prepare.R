@@ -121,7 +121,7 @@ prepare <- function(name.of.product,
                           Warenbestand = sortbydays$Bestand_Einheit)
     }
     if (what.plotting == "regression") {
-      if (is.numeric(plotting.options$VPE) == FALSE) 
+      if (is.numeric(VPE) == FALSE) 
         stop("VPE must be a numeric vector with same length than all other vectors.")
       table <- data.frame(Datum = sortbydays$Datum,
                           Tag_Nr = sortbydays$Tag_Nr,

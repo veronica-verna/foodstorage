@@ -13,7 +13,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
                               Noch4Wochen = as.Date(character()), 
                               Ende = as.Date(character()), 
                               LetzterDatenpunkt = as.Date(character()))
-    big.list <- lapply(group, product.is.over)
+    big.list <- lapply(group, product.is.over, from = from, to = to)
     all.errors <- vector("list", length = 0)
     # seperate 'works' from 'errors'
     for (i in 1:len) {
@@ -23,35 +23,43 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
     }
+    
     # Let's filter table.works
     if (filter == TRUE) {
       # beginning from last data point, show all products which will be over in the next '4' weeks
       last.data.point <- max(table.works$LetzterDatenpunkt)
       referre.date <- last.data.point + weeks(weeks)
       table.works <- table.works[table.works$Ende <= referre.date,]
-      table.works <- table.works[with(table.works, order(Ende)), ]
+      table.works <- table.works[with(table.works, order(Ende)), ] # sorting data decreasing end date
       
       # now seperate: which product is completely over?
       if (nrow(table.works[table.works$Ende <= last.data.point,]) >= 1) {
         table.works.over <- table.works[table.works$Ende <= last.data.point,]
         already.over <- data.frame(Produkt = table.works.over$Produkt, 
-                                   Bezeichnung1 = rep("ist leer seit", len = nrow(table.works.over)),
+                                   Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
                                    Ende = table.works.over$Ende,
-                                   Bezeichnung2 = rep("und hielt für", len = nrow(table.works.over)),
+                                   Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
                                    Dauer = as.numeric(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
                                                       units = "days"),
-                                   Einheit = rep("Tage", nrow(table.works.over)))
+                                   Einheit = rep("Tage", nrow(table.works.over)),
+                                   check.names = FALSE)
         table.works.over.soon <- table.works[table.works$Ende > last.data.point, ]
         will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
-                                        Bezeichnung1 = rep("wird leer sein am", len = nrow(table.works.over.soon)),
+                                        Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
                                         Ende = table.works.over.soon$Ende,
-                                        Bezeichnung2 = rep("also in", len = nrow(table.works.over.soon)),
+                                        Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
                                         Dauer = as.numeric(table.works.over.soon$Ende - last.data.point, units = "days"),
-                                        Einheit = rep("Tage", len = nrow(table.works.over.soon)))
+                                        Einheit = rep("Tage", len = nrow(table.works.over.soon)),
+                                        check.names = FALSE)
+        if (nrow(will.be.over.soon) == 0) 
+          will.be.over.soon <- paste("In den nächsten", weeks, "Wochen wird nichts ausgehen")
       } # only if there is a 'already-finished-product'
     }
     
-    
+    if (exists("already.over") == TRUE && length(all.errors) == 0) 
+      return(list(schon.leer = already.over, bald.leer = will.be.over.soon))
+    if (length(all.errors) == 0) return(list(bald.leer = will.be.over.soon))
+             
     # next step: which different errors do we have and give each of them a number
     all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2))) # seperate calls and change them to character
     dif.error.calls <- unique(all.error.calls)
@@ -81,7 +89,9 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
                                                     manuell.checken = table.errors,
                                                     FehlerLegende = legend))
     return(list(bald.leer = table.works, manuell.checken = table.errors, FehlerLegende = legend))
-  } 
+  }
+  
+  ############################ if result should be plots ##############################
   
   ### plot-window settings ###
   if (len == 2) par(mfrow=c(2,1))
