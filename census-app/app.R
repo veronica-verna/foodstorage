@@ -7,17 +7,36 @@ library(data.table)
 ######################################################################
 ###################### read kornumsatz ###############################
 ######################################################################
-kornumsatz <- read.csv2("data/kornumsatz.csv")
-kornumsatz <- startup.settings(kornumsatz)
+#kornumsatz <- read.csv2("data/kornumsatz.csv")
+#kornumsatz <- startup.settings(kornumsatz)
+
+##################################### product groups ######################
+Huelsenfruechte <- c("Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot")
+Oelsaaten <- c("Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam")
+Nuesse <- c("Cashews", "Haselnüsse geschält", "Walnüsse")
+Gewuerze <- c("Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen")
+Putzequipment <- c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv")
+Oel.Essig <- c("Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel")
+Reis <- c("Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis")
+Getreideprodukte <- c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen")
+Getreidedrinks <- c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja")
+Aufstriche <- c("Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz")
+Sonstiges <- c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker")
+Saefte <- c("Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben")
+### merging together ##
+Oelsaaten <- c(Oelsaaten, Nuesse)
+Grundnahrungsmittel <- c(Getreideprodukte, Reis)
+Getraenke <- c(Getreidedrinks, Saefte)
+Zusammenfassung <- c(Huelsenfruechte, Oelsaaten, Gewuerze, Putzequipment, Oel.Essig, Grundnahrungsmittel, Getraenke, Aufstriche, Sonstiges)
 
 product.group <- list("Bitte wählen" = "Bitte waehlen",
-                      "Zusammenfassung",
+                      "Zusammenfassung", 
+                      "Grundnahrungsmittel",
                       "Hülsenfrüchte" = "Huelsenfruechte", 
                       "Ölsaaten" = "Oelsaaten", 
                       "Gewürze" = "Gewuerze", 
                       "Putzequipment",
                       "Öl und Essig" = "Oel.Essig", 
-                      "Getreideprodukte", 
                       "Getränke" = "Getraenke", 
                       "Aufstriche",
                       "Sonstiges")
