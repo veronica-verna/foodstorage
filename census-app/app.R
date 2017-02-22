@@ -91,10 +91,11 @@ ui <- shinyUI(fluidPage(
                          conditionalPanel(condition = "input.numFuture == 2",
                                           selectInput("groupFuture",
                                                       "Produktgruppen",
-                                                      choices = product.group)),
-                         conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                                          helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                          numericInput('weeks', 'Wochen', value = 4, min = 1))),
+                                                      choices = product.group),
+                                          conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
+                                                           helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                                           numericInput('weeks', 'Wochen', value = 4, min = 1)))
+                         ),
         ################################ Present Stock #################################
         conditionalPanel(condition = "input.what == 'present'",
                          selectInput("numPresent",
@@ -143,10 +144,12 @@ ui <- shinyUI(fluidPage(
       
       
       mainPanel(
-        conditionalPanel(condition = "input.product != 'Bitte waehlen'",
+        conditionalPanel(condition = "input.productFuture != 'Bitte waehlen'",
                          plotOutput("prodPlot")),
         conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                         plotOutput("groupStock", height = 800))
+                         plotOutput("groupStock", height = 800)),
+        conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
+                         tableOutput("orderTable"))
       )
     )
     
@@ -170,10 +173,19 @@ server <- shinyServer(function(input, output){
     })
     
     output$groupStock <- renderPlot({
+      
       if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
         group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
         names(group) <- c()
-        group_reg(group = group, weeks = input$weeks)
+        if (length(group) <= 6) group_reg(group = group, weeks = input$weeks)
+      }
+    })
+    
+    output$orderTable <- renderTable({
+      if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
+        group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+        names(group) <- c()
+        if (length(group) > 6) group_reg(group = group, weeks = input$weeks, list = TRUE)[[1]]
       }
     })
     
