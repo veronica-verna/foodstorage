@@ -163,12 +163,12 @@ ui <- shinyUI(fluidPage(
 server <- shinyServer(function(input, output){
     observeEvent(input$submit, {
       output$prodPlot  <- renderPlot({
-        fun_reg(product = input$product, main_header = input$product)
+        fun_reg(product = input$productFuture, main_header = input$productFuture)
       })
     }) 
     output$prodPlot  <- renderPlot({
-      if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
-        fun_reg(product = input$product, main_header = input$product)
+      if (input$productFuture != 'Bitte waehlen' && input$settings == FALSE) {
+        fun_reg(product = input$productFuture, main_header = input$productFuture)
       }
     })
     

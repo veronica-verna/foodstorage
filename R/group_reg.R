@@ -1,4 +1,4 @@
-1#### function for calculating regressions for groups ####
+#### function for calculating regressions for groups ####
 
 group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4) {
   
@@ -37,7 +37,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         table.works.over <- table.works[table.works$Ende <= last.data.point,]
         already.over <- data.frame(Produkt = table.works.over$Produkt, 
                                    Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
-                                   Ende = table.works.over$Ende,
+                                   Ende = as.character(table.works.over$Ende),
                                    Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
                                    Dauer = as.numeric(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
                                                       units = "days"),
@@ -46,7 +46,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         table.works.over.soon <- table.works[table.works$Ende > last.data.point, ]
         will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
                                         Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
-                                        Ende = table.works.over.soon$Ende,
+                                        Ende = as.character(table.works.over.soon$Ende),
                                         Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
                                         Dauer = as.numeric(table.works.over.soon$Ende - last.data.point, units = "days"),
                                         Einheit = rep("Tage", len = nrow(table.works.over.soon)),
