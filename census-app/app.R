@@ -47,6 +47,7 @@ col.pars <- c("col_points", "col_reg", "col_conv", "col_20", "col_past")
 which.smoother <- c("smoother")
 smoother.pars <- c("span", "degree")
 advanced.pars <- c("nec.dates", "more.than", which.smoother, smoother.pars)
+advanced.list <- c("Notwendige Datenanzahl" = "nec.dates", "Mindestens" = "more.than", "smoother" = "smoother", "span" = "span", "Grad" = "degree")
 fun_reg.list <- list("Zeitangaben" = "data.pars", 
                      "Graphische Parameter" = "graphic.pars",
                      "Beschriftung" = "scription.pars",
@@ -134,10 +135,20 @@ ui <- shinyUI(fluidPage(
                                                            checkboxGroupInput('scription', "Beschriftung", scription.list)),
                                           conditionalPanel(condition = "input.pars.includes('col.pars')",
                                                            checkboxGroupInput('cols', "Farben", col.list)),
+                                          conditionalPanel(condition = "input.pars.includes('advanced.pars')",
+                                                           checkboxGroupInput('advanced', "Fortgeschritten", advanced.list)),
                                           actionButton("submit", "Übernehmen")
                          )),
         conditionalPanel(condition = "input.data.includes('from')",
                          dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
+        conditionalPanel(condition = "input.data.includes('to')",
+                         dateInput("to", "Bis", value = as.character(Sys.Date()))),
+        conditionalPanel(condition = "input.graphics.includes('type')",
+                         radioButtons("type", "Plot-Art", choices = c("Punkte und Linie" = "b", "Nur Punkte" = "p", "Nur Linie" = "l"), selected = "b")),
+#        conditionalPanel(condition = "input.graphics.includes('pch')",
+#                         ...),
+        conditionalPanel(condition = "input.graphics.includes('las')",
+                         numericInput('las', 'Ausrichtung Beschriftung', min = 0, max = 2, step = 1, value = 2)),
         conditionalPanel(condition = "input.cols.includes('col_points')",
                          colourInput("col_points", "Farbe der Punkte", value = "lightgrey"))
       ),
