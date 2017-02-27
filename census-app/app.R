@@ -7,8 +7,16 @@ library(data.table)
 ######################################################################
 ###################### read kornumsatz ###############################
 ######################################################################
-#kornumsatz <- read.csv2("data/kornumsatz.csv")
-#kornumsatz <- startup.settings(kornumsatz)
+kornumsatz <- read.csv2("data/kornumsatz.csv")
+kornumsatz$Datum <- as.Date(kornumsatz$Datum)
+kornumsatz$MengeKum <- as.numeric(kornumsatz$MengeKum)
+kornumsatz$Einheit <- as.factor(kornumsatz$Einheit)
+kornumsatz$Preis <- as.numeric(kornumsatz$Preis)
+kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
+kornumsatz$Umsatz <- as.numeric(kornumsatz$Umsatz)
+kornumsatz$Bestand_Einheit <- as.numeric(kornumsatz$Bestand_Einheit)
+kornumsatz$Bestand_Preis <- as.numeric(kornumsatz$Bestand_Preis)
+kornumsatz <- startup.settings(kornumsatz, reduce = TRUE)
 
 ##################################### product groups ######################
 product.group <- list("Bitte wählen" = "Bitte waehlen",
@@ -118,7 +126,8 @@ ui <- shinyUI(fluidPage(
                          conditionalPanel(condition = "input.numPresent == 2",
                                           selectInput("groupPresent",
                                                       "Produktgruppen",
-                                                      choices = product.group))),
+                                                      choices = product.group))
+                         ),
         
         conditionalPanel(condition = "input.numFuture != 0 | input.numPresent != 0",
                          checkboxInput("settings",
@@ -132,25 +141,62 @@ ui <- shinyUI(fluidPage(
                                           conditionalPanel(condition = "input.pars.includes('graphic.pars')",
                                                            checkboxGroupInput("graphics", "Grafikeinstellungen", graphic.list)),
                                           conditionalPanel(condition = "input.pars.includes('scription.pars')",
-                                                           checkboxGroupInput('scription', "Beschriftung", scription.list)),
+                                                           checkboxGroupInput('labels', "Beschriftung", scription.list)),
                                           conditionalPanel(condition = "input.pars.includes('col.pars')",
                                                            checkboxGroupInput('cols', "Farben", col.list)),
                                           conditionalPanel(condition = "input.pars.includes('advanced.pars')",
                                                            checkboxGroupInput('advanced', "Fortgeschritten", advanced.list)),
                                           actionButton("submit", "Übernehmen")
                          )),
+        ##################### Parameters: Data ######################################################
         conditionalPanel(condition = "input.data.includes('from')",
                          dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
         conditionalPanel(condition = "input.data.includes('to')",
                          dateInput("to", "Bis", value = as.character(Sys.Date()))),
+        ##################### Parameters: Graphics ##################################################
         conditionalPanel(condition = "input.graphics.includes('type')",
                          radioButtons("type", "Plot-Art", choices = c("Punkte und Linie" = "b", "Nur Punkte" = "p", "Nur Linie" = "l"), selected = "b")),
 #        conditionalPanel(condition = "input.graphics.includes('pch')",
 #                         ...),
         conditionalPanel(condition = "input.graphics.includes('las')",
                          numericInput('las', 'Ausrichtung Beschriftung', min = 0, max = 2, step = 1, value = 2)),
+#        conditionalPanel(condition = "input.graphics.includes('lwd')",
+#                         ...),
+#        conditionalPanel(condition = "input.graphics.includes('lty')",
+#                         ...)
+        #################### Parameters: Labels #####################################################
+### here there are '???': default value shall be the name of product = input.productFuture
+        conditionalPanel(condition = "input.labels.includes('main_header')",
+                         helpText("Nur den Namen des Produktes eingeben im 'Dativ'"),
+                         textInput("main_header", "Überschrift")),
+        conditionalPanel(condition = "input.labels.includes('xlab')",
+                         textInput("xlab", "x-Achsen-Beschriftung", value = "")),
+        conditionalPanel(condition = "input.labels.includes('ylab')",
+                         textInput("ylab", "y-Achsen-Beschriftung", value = "Warenbestand in Kilo")),
+        #################### Parameters: Colours ####################################################
         conditionalPanel(condition = "input.cols.includes('col_points')",
-                         colourInput("col_points", "Farbe der Punkte", value = "lightgrey"))
+                         colourInput("col_points", "Punktfarbe", value = "grey")),
+        conditionalPanel(condition = "input.cols.includes('col_reg')",
+                         colourInput("col_reg", "Farbe der 'Zukunftslinie'", value = "grey")),
+        conditionalPanel(condition = "input.cols.includes('col_conv')",
+                         colourInput("col_conv", "Konvergenzintervalle", value = "lightgrey")),
+        conditionalPanel(condition = "input.cols.includes('col_20')",
+                         colourInput("col_20", "Warnfarbe", value = "red")),
+        conditionalPanel(condition = "input.cols.includes('col_past')",
+                         colourInput("col_past", "Vergangenheitslinie", value = "black")),
+        #################### Parameters: Advanced ###################################################
+        conditionalPanel(condition = "input.advanced.includes('nec.dates')",
+                         helpText("Wie viele Daten brauche ich mindestens, um die Zukunft 'vorherzusagen'?"),
+                         numericInput("nec.dates", "Notwendige Datenanzahl", min = 5, max = 20, value = 10)),
+        conditionalPanel(condition = "input.advanced.includes('more.than')",
+                         helpText("Wie viele Tage hintereinander muss der Warenbestand unter 5% des Ausgangsbestands sein, damit der Bestand auf null korigiert wird?"),
+                         numericInput("more.than", "mindestens", min = 10, max = 30, value = 15)),
+        conditionalPanel(condition = "input.advanced.includes('smoother')",
+                         selectInput("smoother", "smoother", which.smoother, selected = "smoother")),
+        conditionalPanel(condition = "input.advanced.includes('span')",
+                         sliderInput("span", "Intervallbreite", min = 0.01, max = 1, step = 0.01, value = 0.1)),
+        conditionalPanel(condition = "input.advanced.includes('degree')",
+                         numericInput("degree", "Grad", min = 1, max = 5, value = 1))
       ),
       
       
