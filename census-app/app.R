@@ -205,7 +205,8 @@ ui <- shinyUI(fluidPage(
         conditionalPanel(condition = "input.productFuture != 'Bitte waehlen'",
                          plotOutput("prodPlot")),
         conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                         plotOutput("groupStock", height = 800),
+                         plotOutput("groupStock", height = 800)),
+        conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
                          tableOutput("orderTable"))
       )
     )
