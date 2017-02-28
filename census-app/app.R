@@ -74,63 +74,36 @@ ui <- shinyUI(fluidPage(
     sidebarLayout(
       sidebarPanel(
         width = 3,
-        ###################### stepwise opening parameter settings ######################
-        radioButtons("what", 
-                     label = "Aktuell  oder Zukunft?",
-                     choices = list("Aktueller Warenbestand" = 'present', 
-                                    "Zukunftsprognose" = 'future')),
-        
         ################################# Future ########################################
-        conditionalPanel(condition = "input.what == 'future'",
-                         selectInput("numFuture",
-                                     "Einzelnes Produkt oder eine Gruppe?",
-                                     choices = list("Bitte wählen" = 0,
-                                                    "Einzelnes Produkt" = 1,
-                                                    "Produktgruppe (Familie)" = 2,
-                                                    "Lieferanten" = 3)),
-                         # Which product?
-                         conditionalPanel(condition = "input.numFuture == 1",
-                                          selectizeInput("productFuture",
-                                                         "Produkt",
-                                                         choices = c("Bitte wählen" = "Bitte waehlen", 
-                                                                     levels(kornumsatz$Produkt)), 
-                                                         select = "Bitte waehlen",
-                                                         options = list(create = TRUE,
-                                                                        placeholder = lapply(levels(kornumsatz$Produkt), '['),
-                                                                        maxItems = 1))),
-                         conditionalPanel(condition = "input.numFuture == 2",
-                                          selectInput("groupFuture",
-                                                      "Produktgruppen",
-                                                      choices = product.group),
-                                          conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                                                           helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                                           numericInput('weeks', 'Wochen', value = 4, min = 1)))
-                         ),
-        ################################ Present Stock #################################
-        conditionalPanel(condition = "input.what == 'present'",
-                         selectInput("numPresent",
-                                     "Nach Gruppe oder Lieferant?",
-                                     choices = list("Bitte wählen" = 0,
-                                                    "Einzelnes Produkt" = 1,
-                                                    "Produktgruppe (Familie)" = 2,
-                                                    "Lieferanten" = 3)),
-                         # Which product?
-                         conditionalPanel(condition = "input.numPresent == 1",
-                                          selectizeInput("productPresent",
-                                                         "Produkt",
-                                                         choices = c("Bitte wählen" = "Bitte waehlen", 
-                                                                     levels(kornumsatz$Produkt)), 
-                                                         select = "Bitte waehlen",
-                                                         options = list(create = TRUE,
-                                                                        placeholder = lapply(levels(kornumsatz$Produkt), '['),
-                                                                        maxItems = 1))),
-                         conditionalPanel(condition = "input.numPresent == 2",
-                                          selectInput("groupPresent",
-                                                      "Produktgruppen",
-                                                      choices = product.group))
-                         ),
+        selectInput("quantity",
+                    "Einzelnes Produkt oder eine Gruppe?",
+                    choices = list("Bitte wählen" = 0,
+                                   "Einzelnes Produkt" = 1,
+                                   "Produktgruppe (Familie)" = 2,
+                                   "Lieferanten" = 3)),
+        # Which product?
+        conditionalPanel(condition = "input.quantity == 1",
+                         selectizeInput("product",
+                                        "Produkt",
+                                        choices = c("Bitte wählen" = "Bitte waehlen", 
+                                                    levels(kornumsatz$Produkt)), 
+                                        select = "Bitte waehlen",
+                                        options = list(create = TRUE,
+                                                       placeholder = lapply(levels(kornumsatz$Produkt), '['),
+                                                       maxItems = 1))),
+        conditionalPanel(condition = "input.quantity == 2",
+                         selectInput("group",
+                                     "Produktgruppen",
+                                     choices = product.group),
+                         # here must be a condition: only if we are in the tab "Zukunftsprognose"
+                         conditionalPanel(condition = "input.group != 'Bitte waehlen'",
+                                          helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                          numericInput('weeks', 'Wochen', value = 4, min = 1))),
         
-        conditionalPanel(condition = "input.numFuture != 0 | input.numPresent != 0",
+        #########################################################################################
+        ###################### Parameter settings ###############################################
+        #########################################################################################
+        conditionalPanel(condition = "input.quantity != 0",
                          checkboxInput("settings",
                                        label = "Erweiterte Einstellungen",
                                        value = FALSE),
@@ -202,12 +175,27 @@ ui <- shinyUI(fluidPage(
       
       
       mainPanel(
-        conditionalPanel(condition = "input.productFuture != 'Bitte waehlen'",
-                         plotOutput("prodPlot")),
-        conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                         plotOutput("groupStock", height = 800)),
-        conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
-                         tableOutput("orderTable"))
+        tabsetPanel(id = "tabs",
+          tabPanel("Warenbestand", value = 1,
+                   conditionalPanel(condition = "input.quantity == 1",
+                                    plotOutput("myPlot")),
+                   conditionalPanel(condition = "input.quantity == 2",
+                                    plotOutput("currentStorage")),
+                   conditionalPanel(condition = "input.quantity == 3",
+                                    plotOutput("currentStorage"))
+          ),
+          tabPanel("Zukunftsprognose", value = 2,
+                   conditionalPanel(condition = "input.quantity == 1",
+                                    plotOutput("fun_reg")),#if <= 6 <- plotOutput(group_reg),
+                   #if > 6 <- tableOutput(group_reg),
+                   conditionalPanel(condition = "input.quantity == 2"),
+                   #if <= 6 <- plotOutput(group_reg),
+                   #if > 6 <- tableOutput(group_reg),
+                   conditionalPanel(condition = "input.quantity == 3")
+                   #if <= 6 <- plotOutput(group_reg),
+                   #if > 6 <- tableOutput(group_reg),
+          )
+        )
       )
     )
     
