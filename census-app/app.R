@@ -57,11 +57,11 @@ which.smoother <- c("smoother")
 smoother.pars <- c("span", "degree")
 advanced.pars <- c("nec.dates", "more.than", which.smoother, smoother.pars)
 advanced.list <- c("Notwendige Datenanzahl" = "nec.dates", "Mindestens" = "more.than", "smoother" = "smoother", "span" = "span", "Grad" = "degree")
-fun_reg.list <- list("Zeitangaben" = "data.pars", 
-                     "Graphische Parameter" = "graphic.pars",
-                     "Beschriftung" = "scription.pars",
-                     "Farben" = "col.pars",
-                     "Für Fortgeschrittene" = "advanced.pars")
+fun_reg.list <- list("Zeitangaben" = "data", 
+                     "Graphische Parameter" = "graphics",
+                     "Beschriftung" = "labels",
+                     "Farben" = "col",
+                     "Für Fortgeschrittene" = "advanced")
 fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pars)
 
 
@@ -71,133 +71,135 @@ fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pa
 ui <- shinyUI(fluidPage(
     titlePanel("Kornkammer"),
     
-    sidebarLayout(
-      sidebarPanel(
-        width = 3,
-        ################################# Future ########################################
-        selectInput("quantity",
-                    "Einzelnes Produkt oder Gruppe?",
-                    choices = list("Bitte wählen" = 0,
-                                   "Einzelnes Produkt" = 1,
-                                   "Produktgruppe (Familie)" = 2,
-                                   "Lieferanten" = 3)),
-        # Which product?
-        conditionalPanel(condition = "input.quantity == 1",
-                         selectizeInput("product",
-                                        "Produkt",
-                                        choices = c("Bitte wählen" = "Bitte waehlen", 
-                                                    levels(kornumsatz$Produkt)), 
-                                        select = "Bitte waehlen",
-                                        options = list(create = TRUE,
-                                                       placeholder = lapply(levels(kornumsatz$Produkt), '['),
-                                                       maxItems = 1))),
-        conditionalPanel(condition = "input.quantity == 2",
-                         selectInput("group",
-                                     "Produktgruppen",
-                                     choices = product.group),
-                         # here must be a condition: only if we are in the tab "Zukunftsprognose"
-                         conditionalPanel(condition = "input.group != 'Bitte waehlen'",
-                                          helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                          numericInput('weeks', 'Wochen', value = 4, min = 1))),
-        
-        #########################################################################################
-        ###################### Parameter settings ###############################################
-        #########################################################################################
-        conditionalPanel(condition = "input.quantity != 0",
-                         checkboxInput("settings",
-                                       label = "Erweiterte Einstellungen",
-                                       value = FALSE),
-                         conditionalPanel(condition = "input.settings == true",
-                                          checkboxGroupInput("pars", label ="Parametergruppen",
-                                                             choices = fun_reg.list),
-                                          conditionalPanel(condition = "input.pars.includes('data.pars')",
-                                                           checkboxGroupInput("data", "Zeitangaben", data.list)),
-                                          conditionalPanel(condition = "input.pars.includes('graphic.pars')",
-                                                           checkboxGroupInput("graphics", "Grafikeinstellungen", graphic.list)),
-                                          conditionalPanel(condition = "input.pars.includes('scription.pars')",
-                                                           checkboxGroupInput('labels', "Beschriftung", scription.list)),
-                                          conditionalPanel(condition = "input.pars.includes('col.pars')",
-                                                           checkboxGroupInput('cols', "Farben", col.list)),
-                                          conditionalPanel(condition = "input.pars.includes('advanced.pars')",
-                                                           checkboxGroupInput('advanced', "Fortgeschritten", advanced.list)),
-                                          actionButton("submit", "Übernehmen")
-                         )),
-        ##################### Parameters: Data ######################################################
-        conditionalPanel(condition = "input.data.includes('from')",
-                         dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
-        conditionalPanel(condition = "input.data.includes('to')",
-                         dateInput("to", "Bis", value = as.character(Sys.Date()))),
-        ##################### Parameters: Graphics ##################################################
-        conditionalPanel(condition = "input.graphics.includes('type')",
-                         radioButtons("type", "Plot-Art", choices = c("Punkte und Linie" = "b", "Nur Punkte" = "p", "Nur Linie" = "l"), selected = "b")),
-#        conditionalPanel(condition = "input.graphics.includes('pch')",
-#                         ...),
-        conditionalPanel(condition = "input.graphics.includes('las')",
-                         numericInput('las', 'Ausrichtung Beschriftung', min = 0, max = 2, step = 1, value = 2)),
-#        conditionalPanel(condition = "input.graphics.includes('lwd')",
-#                         ...),
-#        conditionalPanel(condition = "input.graphics.includes('lty')",
-#                         ...)
-        #################### Parameters: Labels #####################################################
-### here there are '???': default value shall be the name of product = input.productFuture
-        conditionalPanel(condition = "input.labels.includes('main_header')",
-                         helpText("Nur den Namen des Produktes eingeben im 'Dativ'"),
-                         textInput("main_header", "Überschrift")),
-        conditionalPanel(condition = "input.labels.includes('xlab')",
-                         textInput("xlab", "x-Achsen-Beschriftung", value = "")),
-        conditionalPanel(condition = "input.labels.includes('ylab')",
-                         textInput("ylab", "y-Achsen-Beschriftung", value = "Warenbestand in Kilo")),
-        #################### Parameters: Colours ####################################################
-        conditionalPanel(condition = "input.cols.includes('col_points')",
-                         colourInput("col_points", "Punktfarbe", value = "grey")),
-        conditionalPanel(condition = "input.cols.includes('col_reg')",
-                         colourInput("col_reg", "Farbe der 'Zukunftslinie'", value = "grey")),
-        conditionalPanel(condition = "input.cols.includes('col_conv')",
-                         colourInput("col_conv", "Konvergenzintervalle", value = "lightgrey")),
-        conditionalPanel(condition = "input.cols.includes('col_20')",
-                         colourInput("col_20", "Warnfarbe", value = "red")),
-        conditionalPanel(condition = "input.cols.includes('col_past')",
-                         colourInput("col_past", "Vergangenheitslinie", value = "black")),
-        #################### Parameters: Advanced ###################################################
-        conditionalPanel(condition = "input.advanced.includes('nec.dates')",
-                         helpText("Wie viele Daten brauche ich mindestens, um die Zukunft 'vorherzusagen'?"),
-                         numericInput("nec.dates", "Notwendige Datenanzahl", min = 5, max = 20, value = 10)),
-        conditionalPanel(condition = "input.advanced.includes('more.than')",
-                         helpText("Wie viele Tage hintereinander muss der Warenbestand unter 5% des Ausgangsbestands sein, damit der Bestand auf null korigiert wird?"),
-                         numericInput("more.than", "mindestens", min = 10, max = 30, value = 15)),
-        conditionalPanel(condition = "input.advanced.includes('smoother')",
-                         selectInput("smoother", "smoother", which.smoother, selected = "smoother")),
-        conditionalPanel(condition = "input.advanced.includes('span')",
-                         sliderInput("span", "Intervallbreite", min = 0.01, max = 1, step = 0.01, value = 0.1)),
-        conditionalPanel(condition = "input.advanced.includes('degree')",
-                         numericInput("degree", "Grad", min = 1, max = 5, value = 1))
+    fluidRow(
+      column(4,
+             selectInput("quantity",
+                         "Einzelnes Produkt oder Gruppe?",
+                         choices = list("Bitte wählen" = 0,
+                                        "Einzelnes Produkt" = 1,
+                                        "Produktgruppe (Familie)" = 2,
+                                        "Lieferanten" = 3))),
+      column(4,
+             # Which product?
+             conditionalPanel(condition = "input.quantity == 1",
+                              selectizeInput("product",
+                                             "Produkt",
+                                             choices = c("Bitte wählen" = "Bitte waehlen", 
+                                                         levels(kornumsatz$Produkt)), 
+                                             select = "Bitte waehlen",
+                                             options = list(create = TRUE,
+                                                            placeholder = lapply(levels(kornumsatz$Produkt), '['),
+                                                            maxItems = 1))),
+             conditionalPanel(condition = "input.quantity == 2",
+                              selectInput("group",
+                                          "Produktgruppen",
+                                          choices = product.group),
+                              # here must be a condition: only if we are in the tab "Zukunftsprognose"
+                              conditionalPanel(condition = "input.group != 'Bitte waehlen'",
+                                               helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                               numericInput('weeks', 'Wochen', value = 4, min = 1))),
+             conditionalPanel(condition = "input.quantity != 0",
+                              checkboxInput("settings",
+                                            label = "Erweiterte Einstellungen",
+                                            value = FALSE))
+             ),
+      column(4,
+             conditionalPanel(condition = "input.settings == true",
+                              checkboxGroupInput("pars", label ="Parametergruppen",
+                                                 choices = fun_reg.list))
+             )
+    ),
+      #########################################################################################
+      ###################### Parameter settings ###############################################
+      #########################################################################################
+    fluidRow(
+      ##################### Parameters: Data and Labels ##########################################
+      column(3,
+             conditionalPanel(condition = "input.pars.includes('data')",
+                              checkboxGroupInput("data", "Zeitangaben", data.list)),
+             conditionalPanel(condition = "input.pars.includes('labels')",
+                              checkboxGroupInput('labels', "Beschriftung", scription.list)),
+             conditionalPanel(condition = "input.data.includes('from')",
+                              dateInput("from", "Von", value = as.character(Sys.Date() %m-% months(6)))),
+             conditionalPanel(condition = "input.data.includes('to')",
+                              dateInput("to", "Bis", value = as.character(Sys.Date()))),
+             conditionalPanel(condition = "input.labels.includes('main_header')",
+                              helpText("Nur den Namen des Produktes eingeben im 'Dativ'"),
+                              textInput("main_header", "Überschrift")),
+             conditionalPanel(condition = "input.labels.includes('xlab')",
+                              textInput("xlab", "x-Achsen-Beschriftung", value = "")),
+             conditionalPanel(condition = "input.labels.includes('ylab')",
+                              textInput("ylab", "y-Achsen-Beschriftung", value = "Warenbestand in Kilo"))
       ),
-      
-      
-      mainPanel(
-        tabsetPanel(id = "tabs",
-          tabPanel("Warenbestand", value = 1,
-                   conditionalPanel(condition = "input.quantity == 1",
-                                    plotOutput("myPlot")),
-                   conditionalPanel(condition = "input.quantity == 2",
-                                    plotOutput("currentStorage")),
-                   conditionalPanel(condition = "input.quantity == 3",
-                                    plotOutput("currentStorage"))
-          ),
-          tabPanel("Zukunftsprognose", value = 2,
-                   conditionalPanel(condition = "input.quantity == 1",
-                                    plotOutput("fun_reg")),#if <= 6 <- plotOutput(group_reg),
-                   #if > 6 <- tableOutput(group_reg),
-                   conditionalPanel(condition = "input.quantity == 2"),
-                   #if <= 6 <- plotOutput(group_reg),
-                   #if > 6 <- tableOutput(group_reg),
-                   conditionalPanel(condition = "input.quantity == 3")
-                   #if <= 6 <- plotOutput(group_reg),
-                   #if > 6 <- tableOutput(group_reg),
-          )
-        )
+      ##################### Parameters: Graphics ##################################################
+      column(3,
+             
+             conditionalPanel(condition = "input.pars.includes('graphics')",
+                              checkboxGroupInput("graphics", "Grafikeinstellungen", graphic.list)),
+             
+             br(),
+             
+             conditionalPanel(condition = "input.graphics.includes('type')",
+                              radioButtons("type", "Plot-Art", choices = c("Punkte und Linie" = "b", "Nur Punkte" = "p", "Nur Linie" = "l"), selected = "b")),
+             #        conditionalPanel(condition = "input.graphics.includes('pch')",
+             #                         ...),
+             conditionalPanel(condition = "input.graphics.includes('las')",
+                              numericInput('las', 'Ausrichtung Beschriftung', min = 0, max = 2, step = 1, value = 2))
+             #        conditionalPanel(condition = "input.graphics.includes('lwd')",
+             #                         ...),
+             #        conditionalPanel(condition = "input.graphics.includes('lty')",
+             #)
+      ),
+      #################### Parameters: Colours ####################################################
+      column(3,
+             conditionalPanel(condition = "input.pars.includes('col')",
+                              checkboxGroupInput('cols', "Farben", col.list)),
+             br(),
+             conditionalPanel(condition = "input.cols.includes('col_points')",
+                              colourInput("col_points", "Punktfarbe", value = "grey")),
+             conditionalPanel(condition = "input.cols.includes('col_reg')",
+                              colourInput("col_reg", "Farbe der 'Zukunftslinie'", value = "grey")),
+             conditionalPanel(condition = "input.cols.includes('col_conv')",
+                              colourInput("col_conv", "Konvergenzintervalle", value = "lightgrey")),
+             conditionalPanel(condition = "input.cols.includes('col_20')",
+                              colourInput("col_20", "Warnfarbe", value = "red")),
+             conditionalPanel(condition = "input.cols.includes('col_past')",
+                              colourInput("col_past", "Vergangenheitslinie", value = "black"))
+      ),
+      #################### Parameters: Advanced ###################################################
+      column(3,
+             conditionalPanel(condition = "input.pars.includes('advanced')",
+                              checkboxGroupInput('advanced', "Fortgeschritten", advanced.list)),
+             br(),
+             conditionalPanel(condition = "input.advanced.includes('nec.dates')",
+                              helpText("Wie viele Daten brauche ich mindestens, um die Zukunft 'vorherzusagen'?"),
+                              numericInput("nec.dates", "Notwendige Datenanzahl", min = 5, max = 20, value = 10)),
+             conditionalPanel(condition = "input.advanced.includes('more.than')",
+                              helpText("Wie viele Tage hintereinander muss der Warenbestand unter 5% des Ausgangsbestands sein, damit der Bestand auf null korigiert wird?"),
+                              numericInput("more.than", "mindestens", min = 10, max = 30, value = 15)),
+             conditionalPanel(condition = "input.advanced.includes('smoother')",
+                              selectInput("smoother", "smoother", which.smoother, selected = "smoother")),
+             conditionalPanel(condition = "input.advanced.includes('span')",
+                              sliderInput("span", "Intervallbreite", min = 0.01, max = 1, step = 0.01, value = 0.1)),
+             conditionalPanel(condition = "input.advanced.includes('degree')",
+                              numericInput("degree", "Grad", min = 1, max = 5, value = 1))
+      )
+    ),
+    
+    fluidRow(
+      column(12,
+             conditionalPanel(condition = "input.pars.includes('data') |
+                              input.pars.includes('graphics') |
+                              input.pars.includes('labels') |
+                              input.pars.includes('col') |
+                              input.pars.includes('advanced')",
+                              actionButton("goButton", "Übernehmen"))
       )
     )
+     
+      
+      
+
     
   ))
 
