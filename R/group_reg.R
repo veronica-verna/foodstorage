@@ -1,6 +1,6 @@
 #### function for calculating regressions for groups ####
 
-group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4) {
+group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4, errors = FALSE) {
   
   len <- length(group)
   
@@ -84,11 +84,14 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     for (i in 1:length(dif.error.messages)) messages[length(messages) + 1] <- paste(dif.messages[i], dif.error.messages[i], sep = " = ")
     legend <- list(calls = calls, messages = messages) # and that's the last output
     
+    if (errors == TRUE) return(list(Fehler = table.errors,
+                                    Legende = legend))
     if (exists("already.over") == TRUE) return(list(schon.leer = already.over,
                                                     bald.leer = will.be.over.soon,
-                                                    manuell.checken = table.errors,
-                                                    FehlerLegende = legend))
-    return(list(bald.leer = table.works, manuell.checken = table.errors, FehlerLegende = legend))
+                                                    manuell.checken = table.errors[,1]
+                                                    ))
+    return(list(bald.leer = table.works, 
+                manuell.checken = table.errors[,1]))
   }
   
   ############################ if result should be plots ##############################
