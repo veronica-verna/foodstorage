@@ -98,8 +98,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
   
   ### plot-window settings ###
   if (len == 2) par(mfrow=c(2,1))
-  if (len %in% c(3,4)) par(mfrow=c(2,2))
-  if (len >= 5) par(mfrow=c(ceiling(len/3), 3))
+  if (len >= 3) par(mfrow=c(ceiling(len/2), 2))
   
   # now plotting ##
   for (i in 1:len) plotting.groups(group[i], from = from, to = to)
