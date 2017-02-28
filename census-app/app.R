@@ -7,8 +7,9 @@ library(data.table)
 ######################################################################
 ###################### read kornumsatz ###############################
 ######################################################################
-kornumsatz <- read.csv2("data/kornumsatz.csv")
-kornumsatz$Datum <- as.Date(kornumsatz$Datum)
+#kornumsatz <- read.csv2("https://raw.github.com/frumentum/foodcoop-storage/master/data/kornumsatz.csv", colClasses = "character")
+kornumsatz <- read.csv2("data/kornumsatz.csv", colClasses = "character")
+kornumsatz$Datum <- as.factor(kornumsatz$Datum)
 kornumsatz$MengeKum <- as.numeric(kornumsatz$MengeKum)
 kornumsatz$Einheit <- as.factor(kornumsatz$Einheit)
 kornumsatz$Preis <- as.numeric(kornumsatz$Preis)
@@ -16,7 +17,7 @@ kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 kornumsatz$Umsatz <- as.numeric(kornumsatz$Umsatz)
 kornumsatz$Bestand_Einheit <- as.numeric(kornumsatz$Bestand_Einheit)
 kornumsatz$Bestand_Preis <- as.numeric(kornumsatz$Bestand_Preis)
-kornumsatz <- startup.settings(kornumsatz, reduce = TRUE)
+kornumsatz <- startup.settings(kornumsatz)
 
 ##################################### product groups ######################
 product.group <- list("Bitte wählen" = "Bitte waehlen",
@@ -204,8 +205,7 @@ ui <- shinyUI(fluidPage(
         conditionalPanel(condition = "input.productFuture != 'Bitte waehlen'",
                          plotOutput("prodPlot")),
         conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                         plotOutput("groupStock", height = 800)),
-        conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
+                         plotOutput("groupStock", height = 800),
                          tableOutput("orderTable"))
       )
     )
