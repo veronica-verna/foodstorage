@@ -76,7 +76,7 @@ ui <- shinyUI(fluidPage(
         width = 3,
         ################################# Future ########################################
         selectInput("quantity",
-                    "Einzelnes Produkt oder eine Gruppe?",
+                    "Einzelnes Produkt oder Gruppe?",
                     choices = list("Bitte wählen" = 0,
                                    "Einzelnes Produkt" = 1,
                                    "Produktgruppe (Familie)" = 2,
