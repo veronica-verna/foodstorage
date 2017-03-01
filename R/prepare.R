@@ -6,6 +6,7 @@ prepare <- function(name.of.product,
                     more.than = 15,
                     data = kornumsatz,
                     current.storage = FALSE,
+                    myPlot = FALSE,
                     test = FALSE) {
   
   ##### at first: check if the input is correct! ####
@@ -149,6 +150,7 @@ prepare <- function(name.of.product,
     if (current.storage == TRUE) table <- table[nrow(table), ]
     
     if (test == TRUE) return("yes")
+    if (myPlot == TRUE) return(list(table = table, name.of.product = name.of.product))
     return(table)
     
 }
