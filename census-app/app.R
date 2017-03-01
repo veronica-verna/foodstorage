@@ -380,7 +380,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
 
 
 server <- shinyServer(function(input, output){
-    observeEvent(input$goButton, {
+    observeEvent(input$goButtonFut, {
       output$fun_reg  <- renderPlot({
         if (input$productFut != 'Bitte waehlen') {
           fun_reg(product = input$productFut, main_header = input$productFut)
@@ -393,6 +393,14 @@ server <- shinyServer(function(input, output){
       if (input$productFut != 'Bitte waehlen' && input$settings == FALSE) {
         fun_reg(product = input$productFut, main_header = input$productFut)
       }
+    })
+    
+    observeEvent(input$goButton, {
+      output$myPlot  <- renderPlot({
+        if (input$product != 'Bitte waehlen') {
+          myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
+        }
+      })
     })
     
     output$myPlot <- renderPlot({
