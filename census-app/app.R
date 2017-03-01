@@ -113,6 +113,7 @@ ui <- shinyUI(fluidPage(
       ###################### Parameter settings ###############################################
       #########################################################################################
     fluidRow(
+      
       ##################### Parameters: Data and Labels ##########################################
       column(3,
              conditionalPanel(condition = "input.pars.includes('data')",
@@ -195,9 +196,21 @@ ui <- shinyUI(fluidPage(
                               input.pars.includes('advanced')",
                               actionButton("goButton", "Übernehmen"))
       )
-    )
-     
-      
+    ),
+
+
+##############################################################################################
+############################# Main Panel #####################################################
+##############################################################################################
+
+    fluidRow(
+      conditionalPanel(condition = "input.product != 'Bitte waehlen'",
+                       plotOutput("prodPlot"))
+      #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
+      #                 plotOutput("groupStock", height = 800)),
+      #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
+      #                 tableOutput("orderTable"))
+    )  
       
 
     
@@ -213,10 +226,12 @@ server <- shinyServer(function(input, output){
       output$prodPlot  <- renderPlot({
         fun_reg(product = input$productFuture, main_header = input$productFuture)
       })
-    }) 
+    })
+  
+
     output$prodPlot  <- renderPlot({
-      if (input$productFuture != 'Bitte waehlen' && input$settings == FALSE) {
-        fun_reg(product = input$productFuture, main_header = input$productFuture)
+      if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
+        fun_reg(product = input$product, main_header = input$product)
       }
     })
     
