@@ -209,7 +209,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          fluidRow(
                            conditionalPanel(condition = "input.product != 'Bitte waehlen'",
-                                            plotOutput("prodPlot"))
+                                            plotOutput("myPlot"))
                            #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
                            #                 plotOutput("groupStock", height = 800)),
                            #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
@@ -357,7 +357,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          fluidRow(
                            conditionalPanel(condition = "input.product != 'Bitte waehlen'",
-                                            plotOutput("prodPlot"))
+                                            plotOutput("fun_reg"))
                            #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
                            #                 plotOutput("groupStock", height = 800)),
                            #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
@@ -373,16 +373,24 @@ ui <- shinyUI(navbarPage("Kornkammer",
 
 
 server <- shinyServer(function(input, output){
-    observeEvent(input$submit, {
-      output$prodPlot  <- renderPlot({
-        fun_reg(product = input$productFuture, main_header = input$productFuture)
+    observeEvent(input$goButton, {
+      output$fun_reg  <- renderPlot({
+        if (input$product != 'Bitte waehlen') {
+          fun_reg(product = input$product, main_header = input$product)
+        }
       })
     })
   
 
-    output$prodPlot  <- renderPlot({
+    output$fun_reg  <- renderPlot({
       if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
         fun_reg(product = input$product, main_header = input$product)
+      }
+    })
+    
+    output$myPlot <- renderPlot({
+      if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
+        myPlot(prepare(input$product, what.plotting = "Warenbestand"))
       }
     })
     
