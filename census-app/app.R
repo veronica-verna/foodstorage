@@ -96,11 +96,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                   conditionalPanel(condition = "input.quantity == 2",
                                                    selectInput("group",
                                                                "Produktgruppen",
-                                                               choices = product.group),
-                                                   # here must be a condition: only if we are in the tab "Zukunftsprognose"
-                                                   conditionalPanel(condition = "input.group != 'Bitte waehlen'",
-                                                                    helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                                                    numericInput('weeks', 'Wochen', value = 4, min = 1))),
+                                                               choices = product.group)),
                                   conditionalPanel(condition = "input.quantity != 0",
                                                    checkboxInput("settings",
                                                                  label = "Erweiterte Einstellungen",
@@ -212,9 +208,9 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          fluidRow(
                            conditionalPanel(condition = "input.product != 'Bitte waehlen'",
-                                            plotOutput("myPlot"))
-                           #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                           #                 plotOutput("groupStock", height = 800)),
+                                            plotOutput("myPlot")),
+                           conditionalPanel(condition = "input.group != 'Bitte waehlen'",
+                                            plotOutput("currentStorage"))
                            #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
                            #                 tableOutput("orderTable"))
                          )  
@@ -374,58 +370,65 @@ ui <- shinyUI(navbarPage("Kornkammer",
     
   ))
 
+
 ######################################################################################################################
 ####################################### Shiny Server #################################################################
 ######################################################################################################################
 
 
 server <- shinyServer(function(input, output){
-    observeEvent(input$goButtonFut, {
-      output$fun_reg  <- renderPlot({
-        if (input$productFut != 'Bitte waehlen') {
-          fun_reg(product = input$productFut, main_header = input$productFut)
-        }
-      })
-    })
-  
-
+  #################################### fun_reg #####################################################
+  observeEvent(input$goButtonFut, {
     output$fun_reg  <- renderPlot({
-      if (input$productFut != 'Bitte waehlen' && input$settings == FALSE) {
+      if (input$productFut != 'Bitte waehlen') {
         fun_reg(product = input$productFut, main_header = input$productFut)
       }
     })
-    
-    observeEvent(input$goButton, {
-      output$myPlot  <- renderPlot({
-        if (input$product != 'Bitte waehlen') {
-          myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
-        }
-      })
-    })
-    
-    output$myPlot <- renderPlot({
-      if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
+  })
+  
+  
+  output$fun_reg  <- renderPlot({
+    if (input$productFut != 'Bitte waehlen' && input$settings == FALSE) {
+      fun_reg(product = input$productFut, main_header = input$productFut)
+    }
+  })
+  
+  #################################### myPlot ########################################################
+  observeEvent(input$goButton, {
+    output$myPlot  <- renderPlot({
+      if (input$product != 'Bitte waehlen') {
         myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
       }
     })
-    
-    output$groupStock <- renderPlot({
-      
-      if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
-        group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
-        names(group) <- c()
-        if (length(group) <= 6) group_reg(group = group, weeks = input$weeks)
-      }
-    })
-    
-    output$orderTable <- renderTable({
-      if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
-        group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
-        names(group) <- c()
-        if (length(group) > 6) group_reg(group = group, weeks = input$weeks, list = TRUE)[[1]]
-      }
-    })
-    
   })
+  
+  output$myPlot <- renderPlot({
+    if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
+      myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
+    }
+  })
+  
+  ################################### group_reg ###################################################
+  
+  output$orderTable <- renderTable({
+    if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+      names(group) <- c()
+      if (length(group) > 6) group_reg(group = group, weeks = input$weeks, list = TRUE)[[1]]
+    }
+  })
+  
+  ################################### current storage ##############################################
+  output$currentStorage <- renderPlot({
+    
+    if (input$group != 'Bitte waehlen') {
+      group <- unlist(groups.long[which(names(groups.long) == input$group)])
+      names(group) <- c()
+      currentStorage(group)
+    }
+  })
+  
+})
 
+####################################### shiny app executing ################################################
 shinyApp(ui, server)
