@@ -6,7 +6,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
   
   ## if group is bigger than 12, result will be a data frame ###
   
-  if (len > 12 | list == TRUE) {
+  if (len > 6 | list == TRUE) {
     # create an empty data.frame and empty name vector
     table.works <- data.frame(Produkt = character(), 
                               LetztesAuffuellen = as.Date(character()),

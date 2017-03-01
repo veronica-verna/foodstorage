@@ -360,11 +360,11 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          fluidRow(
                            conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
-                                            plotOutput("fun_reg"))
-                           #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen'",
-                           #                 plotOutput("groupStock", height = 800)),
-                           #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
-                           #                 tableOutput("orderTable"))
+                                            plotOutput("fun_reg")),
+                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
+                                            plotOutput("group_regPlot", height = 800)),
+                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen",
+                                            tableOutput("group_regTab"))
                          )
                          )
     
@@ -397,21 +397,29 @@ server <- shinyServer(function(input, output){
   observeEvent(input$goButton, {
     output$myPlot  <- renderPlot({
       if (input$product != 'Bitte waehlen') {
-        myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
+        suppressWarnings(myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE)))
       }
     })
   })
   
   output$myPlot <- renderPlot({
     if (input$product != 'Bitte waehlen' && input$settings == FALSE) {
-      myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE))
+      suppressWarnings(myPlot(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE)))
     }
   })
   
   ################################### group_reg ###################################################
   
-  output$orderTable <- renderTable({
-    if (input$what == 'future' && input$groupFuture != 'Bitte waehlen') {
+  output$group_regPlot <- renderPlot({
+    if (input$groupFut != 'Bitte waehlen') {
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+      names(group) <- c()
+      if (length(group) <= 6) group_reg(group = group, weeks = input$weeks)
+    }
+  })
+  
+  output$group_regTab <- renderTable({
+    if (input$groupFut != 'Bitte waehlen') {
       group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
       names(group) <- c()
       if (length(group) > 6) group_reg(group = group, weeks = input$weeks, list = TRUE)[[1]]
