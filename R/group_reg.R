@@ -39,7 +39,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
                                    Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
                                    Ende = as.character(table.works.over$Ende),
                                    Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
-                                   Dauer = as.numeric(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
+                                   Dauer = as.integer(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
                                                       units = "days"),
                                    Einheit = rep("Tage", nrow(table.works.over)),
                                    check.names = FALSE)
@@ -48,7 +48,7 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
                                         Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
                                         Ende = as.character(table.works.over.soon$Ende),
                                         Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
-                                        Dauer = as.numeric(table.works.over.soon$Ende - last.data.point, units = "days"),
+                                        Dauer = as.integer(table.works.over.soon$Ende - last.data.point, units = "days"),
                                         Einheit = rep("Tage", len = nrow(table.works.over.soon)),
                                         check.names = FALSE)
         if (nrow(will.be.over.soon) == 0) 

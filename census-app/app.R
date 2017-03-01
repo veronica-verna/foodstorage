@@ -362,7 +362,9 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
                                             plotOutput("fun_reg")),
                            conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
-                                            plotOutput("group_regPlot", height = 800)),
+                                            textOutput("test")),
+                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
+                                            plotOutput("group_regPlot")),
                            conditionalPanel(condition = "input.groupFut != 'Bitte waehlen",
                                             tableOutput("group_regTab"))
                          )
@@ -410,19 +412,25 @@ server <- shinyServer(function(input, output){
   
   ################################### group_reg ###################################################
   
+  output$test <- renderText({
+    group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+    names(group) <- c()
+    return(group)
+  })
+  
   output$group_regPlot <- renderPlot({
     if (input$groupFut != 'Bitte waehlen') {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
       names(group) <- c()
-      if (length(group) <= 6) group_reg(group = group, weeks = input$weeks)
+      if (length(group) <= 6) group_reg(group = group)
     }
   })
   
   output$group_regTab <- renderTable({
     if (input$groupFut != 'Bitte waehlen') {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFuture)])
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
       names(group) <- c()
-      if (length(group) > 6) group_reg(group = group, weeks = input$weeks, list = TRUE)[[1]]
+      if (length(group) > 6) group_reg(group = group, weeks = input$weeksFut, list = TRUE)[[1]]
     }
   })
   
