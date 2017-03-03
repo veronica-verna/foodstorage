@@ -361,11 +361,9 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          fluidRow(
                            conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
                                             plotOutput("fun_reg")),
-                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
-                                            textOutput("test")),
-                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
+                           conditionalPanel(condition = "output.groupsize <= 6",
                                             plotOutput("group_regPlot")),
-                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen",
+                           conditionalPanel(condition = "output.groupsize > 6",
                                             tableOutput("group_regTab"))
                          )
                          )
@@ -412,27 +410,24 @@ server <- shinyServer(function(input, output){
   
   ################################### group_reg ###################################################
   
-  output$test <- renderText({
+  output$groupsize <- reactive({
+    if (input$groupFut != "Biite waehlen") {
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+      names(group) <- c()
+      return(length(group))
+    }
+  })
+  output$group_regPlot <- renderPlot({
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
     names(group) <- c()
-    return(group)
+    group_reg(group = group)
   })
-  
-  output$group_regPlot <- renderPlot({
-    if (input$groupFut != 'Bitte waehlen') {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
-      names(group) <- c()
-      if (length(group) <= 6) group_reg(group = group)
-    }
-  })
-  
   output$group_regTab <- renderTable({
-    if (input$groupFut != 'Bitte waehlen') {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
-      names(group) <- c()
-      if (length(group) > 6) group_reg(group = group, weeks = input$weeksFut, list = TRUE)[[1]]
-    }
+    group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+    names(group) <- c()
+    group_reg(group, weeks = input$weeksFut, list = T)
   })
+  
   
   ################################### current storage ##############################################
   output$currentStorage <- renderPlot({
