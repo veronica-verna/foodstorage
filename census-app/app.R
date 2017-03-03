@@ -361,6 +361,8 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          fluidRow(
                            conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
                                             plotOutput("fun_reg")),
+                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
+                                            textOutput("groupsize")),
                            conditionalPanel(condition = "output.groupsize <= 6",
                                             plotOutput("group_regPlot")),
                            conditionalPanel(condition = "output.groupsize > 6",

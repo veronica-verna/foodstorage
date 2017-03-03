@@ -57,8 +57,8 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     }
     
     if (exists("already.over") == TRUE && length(all.errors) == 0) 
-      return(list(schon.leer = already.over, bald.leer = will.be.over.soon))
-    if (length(all.errors) == 0) return(list(bald.leer = will.be.over.soon))
+      return(rbind(already.over, will.be.over.soon))
+    if (length(all.errors) == 0) return(will.be.over.soon)
              
     # next step: which different errors do we have and give each of them a number
     all.error.calls <- unlist(as.character(lapply(all.errors, '[[', 2))) # seperate calls and change them to character
@@ -86,12 +86,16 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     
     if (errors == TRUE) return(list(Fehler = table.errors,
                                     Legende = legend))
-    if (exists("already.over") == TRUE) return(list(schon.leer = already.over,
-                                                    bald.leer = will.be.over.soon,
-                                                    manuell.checken = table.errors[,1]
-                                                    ))
-    return(list(bald.leer = table.works, 
-                manuell.checken = table.errors[,1]))
+    table.errors <- data.frame(Produkt = table.errors[,1], 
+                               Bezeichnung = rep("manuell überprüfen", len = nrow(table.errors)),
+                               Ende = rep("via", nrow(table.errors)),
+                               Bezeichnung = rep("Warenbestand", len = nrow(table.errors)),
+                               Dauer = rep("->", nrow(table.errors)),
+                               Einheit = rep("Produkt", nrow(table.errors)),
+                               check.names = FALSE)
+    ### creating one big data frame for shiny
+    if (exists("already.over") == TRUE) return(rbind(already.over, will.be.over.soon, table.errors))
+    return(rbind(will.be.over.soon, table.errors))
   }
   
   ############################ if result should be plots ##############################
