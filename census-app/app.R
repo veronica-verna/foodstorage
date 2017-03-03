@@ -366,7 +366,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            conditionalPanel(condition = "output.groupsize <= 6",
                                             plotOutput("group_regPlot")),
                            conditionalPanel(condition = "output.groupsize > 6",
-                                            tableOutput("group_regTab"))
+                                            dataTableOutput("group_regTab"))
                          )
                          )
     
@@ -413,10 +413,10 @@ server <- shinyServer(function(input, output){
   ################################### group_reg ###################################################
   
   output$groupsize <- reactive({
-    if (input$groupFut != "Biite waehlen") {
+    if (input$groupFut != "Bitte waehlen") {
       group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
       names(group) <- c()
-      return(length(group))
+      length(group)
     }
   })
   output$group_regPlot <- renderPlot({
@@ -424,7 +424,7 @@ server <- shinyServer(function(input, output){
     names(group) <- c()
     group_reg(group = group)
   })
-  output$group_regTab <- renderTable({
+  output$group_regTab <- renderDataTable({
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
     names(group) <- c()
     group_reg(group, weeks = input$weeksFut, list = T)
