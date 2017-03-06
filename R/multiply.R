@@ -23,10 +23,10 @@ multiply <- function(FUN,
     stop("Vector of products has to be a factor")
   
   lev <- levels(products)
-  group_size = length(group)
+  group_size <- length(group)
   if (length(unique(group %in% lev)) !=1 && unique(group %in% lev) != TRUE)
     stop("Vector of products has to contain ALL name.of.product[s]")
-  
+   
   #if (FUN == "prepare") {
     if (length(par) == 0) {
       par <- list(what.plotting = "Warenbestand", from = "", to = "", more.than = 15, correction = 0.05)

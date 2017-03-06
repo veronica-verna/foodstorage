@@ -69,6 +69,7 @@ fun_reg.pars <- c(data.pars, graphic.pars, scription.pars, col.pars, advanced.pa
 ################################## Shiny UI ###################################################
 ###############################################################################################
 ui <- shinyUI(navbarPage("Kornkammer",
+                         theme = shinytheme("united"),
                 
                          ################################ Warenbestand ############################################
                 
@@ -78,10 +79,10 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            column(4,
                                   selectInput("quantity",
                                               "Einzelnes Produkt oder Gruppe?",
-                                              choices = list("Bitte wählen" = 0,
-                                                             "Einzelnes Produkt" = 1,
+                                              choices = list("Einzelnes Produkt" = 1,
                                                              "Produktgruppe (Familie)" = 2,
-                                                             "Lieferanten" = 3))),
+                                                             "Lieferanten" = 3),
+                                              selected = 2)),
                            column(4,
                                   # Which product?
                                   conditionalPanel(condition = "input.quantity == 1",
@@ -211,8 +212,6 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                             plotOutput("myPlot")),
                            conditionalPanel(condition = "input.group != 'Bitte waehlen'",
                                             plotOutput("currentStorage"))
-                           #conditionalPanel(condition = "input.groupFuture != 'Bitte waehlen",
-                           #                 tableOutput("orderTable"))
                          )  
                          ),
                 
@@ -224,10 +223,10 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            column(4,
                                   selectInput("quantityFut",
                                               "Einzelnes Produkt oder Gruppe?",
-                                              choices = list("Bitte wählen" = 0,
-                                                             "Einzelnes Produkt" = 1,
+                                              choices = list("Einzelnes Produkt" = 1,
                                                              "Produktgruppe (Familie)" = 2,
-                                                             "Lieferanten" = 3))),
+                                                             "Lieferanten" = 3),
+                                              selected = 2)),
                            column(4,
                                   # Which product?
                                   conditionalPanel(condition = "input.quantityFut == 1",
@@ -242,7 +241,8 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                   conditionalPanel(condition = "input.quantityFut == 2",
                                                    selectInput("groupFut",
                                                                "Produktgruppen",
-                                                               choices = product.group),
+                                                               choices = product.group,
+                                                               selected = "Zusammenfassung"),
                                                    # here must be a condition: only if we are in the tab "Zukunftsprognose"
                                                    conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
                                                                     helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
@@ -365,7 +365,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                             textOutput("groupsize")),
                            conditionalPanel(condition = "output.groupsize <= 6",
                                             plotOutput("group_regPlot")),
-                           conditionalPanel(condition = "output.groupsize > 6",
+                           conditionalPanel(condition = "output.groupsize > 6 | input.groupFut == 'Zusammenfassung'",
                                             dataTableOutput("group_regTab"))
                          )
                          )
@@ -419,15 +419,22 @@ server <- shinyServer(function(input, output){
       length(group)
     }
   })
+  
+  
   output$group_regPlot <- renderPlot({
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
     names(group) <- c()
     group_reg(group = group)
   })
   output$group_regTab <- renderDataTable({
-    group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
-    names(group) <- c()
-    group_reg(group, weeks = input$weeksFut, list = T)
+    if (input$groupFut == "Zusammenfassung") {
+      big.list <- lapply(groups.long[-10], group_reg, list = T, weeks = input$weeksFut)
+      return(do.call("rbind", big.list))
+    } else {
+      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+      names(group) <- c()
+      group_reg(group, weeks = input$weeksFut, list = T)
+    }
   })
   
   
