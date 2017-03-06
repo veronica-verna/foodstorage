@@ -6,25 +6,16 @@ currentStorage <- function(group,
                            col = "grey",
                            cex.axis = 0.8,
                            cex.names = 0.8,
-                           decreasing = TRUE) {
+                           decreasing = TRUE, 
+                           summary = FALSE) {
+  
   par(mar = mar)
+  group.stock <- multiply(prepare, group)
+  empty <- names(group.stock$Leer)
+  ### for the 'summary-case'
+  if (summary == TRUE) return(list(group.stock$Warenbestand, empty))
   
-  if (is.list(group)) {
-    len <- length(group)
-    empty <- character()
-    stock <- numeric(length = len)
-    for (i in 1:len) {
-      group.stock <- multiply(prepare, group[[i]])
-      empty[length(empty) + 1] <- names(group.stock$Leer)
-      stock[i] <- as.numeric(names(group)[i] = sum(group.stock$Warenbestand))
-    }
-  } else {
-    group.stock <- multiply(prepare, group)
-    empty <- names(group.stock$Leer)
-    stock <- group.stock$Warenbestand
-  }
-  
-  barplot(sort(stock, decreasing = decreasing), 
+  barplot(sort(group.stock$Warenbestand, decreasing = decreasing), 
           horiz = horiz,
           las = las,
           cex.axis = cex.axis,

@@ -192,14 +192,12 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          ############################### Submit Button #################################################
                          fluidRow(
-                           column(12,
-                                  conditionalPanel(condition = "input.pars.includes('data') |
+                           conditionalPanel(condition = "input.pars.includes('data') |
                               input.pars.includes('graphics') |
                               input.pars.includes('labels') |
                               input.pars.includes('col') |
                               input.pars.includes('advanced')",
                                                    actionButton("goButton", "Übernehmen"))
-                           )
                          ),
                          
                          
@@ -211,8 +209,10 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          fluidRow(
                            conditionalPanel(condition = "input.product != 'Bitte waehlen'",
                                             plotOutput("myPlot")),
-                           conditionalPanel(condition = "input.group != 'Bitte waehlen'",
-                                            plotOutput("currentStorage"))
+                           conditionalPanel(condition = "input.group != 'Bitte waehlen' && input.group != 'Zusammenfassung'",
+                                            plotOutput("currentStorage")),
+                           conditionalPanel(condition = "input.group == 'Zusammenfassung'",
+                                            plotOutput("currentStorageSum", height = 1000))
                          )  
                          ),
                 
@@ -342,14 +342,12 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          
                          ##################### Submit Button #############################################################
                          fluidRow(
-                           column(12,
-                                  conditionalPanel(condition = "input.parsFut.includes('dataFut') |
+                           conditionalPanel(condition = "input.parsFut.includes('dataFut') |
                               input.parsFut.includes('graphicsFut') |
                               input.parsFut.includes('labelsFut') |
                               input.parsFut.includes('colsFut') |
                               input.parsFut.includes('advancedFut')",
                                                    actionButton("goButtonFut", "Übernehmen"))
-                           )
                          ),
                          
                          
@@ -365,7 +363,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
                                             textOutput("groupsize")),
                            conditionalPanel(condition = "output.groupsize <= 6 && input.groupFut != 'Bitte waehlen'",
-                                            plotOutput("group_regPlot")),
+                                            plotOutput("group_regPlot", height = 1000)),
                            conditionalPanel(condition = "output.groupsize > 6 && input.groupFut != 'Bitte waehlen' | input.groupFut == 'Zusammenfassung'",
                                             dataTableOutput("group_regTab"))
                          )
@@ -446,6 +444,27 @@ server <- shinyServer(function(input, output){
       group <- unlist(groups.long[which(names(groups.long) == input$group)])
       names(group) <- c()
       currentStorage(group)
+    }
+  })
+  
+  output$currentStorageSum <- renderPlot({
+    big.list <- lapply(groups.long[-10], currentStorage, summary = TRUE)
+    full <- lapply(big.list, '[[', 1)
+    names(full) <- c()
+    full <- unlist(full)
+    empty <- lapply(big.list, '[[', 2)
+    names(empty) <- c()
+    empty <- unlist(empty)
+    barplot(sort(full, decreasing = TRUE), 
+          horiz = TRUE,
+          las = 1,
+          cex.axis = 0.8,
+          cex.names = 0.8,
+          xlab = "Warenbestand in Kilo")
+  if (length(empty) != 0) { # usual usecase
+    legend("topright", 
+           legend = c("Derzeit vergriffen:", sort(empty, decreasing = TRUE)),
+           pch = c(NA, rep(16, length(empty))))
     }
   })
   

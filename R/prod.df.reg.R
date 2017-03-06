@@ -18,7 +18,7 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
     if (above_20_procent > nec.dates) {
       last.refill <- highest_storage
       prod_df.reg <- prod_df[prod_df$Datum >= last.refill, ]
-    } else stop("too less data for calculation a regression")
+    } else stop("too little data for calculation a regression")
   } else {
     # normal usecase: Last refill is older than 10 days
     last.refill <- prod_df[prod_df$MengeDif > procent70, ][num_refill,]$Datum
@@ -30,7 +30,7 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
       if (num_refill > 1) {
         used.refill <- prod_df[prod_df$MengeDif > procent70, ][nrow(prod_df[prod_df$MengeDif > procent70,]) - 1,]$Datum
         prod_df.reg <- prod_df[prod_df$Datum >= used.refill & prod_df$Datum < last.refill, ]
-      } else stop("There are too less dates for only one existing 'refill'")
+      } else stop("There are too little data for only one existing 'refill'")
     }
   }
   #return(tail(prod_df_reg))
