@@ -227,38 +227,22 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            column(4,
                                   selectInput("quantityFut",
                                               "Einzelnes Produkt oder Gruppe?",
-                                              choices = list("Zusammenfassung" = 0, 
-                                                             "Einzelnes Produkt" = 1,
-                                                             "Produktgruppe (Familie)" = 2,
-                                                             "Lieferanten" = 3)),
-                                  conditionalPanel(condition = "input.quantityFut == 0",
-                                                   helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                                   numericInput("summaryFut", "Wochen", value = 4))
+                                              choices = list("Zusammenfassung" = "sumFut", 
+                                                             "Einzelnes Produkt" = "ONEprodFut",
+                                                             "Produktgruppe (Familie)" = "familyFut",
+                                                             "Lieferanten" = "producerFut"))
                                   ),
                            column(4,
                                   # Which product?
-                                  conditionalPanel(condition = "input.quantityFut == 1",
-                                                   selectizeInput("productFut",
-                                                                  "Produkt",
-                                                                  choices = c("Bitte wählen" = "Bitte waehlen", 
-                                                                              levels(kornumsatz$Produkt)), 
-                                                                  select = "Bitte waehlen",
-                                                                  options = list(create = TRUE,
-                                                                                 placeholder = lapply(levels(kornumsatz$Produkt), '['),
-                                                                                 maxItems = 1))),
-                                  conditionalPanel(condition = "input.quantityFut == 2",
-                                                   selectInput("groupFut",
-                                                               "Produktgruppen",
-                                                               choices = product.group),
-                                                   # here must be a condition: only if we are in the tab "Zukunftsprognose"
-                                                   conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
-                                                                    helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                                                    numericInput('weeksFut', 'Wochen', value = 4, min = 1))
-                                                   ),
-                                  conditionalPanel(condition = "input.quantityFut != 0",
-                                                   checkboxInput("settingsFut",
-                                                                 label = "Erweiterte Einstellungen",
-                                                                 value = FALSE))
+                                  uiOutput("quantityFut")
+                                  #conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
+                                  #                                  helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                  #                                  numericInput('weeksFut', 'Wochen', value = 4, min = 1))
+                                  #                 ),
+                                  #conditionalPanel(condition = "input.quantityFut != 0",
+                                  #                 checkboxInput("settingsFut",
+                                  #                               label = "Erweiterte Einstellungen",
+                                  #                               value = FALSE))
                                   ),
                            column(4,
                                   conditionalPanel(condition = "input.settingsFut == true",
@@ -387,6 +371,24 @@ ui <- shinyUI(navbarPage("Kornkammer",
 
 
 server <- shinyServer(function(input, output){
+  #################################### Basig Parameters #############################################
+  output$quantityFut <- renderUI({
+    if (input$quantityFut == "sumFut") helpText("Welche Produkten gehen in den nächsten x-Wochen aus?")
+    switch(input$quantityFut,
+           "sumFut" = numericInput("summaryFut", "Wochen", value = 4),
+           "ONEprodFut" = selectizeInput("productFut",
+                                         "Produkt",
+                                         choices = c("Bitte wählen" = "Bitte waehlen", 
+                                                     levels(kornumsatz$Produkt)), 
+                                         select = "Bitte waehlen",
+                                         options = list(create = TRUE,
+                                                        placeholder = lapply(levels(kornumsatz$Produkt), '['),
+                                                        maxItems = 1)),
+           "familyFut" = selectInput("groupFut",
+                                     "Produktgruppen",
+                                     choices = product.group)
+           )
+  })
   #################################### fun_reg #####################################################
   observeEvent(input$goButtonFut, {
     output$fun_reg  <- renderPlot({
