@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(shinythemes)
 library(colourpicker)
 library(lubridate)
 library(data.table)
@@ -21,7 +22,6 @@ kornumsatz <- startup.settings(kornumsatz)
 
 ##################################### product groups ######################
 product.group <- list("Bitte wählen" = "Bitte waehlen",
-                      "Zusammenfassung", 
                       "Grundnahrungsmittel",
                       "Hülsenfrüchte" = "Huelsenfruechte", 
                       "Ölsaaten" = "Oelsaaten", 
@@ -39,8 +39,7 @@ groups.long <- list("Grundnahrungsmittel" = c("Buchweizen", "Buchweizenmehl", "C
                     "Putzequipment" = c("Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv"),
                     "Getraenke" = c("Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben"),
                     "Aufstriche" = c("Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz"),
-                    "Sonstiges" = c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker"),
-                    "Zusammenfassung" = c("Buchweizen", "Buchweizenmehl", "Couscous", "Dinkel", "Grünkern", "Hafer", "Haferflocken", "Hirse.Braun", "Hirse.Gold", "Nudeln", "Polenta", "Roggen", "Salz", "Spaghetti", "Weizen", "Basmati.Braun", "Basmati.Weiss", "Risottoreis", "Rundkornreis", "Bohnen", "Bohnen.Borlotti", "Kichererbsen", "Linsen.Braun", "Linsen.Beluga", "Linsen.Rot", "Blaumohn", "Leinsamen", "Sonnenblumenkerne", "Kürbiskerne", "Sesam", "Cashews", "Haselnüsse geschält", "Walnüsse", "Basilikum", "Bockshornklee Ganz", "Chilli Gemahlen", "Gemüsebrühe", "Ingwer Gemahlen", "Kardamom Ganz", "Koriander Ganz", "Koriander Gemahlen", "Kräuter der Provence", "Kreuzkümmel Ganz", "Kreuzkümmel Gemahlen", "Kümmel", "Kurkuma Gemahlen", "Oregano", "Paprika Edelsüß", "Pfeffer Schwarz Ganz", "Rosmarin", "Schwarzkümmel", "Senfkörner", "Thymian", "Zimt Ganz", "Zimt Gemahlen", "Apfelessig", "BratoelDavert", "Olivenöl", "Rapsöl", "Sonnenblumenoel", "Allesreiniger", "Spuelmittel.Hand", "Spülmittel Maschine", "Waschmittel Lavendel", "Waschmittel.Pulver", "Waschmittel Seide/Wolle", "Waschmittel Sensitiv", "Drink Buchweizen", "Drink.Dinkel", "Drink.Hafer", "Drink.Soja", "Saft Apfel", "Saft Apfel-Birne", "Saft Apfel-Möhre", "Saft Trauben", "Basitom", "Currychini", "Erdnussmus", "Mandelmus", "Mepfel", "Rote Beete Meerettich", "Samba", "Sendi", "Senf Kirsche", "Senf Mango", "Senf Sarepta", "Zwiebelschmelz", "Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker"))
+                    "Sonstiges" = c("Espresso", "Getrocknetes.Gemuese", "Honig", "Kaffee", "Kaffee roh", "Kokosfett", "Rosinen", "Tomatenmark", "Tomatenpassata", "Zucker"))
 
 
 
@@ -74,15 +73,18 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          ################################ Warenbestand ############################################
                 
                 tabPanel("Warenbestand", value = 1,
+                         ########################### Header ######################################
+                         h2("Du willst wissen, was in der Kornkammer gerade vorrätig ist?"),
                          ########################### Basic Settings ##############################
                          fluidRow(
                            column(4,
                                   selectInput("quantity",
                                               "Einzelnes Produkt oder Gruppe?",
-                                              choices = list("Einzelnes Produkt" = 1,
+                                              choices = list("Zusammenfassung" = 0,
+                                                             "Einzelnes Produkt" = 1,
                                                              "Produktgruppe (Familie)" = 2,
-                                                             "Lieferanten" = 3),
-                                              selected = 2)),
+                                                             "Lieferanten" = 3))
+                                  ),
                            column(4,
                                   # Which product?
                                   conditionalPanel(condition = "input.quantity == 1",
@@ -97,8 +99,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                   conditionalPanel(condition = "input.quantity == 2",
                                                    selectInput("group",
                                                                "Produktgruppen",
-                                                               choices = product.group,
-                                                               selected = "Grundnahrungsmittel")),
+                                                               choices = product.group)),
                                   conditionalPanel(condition = "input.quantity != 0",
                                                    checkboxInput("settings",
                                                                  label = "Erweiterte Einstellungen",
@@ -207,27 +208,33 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          ##############################################################################################
                          
                          fluidRow(
+                           conditionalPanel(condition = "input.quantity == 0",
+                                            plotOutput("currentStorageSum", height = 1000)),
                            conditionalPanel(condition = "input.product != 'Bitte waehlen'",
                                             plotOutput("myPlot")),
-                           conditionalPanel(condition = "input.group != 'Bitte waehlen' && input.group != 'Zusammenfassung'",
-                                            plotOutput("currentStorage")),
-                           conditionalPanel(condition = "input.group == 'Zusammenfassung'",
-                                            plotOutput("currentStorageSum", height = 1000))
+                           conditionalPanel(condition = "input.group != 'Bitte waehlen'",
+                                            plotOutput("currentStorage"))
                          )  
                          ),
                 
                 ################################# Zukunftsprognose ################################################
                 
                 tabPanel("Zukunftsprognose", value = 2,
+                         ########################### Header ######################################
+                         h2("Du möchtest wissen, was als nächstes nachbestellt werden sollte?"),
                          ########################### Basic Settings ##############################
                          fluidRow(
                            column(4,
                                   selectInput("quantityFut",
                                               "Einzelnes Produkt oder Gruppe?",
-                                              choices = list("Einzelnes Produkt" = 1,
+                                              choices = list("Zusammenfassung" = 0, 
+                                                             "Einzelnes Produkt" = 1,
                                                              "Produktgruppe (Familie)" = 2,
-                                                             "Lieferanten" = 3),
-                                              selected = 2)),
+                                                             "Lieferanten" = 3)),
+                                  conditionalPanel(condition = "input.quantityFut == 0",
+                                                   helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
+                                                   numericInput("summaryFut", "Wochen", value = 4))
+                                  ),
                            column(4,
                                   # Which product?
                                   conditionalPanel(condition = "input.quantityFut == 1",
@@ -242,17 +249,17 @@ ui <- shinyUI(navbarPage("Kornkammer",
                                   conditionalPanel(condition = "input.quantityFut == 2",
                                                    selectInput("groupFut",
                                                                "Produktgruppen",
-                                                               choices = product.group,
-                                                               selected = "Zusammenfassung"),
+                                                               choices = product.group),
                                                    # here must be a condition: only if we are in the tab "Zukunftsprognose"
                                                    conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
                                                                     helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                                                    numericInput('weeksFut', 'Wochen', value = 4, min = 1))),
+                                                                    numericInput('weeksFut', 'Wochen', value = 4, min = 1))
+                                                   ),
                                   conditionalPanel(condition = "input.quantityFut != 0",
                                                    checkboxInput("settingsFut",
                                                                  label = "Erweiterte Einstellungen",
                                                                  value = FALSE))
-                           ),
+                                  ),
                            column(4,
                                   conditionalPanel(condition = "input.settingsFut == true",
                                                    checkboxGroupInput("parsFut", label ="Parametergruppen",
@@ -358,13 +365,15 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          ##############################################################################################
                          
                          fluidRow(
+                           conditionalPanel(condition = "input.quantityFut == 0",
+                                            dataTableOutput("group_regSUM")),
                            conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
                                             plotOutput("fun_reg")),
                            conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
                                             textOutput("groupsize")),
                            conditionalPanel(condition = "output.groupsize <= 6 && input.groupFut != 'Bitte waehlen'",
                                             plotOutput("group_regPlot", height = 1000)),
-                           conditionalPanel(condition = "output.groupsize > 6 && input.groupFut != 'Bitte waehlen' | input.groupFut == 'Zusammenfassung'",
+                           conditionalPanel(condition = "output.groupsize > 6 && input.groupFut != 'Bitte waehlen'",
                                             dataTableOutput("group_regTab"))
                          )
                          )
@@ -410,6 +419,11 @@ server <- shinyServer(function(input, output){
   })
   
   ################################### group_reg ###################################################
+  output$group_regSUM <- renderDataTable({
+    big.list <- lapply(groups.long, group_reg, list = T, weeks = input$summaryFut)
+    df <- do.call("rbind", big.list)
+    return(df[with(df, order(df[,2], df[,3])),])
+  })
   
   output$groupsize <- reactive({
     if (input$groupFut != "Bitte waehlen") {
@@ -426,14 +440,9 @@ server <- shinyServer(function(input, output){
     group_reg(group = group)
   })
   output$group_regTab <- renderDataTable({
-    if (input$groupFut == "Zusammenfassung") {
-      big.list <- lapply(groups.long[-10], group_reg, list = T, weeks = input$weeksFut)
-      return(do.call("rbind", big.list))
-    } else {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
-      names(group) <- c()
-      group_reg(group, weeks = input$weeksFut, list = T)
-    }
+    group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+    names(group) <- c()
+    group_reg(group, weeks = input$weeksFut, list = T)
   })
   
   
@@ -448,7 +457,7 @@ server <- shinyServer(function(input, output){
   })
   
   output$currentStorageSum <- renderPlot({
-    big.list <- lapply(groups.long[-10], currentStorage, summary = TRUE)
+    big.list <- lapply(groups.long, currentStorage, summary = TRUE)
     full <- lapply(big.list, '[[', 1)
     names(full) <- c()
     full <- unlist(full)
