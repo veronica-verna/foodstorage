@@ -222,6 +222,8 @@ ui <- shinyUI(navbarPage("Kornkammer",
                 tabPanel("Zukunftsprognose", value = 2,
                          ########################### Header ######################################
                          h2("Du möchtest wissen, was als nächstes nachbestellt werden sollte?"),
+                         h5(em("Für manche Produkte kann aus verschiedenen Gründen keine Zukunftsprognose gemacht werden. Diese sind gekennzeichnet mit 'manuell überprüfen'. In diesen Fällen schaut euch einfach die Warenbestandskurve an.")),
+                         br(),
                          ########################### Basic Settings ##############################
                          fluidRow(
                            column(4,
@@ -235,113 +237,12 @@ ui <- shinyUI(navbarPage("Kornkammer",
                            column(4,
                                   # Which product?
                                   uiOutput("quantityFut")
-                                  #conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
-                                  #                                  helpText("Welchen Produkten gehen in den nächsten x-Wochen aus?"),
-                                  #                                  numericInput('weeksFut', 'Wochen', value = 4, min = 1))
-                                  #                 ),
-                                  #conditionalPanel(condition = "input.quantityFut != 0",
-                                  #                 checkboxInput("settingsFut",
-                                  #                               label = "Erweiterte Einstellungen",
-                                  #                               value = FALSE))
                                   ),
                            column(4,
-                                  conditionalPanel(condition = "input.settingsFut == true",
-                                                   checkboxGroupInput("parsFut", label ="Parametergruppen",
-                                                                      choices = fun_reg.list))
+                                  conditionalPanel(condition = "output.groupsize > 6",
+                                                   uiOutput("weeksFut"))
                            )
                          ),
-                         #########################################################################################
-                         ###################### Parameter settings ###############################################
-                         #########################################################################################
-                         fluidRow(
-                           
-                           
-                           ##################### Parameters: dataFutFut and labelsFut ##########################################
-                           column(3,
-                                  conditionalPanel(condition = "input.parsFut.includes('data')",
-                                                   checkboxGroupInput("dataFut", "Zeitangaben", data.list)),
-                                  conditionalPanel(condition = "input.parsFut.includes('labels')",
-                                                   checkboxGroupInput('labelsFut', "Beschriftung", scription.list)),
-                                  
-                                  conditionalPanel(condition = "input.dataFut.includes('from')",
-                                                   dateInput("fromFut", "Von", value = as.character(Sys.Date() %m-% months(6)))),
-                                  conditionalPanel(condition = "input.dataFut.includes('to')",
-                                                   dateInput("toFut", "Bis", value = as.character(Sys.Date()))),
-                                  
-                                  conditionalPanel(condition = "input.labelsFut.includes('main')",
-                                                   helpText("Nur den Namen des Produktes eingeben im 'Dativ'"),
-                                                   textInput("mainFut", "Überschrift")),
-                                  conditionalPanel(condition = "input.labelsFut.includes('xlab')",
-                                                   textInput("xlabFut", "x-Achsen-Beschriftung", value = "")),
-                                  conditionalPanel(condition = "input.labelsFut.includes('ylab')",
-                                                   textInput("ylabFut", "y-Achsen-Beschriftung", value = "Warenbestand in Kilo"))
-                           ),
-                           ##################### Parameters: Graphics ##################################################
-                           column(3,
-                                  
-                                  conditionalPanel(condition = "input.parsFut.includes('graphics')",
-                                                   checkboxGroupInput("graphicsFut", "Grafikeinstellungen", graphic.list)),
-                                  
-                                  br(),
-                                  
-                                  conditionalPanel(condition = "input.graphicsFut.includes('type')",
-                                                   radioButtons("typeFut", "Plot-Art", choices = c("Punkte und Linie" = "b", "Nur Punkte" = "p", "Nur Linie" = "l"), selected = "b")),
-                                  #        conditionalPanel(condition = "input.graphics.includes('pch')",
-                                  #                         ...),
-                                  conditionalPanel(condition = "input.graphicsFut.includes('las')",
-                                                   numericInput('lasFut', 'Ausrichtung Beschriftung', min = 0, max = 2, step = 1, value = 2))
-                                  #        conditionalPanel(condition = "input.graphics.includes('lwd')",
-                                  #                         ...),
-                                  #        conditionalPanel(condition = "input.graphics.includes('lty')",
-                                  #)
-                           ),
-                           #################### Parameters: Colours ####################################################
-                           column(3,
-                                  conditionalPanel(condition = "input.parsFut.includes('col')",
-                                                   checkboxGroupInput('colsFut', "Farben", col.list)),
-                                  br(),
-                                  conditionalPanel(condition = "input.colsFut.includes('col_points')",
-                                                   colourInput("col_pointsFut", "Punktfarbe", value = "grey")),
-                                  conditionalPanel(condition = "input.colsFut.includes('col_reg')",
-                                                   colourInput("col_regFut", "Farbe der 'Zukunftslinie'", value = "grey")),
-                                  conditionalPanel(condition = "input.colsFut.includes('col_conv')",
-                                                   colourInput("col_convFut", "Konvergenzintervalle", value = "lightgrey")),
-                                  conditionalPanel(condition = "input.colsFut.includes('col_20')",
-                                                   colourInput("col_20Fut", "Warnfarbe", value = "red")),
-                                  conditionalPanel(condition = "input.colsFut.includes('col_past')",
-                                                   colourInput("col_pastFut", "Vergangenheitslinie", value = "black"))
-                           ),
-                           #################### Parameters: Advanced ###################################################
-                           column(3,
-                                  conditionalPanel(condition = "input.parsFut.includes('advanced')",
-                                                   checkboxGroupInput('advancedFut', "Fortgeschritten", advanced.list)),
-                                  br(),
-                                  conditionalPanel(condition = "input.advancedFut.includes('nec.dates')",
-                                                   helpText("Wie viele Daten brauche ich mindestens, um die Zukunft 'vorherzusagen'?"),
-                                                   numericInput("nec.datesFut", "Notwendige Datenanzahl", min = 5, max = 20, value = 10)),
-                                  conditionalPanel(condition = "input.advancedFut.includes('more.than')",
-                                                   helpText("Wie viele Tage hintereinander muss der Warenbestand unter 5% des Ausgangsbestands sein, damit der Bestand auf null korigiert wird?"),
-                                                   numericInput("more.thanFut", "mindestens", min = 10, max = 30, value = 15)),
-                                  conditionalPanel(condition = "input.advancedFut.includes('smoother')",
-                                                   selectInput("smootherFut", "smoother", which.smoother, selected = "smoother")),
-                                  conditionalPanel(condition = "input.advancedFut.includes('span')",
-                                                   sliderInput("spanFut", "Intervallbreite", min = 0.01, max = 1, step = 0.01, value = 0.1)),
-                                  conditionalPanel(condition = "input.advancedFut.includes('degree')",
-                                                   numericInput("degreeFut", "Grad", min = 1, max = 5, value = 1))
-                           )
-                         ),
-                         
-                         ##################### Submit Button #############################################################
-                         fluidRow(
-                           conditionalPanel(condition = "input.parsFut.includes('dataFut') |
-                              input.parsFut.includes('graphicsFut') |
-                              input.parsFut.includes('labelsFut') |
-                              input.parsFut.includes('colsFut') |
-                              input.parsFut.includes('advancedFut')",
-                                                   actionButton("goButtonFut", "Übernehmen"))
-                         ),
-                         
-                         
                          
                          
                          ##############################################################################################
@@ -349,16 +250,26 @@ ui <- shinyUI(navbarPage("Kornkammer",
                          ##############################################################################################
                          
                          fluidRow(
-                           conditionalPanel(condition = "input.quantityFut == 0",
+                           ####################### summary #########################################
+                           conditionalPanel(condition = "input.quantityFut == 'sumFut'",
                                             dataTableOutput("group_regSUM")),
-                           conditionalPanel(condition = "input.productFut != 'Bitte waehlen'",
+                           ####################### for one product #################################
+                           conditionalPanel(condition = "input.quantityFut == 'ONEprodFut' && input.productFut != 'Bitte waehlen'",
                                             plotOutput("fun_reg")),
-                           conditionalPanel(condition = "input.groupFut != 'Bitte waehlen'",
-                                            textOutput("groupsize")),
-                           conditionalPanel(condition = "output.groupsize <= 6 && input.groupFut != 'Bitte waehlen'",
+                           ####################### plots for group of products #####################
+                           conditionalPanel(condition = "output.groupsize <= 6 && 
+                                            input.quantityFut == 'familyFut' && 
+                                            input.groupFut != 'Bitte waehlen'",
                                             plotOutput("group_regPlot", height = 1000)),
-                           conditionalPanel(condition = "output.groupsize > 6 && input.groupFut != 'Bitte waehlen'",
-                                            dataTableOutput("group_regTab"))
+                           ####################### data.table for group of products ################
+                           conditionalPanel(condition = "output.groupsize > 6 && 
+                                            input.quantityFut == 'familyFut' && 
+                                            input.groupFut != 'Bitte waehlen'",
+                                            dataTableOutput("group_regTab")),
+                           ####################### only necessary for panels above #################
+                           conditionalPanel(condition = "input.quantityFut == 'familyFut' && 
+                                            input.groupFut != 'Bitte waehlen'",
+                                            textOutput("groupsize"))
                          )
                          )
     
@@ -373,9 +284,9 @@ ui <- shinyUI(navbarPage("Kornkammer",
 server <- shinyServer(function(input, output){
   #################################### Basig Parameters #############################################
   output$quantityFut <- renderUI({
-    if (input$quantityFut == "sumFut") helpText("Welche Produkten gehen in den nächsten x-Wochen aus?")
     switch(input$quantityFut,
-           "sumFut" = numericInput("summaryFut", "Wochen", value = 4),
+           "sumFut" = list(helpText("Welche Produkten gehen in den nächsten x-Wochen aus?"),
+                           numericInput("summaryFut", "Wochen", value = 4)),
            "ONEprodFut" = selectizeInput("productFut",
                                          "Produkt",
                                          choices = c("Bitte wählen" = "Bitte waehlen", 
@@ -390,18 +301,12 @@ server <- shinyServer(function(input, output){
            )
   })
   #################################### fun_reg #####################################################
-  observeEvent(input$goButtonFut, {
-    output$fun_reg  <- renderPlot({
+  
+  output$fun_reg  <- renderPlot({
+    if (input$quantityFut == 'ONEprodFut') {
       if (input$productFut != 'Bitte waehlen') {
         fun_reg(product = input$productFut, main_header = input$productFut)
       }
-    })
-  })
-  
-  
-  output$fun_reg  <- renderPlot({
-    if (input$productFut != 'Bitte waehlen' && input$settings == FALSE) {
-      fun_reg(product = input$productFut, main_header = input$productFut)
     }
   })
   
@@ -421,25 +326,46 @@ server <- shinyServer(function(input, output){
   })
   
   ################################### group_reg ###################################################
-  output$group_regSUM <- renderDataTable({
-    big.list <- lapply(groups.long, group_reg, list = T, weeks = input$summaryFut)
-    df <- do.call("rbind", big.list)
-    return(df[with(df, order(df[,2], df[,3])),])
-  })
   
-  output$groupsize <- reactive({
-    if (input$groupFut != "Bitte waehlen") {
-      group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
-      names(group) <- c()
-      length(group)
+  ### summary
+  output$group_regSUM <- renderDataTable({
+    if (input$quantityFut == 'sumFut') {
+      big.list <- lapply(groups.long, group_reg, list = T, weeks = input$summaryFut)
+      df <- do.call("rbind", big.list)
+      return(df[with(df, order(df[,2], df[,3])),])
     }
   })
   
+  ### checking length of group
+  output$groupsize <- reactive({
+    if (input$quantityFut == 'familyFut') {
+      if (input$groupFut != "Bitte waehlen") {
+        group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
+        names(group) <- c()
+        length(group)
+      }
+    }
+  })
   
+  ### if length <= 6 -> plot
   output$group_regPlot <- renderPlot({
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
     names(group) <- c()
     group_reg(group = group)
+  })
+  
+  ### if length > 6 -> Data.Table
+  weeksFut <- reactive({
+    if (input$quantityFut == 'familyFut') {
+      if (input$groupFut != "Bitte waehlen") {
+        list(helpText("Welche Produkten gehen in den nächsten x-Wochen aus?"),
+             numericInput("weeksFut", "Wochen", value = 4))
+      }
+    }
+  })
+  output$weeksFut <- renderUI({
+    if (input$quantityFut == 'familyFut')
+      return(weeksFut())
   })
   output$group_regTab <- renderDataTable({
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
