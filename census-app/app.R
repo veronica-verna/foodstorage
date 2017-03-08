@@ -112,7 +112,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
                 tabPanel("Zukunftsprognose", value = 2,
                          ########################### Header ######################################
                          h2("Du möchtest wissen, was als nächstes nachbestellt werden sollte?"),
-                         h5(em("Für manche Produkte kann aus verschiedenen Gründen keine Zukunftsprognose gemacht werden. Diese sind gekennzeichnet mit 'manuell überprüfen'. In diesen Fällen schaut euch einfach die Warenbestandskurve an.")),
+                         h5(em("Für manche Produkte kann aus verschiedenen Gründen keine Zukunftsprognose gemacht werden. Diese sind gekennzeichnet mit 'kPm' (keine Prognose möglich). In diesen Fällen schaut euch einfach die Warenbestände an.")),
                          br(),
                          ########################### Basic Settings ##############################
                          fluidRow(

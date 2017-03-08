@@ -37,9 +37,9 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         if (nrow(table.works.over) >= 1) {
           already.over <- data.frame(Produkt = table.works.over$Produkt, 
                                      Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
-                                     Ende = as.character(table.works.over$Ende),
+                                     Datum = as.character(table.works.over$Ende),
                                      Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
-                                     Dauer = as.integer(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
+                                     Anzahl = as.integer(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
                                                         units = "days"),
                                      Einheit = rep("Tage", nrow(table.works.over)),
                                      check.names = FALSE)
@@ -48,9 +48,9 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
         if (nrow(table.works.over.soon) >= 1) {
           will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
                                           Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
-                                          Ende = as.character(table.works.over.soon$Ende),
+                                          Datum = as.character(table.works.over.soon$Ende),
                                           Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
-                                          Dauer = as.integer(table.works.over.soon$Ende - last.data.point, units = "days"),
+                                          Anzahl = as.integer(table.works.over.soon$Ende - last.data.point, units = "days"),
                                           Einheit = rep("Tage", len = nrow(table.works.over.soon)),
                                           check.names = FALSE)
         }
@@ -84,7 +84,13 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
       call.vector[i] <- paste0("Call", which(dif.error.calls %in% all.error.calls[i]))
       message.vector[i] <- paste0("Message", which(dif.error.messages %in% all.errors[[i]][[3]])) 
     }
-    table.errors <- data.frame(Produkt = products, Fehlerort = call.vector, Fehlermeldung = message.vector)
+    table.errors <- data.frame(Produkt = products, 
+                               Fehlerort = call.vector, 
+                               Fehlermeldung = message.vector,
+                               Warenbestand = numeric(length(products)))
+    df <- multiply(prepare, as.character(table.errors[,1]))
+    full <- df$Warenbestand
+    table.errors[which(table.errors[,1] %in% names(full)), 4] <- full
     # now second output is finished: table.errors
     # next step: make a legend
     dif.calls <- unique(call.vector)
@@ -98,12 +104,13 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     if (errors == TRUE) return(list(Fehler = table.errors,
                                     Legende = legend))
     table.errors <- data.frame(Produkt = table.errors[,1], 
-                               Bezeichnung = rep("manuell überprüfen", len = nrow(table.errors)),
-                               Ende = rep("via", nrow(table.errors)),
+                               Bezeichnung = rep("kPm", len = nrow(table.errors)),
+                               Datum = as.character(rep(df$Datum, nrow(table.errors))),
                                Bezeichnung = rep("Warenbestand", len = nrow(table.errors)),
-                               Dauer = rep("->", nrow(table.errors)),
-                               Einheit = rep("Produkt", nrow(table.errors)),
+                               Anzahl = table.errors[,4],
+                               Einheit = rep("Kilo", nrow(table.errors)),
                                check.names = FALSE)
+    
     ### creating one big data frame for shiny
     if (exists("already.over") == TRUE &&
         exists("will.be.over.soon") == TRUE) 

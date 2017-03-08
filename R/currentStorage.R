@@ -11,9 +11,8 @@ currentStorage <- function(group,
   
   par(mar = mar)
   group.stock <- multiply(prepare, group)
-  empty <- names(group.stock$Leer)
   ### for the 'summary-case'
-  if (summary == TRUE) return(list(group.stock$Warenbestand, empty))
+  if (summary == TRUE) return(list(group.stock$Warenbestand, group.stock$Leer))
   
   barplot(sort(group.stock$Warenbestand, decreasing = decreasing), 
           horiz = horiz,
@@ -21,10 +20,10 @@ currentStorage <- function(group,
           cex.axis = cex.axis,
           cex.names = cex.names,
           xlab = xlab)
-  if (length(empty) != 0) { # usual usecase
+  if (length(group.stock$Leer) != 0) { # usual usecase
     legend("topright", 
-           legend = c("Derzeit vergriffen:", empty),
-           pch = c(NA, rep(16, length(empty))))
+           legend = c("Derzeit vergriffen:", group.stock$Leer),
+           pch = c(NA, rep(16, length(group.stock$Leer))))
     }
   par(mar = c(5, 4, 4, 2) + 0.1)
 }

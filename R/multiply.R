@@ -8,6 +8,8 @@ multiply <- function(FUN,
                      reduce = FALSE,
                      test = FALSE) {
   
+  if (class(FUN) != "function") stop("FUN must be of class 'function'")
+  FUN <- match.fun(FUN)
   if (is.data.frame(data) == FALSE)
     stop("data must be a data frame with 10 columns. For details type help(prepare).")
   dates <- data$Datum
@@ -48,7 +50,7 @@ multiply <- function(FUN,
           table <- cbind(table, new.column = new.column)
           colnames(table)[i + 2] <- group[i]
         } 
-      }
+      } 
       
       if (reduce == TRUE) table <- data.frame(Datum = table[,1], 
                                                Warenbestand = rowSums(table[, 3:ncol(table)]))
@@ -56,15 +58,14 @@ multiply <- function(FUN,
       if (reduce == FALSE && current.storage == TRUE) {
         Warenbestand <- t(table[,-c(1,2)])
         colnames(Warenbestand)[1] <- "Kilo"
-        #return(class(Warenbestand))
         full <- Warenbestand[Warenbestand[,1] > 0.03, ]
         empty <- Warenbestand[Warenbestand[,1] <= 0.03, ]
-        if (length(empty) == 1) {
-          all.names <- names(Warenbestand[,1])
-          names.full <- names(full)
-          empty <- suppressWarnings(all.names[!all.names == names.full])
-        }
-        return(list(Warenbestand = full, Leer = empty, Datum = table$Datum[1]))
+        
+        if (length(empty) == 1) names(empty) <- rownames(Warenbestand)[which(Warenbestand[,1] %in% empty)]
+        if (length(full) == 1) names(full) <- rownames(Warenbestand)[which(Warenbestand[,1] %in% full)]
+        
+        if (test == TRUE) return("yes")
+        return(list(Warenbestand = full, Leer = names(empty), Datum = table$Datum[1]))
       }
     }
     
