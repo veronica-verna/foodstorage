@@ -9,7 +9,7 @@ library(data.table)
 ###################### read kornumsatz ###############################
 ######################################################################
 #kornumsatz <- read.csv2("https://raw.github.com/frumentum/foodcoop-storage/master/data/kornumsatz.csv", colClasses = "character")
-kornumsatz <- read.csv2("data/kornumsatz.csv", colClasses = "character")
+kornumsatz <- read.csv2("/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage/census-app/data/kornumsatz.csv", colClasses = "character")
 kornumsatz$Datum <- as.factor(kornumsatz$Datum)
 kornumsatz$MengeKum <- as.numeric(kornumsatz$MengeKum)
 kornumsatz$Einheit <- as.factor(kornumsatz$Einheit)
@@ -172,7 +172,7 @@ ui <- shinyUI(navbarPage("Kornkammer",
 
 
 server <- shinyServer(function(input, output){
-  #################################### Basig Parameters #############################################
+  #################################### Basic Parameters #############################################
   ############################# present ###################################################
   output$quantity <- renderUI({
     switch(input$quantity,
@@ -181,9 +181,8 @@ server <- shinyServer(function(input, output){
                                       choices = c("Bitte wählen" = "Bitte waehlen", 
                                                   levels(kornumsatz$Produkt)), 
                                       select = "Bitte waehlen",
-                                      options = list(create = TRUE,
-                                                    placeholder = lapply(levels(kornumsatz$Produkt), '['),
-                                                    maxItems = 1)),
+                                      options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['),
+                                                     maxItems = 1)),
            "family" = selectInput("group",
                                   "Produktgruppen",
                                   choices = product.group)
@@ -200,8 +199,7 @@ server <- shinyServer(function(input, output){
                                          choices = c("Bitte wählen" = "Bitte waehlen", 
                                                      levels(kornumsatz$Produkt)), 
                                          select = "Bitte waehlen",
-                                         options = list(create = TRUE,
-                                                        placeholder = lapply(levels(kornumsatz$Produkt), '['),
+                                         options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['),
                                                         maxItems = 1)),
            "familyFut" = selectInput("groupFut",
                                      "Produktgruppen",
@@ -235,7 +233,7 @@ server <- shinyServer(function(input, output){
       df <- do.call("rbind", big.list)
       return(df[with(df, order(df[,2], df[,3])),])
     }
-  })
+  }, options = list(pageLength = 100))
   
   ### checking length of group
   output$groupsize <- reactive({
@@ -272,7 +270,7 @@ server <- shinyServer(function(input, output){
     group <- unlist(groups.long[which(names(groups.long) == input$groupFut)])
     names(group) <- c()
     group_reg(group, weeks = input$weeksFut, list = T)
-  })
+  }, options = list(pageLength = 100))
   
   
   ################################### current storage ##############################################

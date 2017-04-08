@@ -53,16 +53,16 @@ fun_reg <- function(product,
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   # one warning for the same is enough -> suppresWarnings
-  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df.big) # data points
-  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$df) # data.frame since last refill
-  last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$last.refill) 
-  if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)) == 4) {
-    used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.7, 0.2)$used.refill)
+  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df.big) # data points
+  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df) # data.frame since last refill
+  last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$last.refill) 
+  if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)) == 4) {
+    used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$used.refill)
   }
   
   # calculate regression #
   fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
-  if (exists("used.refill") == TRUE) {
+  if (exists("used.refill")) {
     newIntercept <- prod_df[prod_df$Datum == last.refill,]$Warenbestand - (fm_reg$coefficients[2] * as.numeric(ymd(last.refill)))
     fm_reg$coefficients[1] <- as.numeric(as.character(newIntercept))
   }

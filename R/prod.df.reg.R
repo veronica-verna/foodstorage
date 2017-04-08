@@ -1,6 +1,6 @@
 ### function to generate the dataframe you need for calculating the regression ####
 
-prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates = 10, refill.percent = 0.7, data.num.percent = 0.2, test = FALSE) {
+prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates = 10, refill.percent = 0.5, data.num.percent = 0.2, test = FALSE) {
   
   prod_df <- prepare(name.of.product = product, "regression", from = from, to = to, more.than = more.than)
   
@@ -34,6 +34,7 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
     }
   }
   #return(tail(prod_df_reg))
+  ### here some works need to be done: it doesn't work for more than one 'storage.is.zero' ###
   if (0 %in% prod_df.reg$Warenbestand) {
     storage.is.zero <- prod_df.reg[prod_df.reg$Warenbestand == 0 & prod_df.reg$MengeDif != 0,]$Datum
     pos.dates <- seq(from = storage.is.zero[1], to = storage.is.zero[1] + more.than, by = 'day')
@@ -43,6 +44,6 @@ prod.df.reg <- function (product, from = "", to = "", more.than = 15, nec.dates 
     if (length(storage.is.zero) != 1) warning("Since the last refill, more than one time storage is empty for at least 15 days")
   }
   if (test == TRUE) return("yes")
-  if (exists("used.refill") == TRUE) return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill, used.refill = used.refill))
+  if (exists("used.refill")) return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill, used.refill = used.refill))
   return(list(df.big = prod_df, df = prod_df.reg, last.refill = last.refill))
 }

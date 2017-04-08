@@ -1,6 +1,6 @@
 #### function for calculating regressions for groups ####
 
-group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4, errors = FALSE) {
+group_reg <- function(group, table = kornumsatz, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4, errors = FALSE) {
   
   len <- length(group)
   
@@ -103,12 +103,22 @@ group_reg <- function(group, from = "", to = "", list = FALSE, filter = TRUE, we
     
     if (errors == TRUE) return(list(Fehler = table.errors,
                                     Legende = legend))
+    
+    ### get products' unit which ended up in errors ########
+    # arrange table.errors in alphabetical order
+    #table.errors <- table.errors[with(table.errors, order(table.errors[,1])), ] 
+    # get unit of products, order, and delete duplicates
+    units <- unique(table[table$Produkt %in% table.errors[,1], c(1,5)])
+    units <- units[with(units, order(units[,1])), ]
+    units <- units[!duplicated(units[,1]),]
+    units <- units[,2]
+    
     table.errors <- data.frame(Produkt = table.errors[,1], 
                                Bezeichnung = rep("kPm", len = nrow(table.errors)),
                                Datum = as.character(rep(df$Datum, nrow(table.errors))),
                                Bezeichnung = rep("Warenbestand", len = nrow(table.errors)),
                                Anzahl = table.errors[,4],
-                               Einheit = rep("Kilo", nrow(table.errors)),
+                               Einheit = units,
                                check.names = FALSE)
     
     ### creating one big data frame for shiny

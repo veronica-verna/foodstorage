@@ -3,10 +3,10 @@
 reduceONE <- function(table, pro) {
   require(lubridate)
   #naming vectors
-  if (is.data.frame(table) == FALSE) stop("table has to be a data frame")
+  if (!is.data.frame(table)) stop("table has to be a data frame")
   dates <- table$Datum
-  if (is.Date(dates) == FALSE) stop("dates must be of class 'Date'")
-  if (is.factor(table$Produkt) == FALSE) stop("products must be of class factor")
+  if (!is.Date(dates)) stop("dates must be of class 'Date'")
+  if (!is.factor(table$Produkt)) stop("products must be of class factor")
   dif.products <- levels(table$Produkt)
   len <- length(dif.products)
   
