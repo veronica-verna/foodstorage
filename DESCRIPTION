@@ -1,5 +1,5 @@
 Package: foodstorage
-Title: Replace storage of foodcoops on time
+Title: Look-up foodco-ops' storage of products
 Version: 0.1
 Authors@R: person("Simon", "Poeschl", email = "frumentum@posteo.de", role = c("aut", "cre"))
 Description: This package contains a bunch of functions for calculating the current storage's inventory. Automatically it reports when a new order cycle should be started.
@@ -8,5 +8,5 @@ License: GPL
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.0
-Import: lubridate (>= 1.6.0), shiny (>= 0.14.2), data.table
+Import: lubridate (>= 1.6.0), shiny (>= 0.14.2), data.table, shinyjs (>= 0.9), shinythemes (>= 1.1.1), colourpicker (>= 0.3)
 Suggests: testthat
