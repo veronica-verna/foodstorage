@@ -25,8 +25,8 @@
 #' @param test logical. If TRUE you can test fun_reg by test_function {foodstorage}
 #' @return If graphics is true (default), the result will be a plot. X-axis consists of a time serie, y-axis consists of the daily food storage. If graphics is false, a list is spewed containing two dates: The second one is the date, when your storage will run out of the giving product. And the first one is the date four weeks before end.
 #' 
-
-
+#'
+#' @export
 fun_reg <- function(product,
                     from = "",
                     to = "",

@@ -139,7 +139,7 @@ group_reg <- function(group, table = kornumsatz, from = "", to = "", list = FALS
   ### plot-window settings ###
   if (len == 2) par(mfrow=c(2,1))
   if (len >= 3) par(mfrow=c(ceiling(len/2), 2))
-  
+  #par(mfrow=c(3,2))
   # now plotting ##
   for (i in 1:len) plotting.groups(group[i], from = from, to = to)
   par(mfrow = c(1,1)) # for resetting settings
