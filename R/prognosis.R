@@ -27,49 +27,49 @@
 #' 
 #'
 #' @export
-fun_reg <- function(product,
-                    from = "",
-                    to = "",
-                    graphics = TRUE,
-                    type = "p",
-                    col_points = "grey",
-                    pch = 16,
-                    main_header = "",
-                    ylab = "Warenbestand in Kilo",
-                    xlab = "",
-                    las = 1,
-                    col_reg = "grey",
-                    col_conv = "lightgrey",
-                    col_20 = "red",
-                    col_past = "black",
-                    smoother = "loess",
-                    span = 0.1,
-                    degree = 1,
-                    lwd = c(2,2,1),
-                    lty = c(1,1,2),
-                    nec.dates = 10,
-                    more.than = 15,
-                    test = FALSE) {
+prognosis <- function(product,
+                      from = "",
+                      to = "",
+                      graphics = TRUE,
+                      type = "p",
+                      col_points = "grey",
+                      pch = 16,
+                      main_header = "",
+                      ylab = "Warenbestand in Kilo",
+                      xlab = "",
+                      las = 1,
+                      col_reg = "grey",
+                      col_conv = "lightgrey",
+                      col_20 = "red",
+                      col_past = "black",
+                      smoother = "loess",
+                      span = 0.1,
+                      degree = 1,
+                      lwd = c(2,2,1),
+                      lty = c(1,1,2),
+                      nec.dates = 10,
+                      more.than = 15,
+                      test = FALSE) {
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   # one warning for the same is enough -> suppresWarnings
   prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df.big) # data points
-  prod_df.reg <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df) # data.frame since last refill
+  prognosis_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df) # data.frame since last refill
   last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$last.refill) 
   if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)) == 4) {
     used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$used.refill)
   }
   
   # calculate regression #
-  fm_reg <- lm(Warenbestand ~ Datum, data = prod_df.reg)
+  fm_reg <- lm(Warenbestand ~ Datum, data = prognosis_df)
   if (exists("used.refill")) {
     newIntercept <- prod_df[prod_df$Datum == last.refill,]$Warenbestand - (fm_reg$coefficients[2] * as.numeric(ymd(last.refill)))
     fm_reg$coefficients[1] <- as.numeric(as.character(newIntercept))
   }
   x_end <- -fm_reg$coefficients[1] / fm_reg$coefficients[2]
   end_date <- as.Date(as.character(as.Date(x_end, origin = "1970-01-01")))
-  #storage.at.end <- prod_df.reg$Warenbestand[prod_df.reg$Datum == as.character(end_date)]
-  if (prod_df.reg$Warenbestand[nrow(prod_df.reg)] == 0) {
+  #storage.at.end <- prognosis_df$Warenbestand[prognosis_df$Datum == as.character(end_date)]
+  if (prognosis_df$Warenbestand[nrow(prognosis_df)] == 0) {
     date_reg <- seq(from = last.refill, to = end_date, by = 'day')
   } else {
     if (end_date > prod_df$Datum[nrow(prod_df)]) {
@@ -172,8 +172,8 @@ fun_reg <- function(product,
     #par(col.axis = col_20)
     #axis(side = 1, at = four_weeks, labels = conv.date(four_weeks), col.ticks = col_20)
     # other solution: four_weeks warning instead of 20%
-    # abline(h = 0.2 * prod_df.reg$Warenbestand[1], lty = 3, col = "black")
-    # text(x = prod_df.reg$Datum[15], y = 0.23 * prod_df.reg$Warenbestand[1], labels = "20% der letzten Bestellung")
+    # abline(h = 0.2 * prognosis_df$Warenbestand[1], lty = 3, col = "black")
+    # text(x = prognosis_df$Datum[15], y = 0.23 * prognosis_df$Warenbestand[1], labels = "20% der letzten Bestellung")
   
   
   
