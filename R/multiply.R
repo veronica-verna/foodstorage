@@ -29,7 +29,7 @@ multiply <- function(FUN,
   if (length(unique(group %in% lev)) !=1 && unique(group %in% lev) != TRUE)
     stop("Vector of products has to contain ALL name.of.product[s]")
    
-  if (FUN == substitute(prepare)) {
+  #if (FUN == substitute(prepare)) {
     if (length(par) == 0) {
       par <- list(what.plotting = "Warenbestand", from = "", to = "", more.than = 15, correction = 0.05)
     } else {
@@ -67,7 +67,7 @@ multiply <- function(FUN,
         if (test == TRUE) return("yes")
         return(list(Warenbestand = full, Leer = names(empty), Datum = table$Datum[1]))
       }
-    }
+    #}
     
   
     if (test == TRUE) return("yes")
