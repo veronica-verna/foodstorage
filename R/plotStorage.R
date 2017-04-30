@@ -1,23 +1,23 @@
 # Plotten mit myPlot funktion ####
-myPlot <- function(prepare,
-                   prod.name.for.plot = "",
-                   smoother = c("loess", "loess"),
-                   span = c(0.1, 0.1),
-                   degree = c(1,1),
-                   pch = c(16, 16),
-                   col_points = c(rgb(red=0.2, green=0.2, blue=0.2, alpha=0), rgb(red=0.2, green=0.2, blue=0.2, alpha=0)), # invisible/transparent points
-                   col_line = c("black", "black"),
-                   lwd = c(2,2),
-                   lty = c(1,2),
-                   axis_side = c(2,4),
-                   las = c(1,1),
-                   line = c(3,3),
-                   mfrow = c(1,1),
-                   mar = c(4, 5, 4, 1) + 0.1,
-                   add = FALSE,
-                   cex.axis = 1.3,
-                   cex.lab = 1.6,
-                   cex.main = 1.6){
+plotStorage <- function(prepare,
+                       prod.name.for.plot = "",
+                       smoother = c("loess", "loess"),
+                       span = c(0.1, 0.1),
+                       degree = c(1,1),
+                       pch = c(16, 16),
+                       col_points = c(rgb(red=0.2, green=0.2, blue=0.2, alpha=0), rgb(red=0.2, green=0.2, blue=0.2, alpha=0)), # invisible/transparent points
+                       col_line = c("black", "black"),
+                       lwd = c(2,2),
+                       lty = c(1,2),
+                       axis_side = c(2,4),
+                       las = c(1,1),
+                       line = c(3,3),
+                       mfrow = c(1,1),
+                       mar = c(4, 5, 4, 1) + 0.1,
+                       add = FALSE,
+                       cex.axis = 1.3,
+                       cex.lab = 1.6,
+                       cex.main = 1.6){
   
   # at first: check if the input is correct ####
     if (is.list(prepare) != TRUE) stop("prepare has to be a list: first element $data is a data frame, second element $name.of.product is a character string")

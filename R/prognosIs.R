@@ -27,7 +27,7 @@
 #' 
 #'
 #' @export
-prognosis <- function(product,
+prognosIs <- function(product,
                       from = "",
                       to = "",
                       graphics = TRUE,
