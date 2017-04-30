@@ -11,7 +11,7 @@ product.is.over <- function(product, from = "", to = "") {
       
       #message("This is the 'try' part")
       
-      suppressWarnings(fun_reg(product, graphics = FALSE, from = from, to = to))  
+      suppressWarnings(prognosIs(product, graphics = FALSE, from = from, to = to))  
       # The return value of `fun_reg()` is the actual value 
       # that will be returned in case there is no condition 
       # (e.g. warning or error). 
