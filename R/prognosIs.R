@@ -53,11 +53,11 @@ prognosIs <- function(product,
   
   # rgb(red=0.2, green=0.2, blue=0.2, alpha=0)
   # one warning for the same is enough -> suppresWarnings
-  prod_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df.big) # data points
-  prognosis_df <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$df) # data.frame since last refill
-  last.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$last.refill) 
-  if (length(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)) == 4) {
-    used.refill <- suppressWarnings(prod.df.reg(product, from, to, more.than, nec.dates, 0.5, 0.2)$used.refill)
+  prod_df <- suppressWarnings(time.span(product, from, to, more.than, nec.dates, 0.5, 0.2)$df.big) # data points
+  prognosis_df <- suppressWarnings(time.span(product, from, to, more.than, nec.dates, 0.5, 0.2)$df) # data.frame since last refill
+  last.refill <- suppressWarnings(time.span(product, from, to, more.than, nec.dates, 0.5, 0.2)$last.refill) 
+  if (length(time.span(product, from, to, more.than, nec.dates, 0.5, 0.2)) == 4) {
+    used.refill <- suppressWarnings(time.span(product, from, to, more.than, nec.dates, 0.5, 0.2)$used.refill)
   }
   
   # calculate regression #
