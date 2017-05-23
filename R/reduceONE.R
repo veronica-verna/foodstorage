@@ -33,7 +33,7 @@ reduceONE <- function(table, pro) {
     new.tf[is.na(new.tf$Preis),]$Preis <- new.tf$Preis[which(is.na(new.tf$Preis)) - 1]
     #return(new.tf)
     # and now let's replace 'MengeKum', 'Preis' and 'Umsatz' ...
-    table[table$Position %in% pos.to.replace, c(4,6,7)] <- new.tf[new.tf$Datum %in% double.dates, c(2,3,4)]
+    table[table$Position %in% pos.to.replace, c(3,5,7)] <- new.tf[new.tf$Datum %in% double.dates, c(2,3,4)]
     #return(table)
     # ... and delete the duplicates
     table <- table[!(table$Position %in% pos.to.delete), ]
@@ -42,7 +42,7 @@ reduceONE <- function(table, pro) {
     tf <- table[table$Produkt %in% dif.products[pro], ]
     #return(tf)
     rows.replacement <- which(tf$Datum %in% double.dates)
-    return(rows.replacement)
+    #return(rows.replacement)
     if (rows.replacement[1] == 1) {
       day <- tf[rows.replacement[1],]$Datum
       sum.of.day <- round(sum(tf[tf$Datum %in% day, ]$Bestand_Einheit), 3)
