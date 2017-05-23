@@ -23,7 +23,7 @@ startup.settings <- function(table, importPRODUCTS, reduce = TRUE) {
   }
   
   # Korrektur Bohnen
-  kornumsatz[kornumsatz$Produkt == "Bohnen Borlotti" & kornumsatz$Datum >= as.Date("2016-10-13", origin="1970-01-01"), ]$Produkt <- "Bohnen"
+  kornumsatz[kornumsatz$Produkt == "Bohnen Borlotti" & kornumsatz$Datum >= as.Date("2016-10-13", origin="1970-01-01"), ]$Produkt <- "Bohnen schwarz"
   
   rm(VPE, i, Position)
   
