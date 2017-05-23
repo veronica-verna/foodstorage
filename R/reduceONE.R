@@ -10,7 +10,7 @@ reduceONE <- function(table, pro) {
   dif.products <- levels(table$Produkt)
   len <- length(dif.products)
   
-  # look for each product, if there exist more than one row for one date
+  # look for each product, if there exists more than one row for one date
   for (pro in 1:len) {
     tf <- table[table$Produkt == dif.products[pro], ]
     # create a table which contains duplicates
