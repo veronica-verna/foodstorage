@@ -30,7 +30,7 @@ prepare <- function(name.of.product,
     # name of product has to be in vector of products!
     lev <- levels(products)
     if (length(name.of.product) == 1) {
-      if (isTRUE(name.of.product %in% lev) == FALSE) 
+      if (!isTRUE(name.of.product %in% lev)) 
         stop("Vector of products has to contain name.of.product")
     } else {
       for (i in 1:length(name.of.product)) {

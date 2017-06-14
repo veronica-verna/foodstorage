@@ -10,6 +10,7 @@ multiply <- function(FUN,
   
   if (class(FUN) != "function") stop("FUN must be of class 'function'")
   FUN <- match.fun(FUN)
+  #fun.name <- tolower(FUN)
   if (is.data.frame(data) == FALSE)
     stop("data must be a data frame with 10 columns. For details type help(prepare).")
   dates <- data$Datum
@@ -29,7 +30,7 @@ multiply <- function(FUN,
   if (length(unique(group %in% lev)) !=1 && unique(group %in% lev) != TRUE)
     stop("Vector of products has to contain ALL name.of.product[s]")
    
-  if (FUN == substitute(prepare)) {
+  #if (fun.name == "prepare") {
     if (length(par) == 0) {
       par <- list(what.plotting = "Warenbestand", from = "", to = "", more.than = 15, correction = 0.05)
     } else {
@@ -72,5 +73,5 @@ multiply <- function(FUN,
   
     if (test == TRUE) return("yes")
     return(table)
-  }
+  #}
 }

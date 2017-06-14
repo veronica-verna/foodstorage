@@ -17,7 +17,7 @@ prognosEs <- function(group, table = kornumsatz, from = "", to = "", list = FALS
     all.errors <- vector("list", length = 0)
     # seperate 'works' from 'errors'
     for (i in 1:len) {
-      if (is.data.frame(big.list[[i]]) == TRUE) { # data.frame, because 'works' returns a data.frame with 5 columns
+      if (is.data.frame(big.list[[i]])) { # data.frame, because 'works' returns a data.frame with 5 columns
         table.works <- rbind(table.works, big.list[[i]])
       } else {
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
@@ -108,7 +108,7 @@ prognosEs <- function(group, table = kornumsatz, from = "", to = "", list = FALS
     # arrange table.errors in alphabetical order
     #table.errors <- table.errors[with(table.errors, order(table.errors[,1])), ] 
     # get unit of products, order, and delete duplicates
-    units <- unique(table[table$Produkt %in% table.errors[,1], c(1,5)])
+    units <- unique(table[table$Produkt %in% table.errors[,1], c('Produkt', 'Einheit')])
     units <- units[with(units, order(units[,1])), ]
     units <- units[!duplicated(units[,1]),]
     units <- units[,2]
