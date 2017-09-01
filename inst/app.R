@@ -1,18 +1,9 @@
-library(shiny)
-library(shinyjs)
-library(shinythemes)
-library(colourpicker)
-library(lubridate)
-library(data.table)
-library(foodstorage)
-library(DT)
-
 ######################################################################
 ###################### read kornumsatz ###############################
 ######################################################################
 data("kornumsatz_demo")
 kornumsatz <- kornumsatz_demo
-rm(kornumsatz_demo)
+#rm(kornumsatz_demo)
 data("starting_csv")
 kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 kornumsatz <- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
