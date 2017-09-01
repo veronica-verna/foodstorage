@@ -1,3 +1,4 @@
+#' @export
 # Plotten mit myPlot funktion ####
 plotStorage <- function(prepare,
                        prod.name.for.plot = "",

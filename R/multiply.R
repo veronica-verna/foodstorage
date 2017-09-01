@@ -1,3 +1,4 @@
+#' @export
 #### function for multiplying different other functions
 
 multiply <- function(FUN, 

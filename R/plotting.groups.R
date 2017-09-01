@@ -1,3 +1,4 @@
+#' @export
 ## fun_reg in tryCatch
 
 plotting.groups <- function(product, from = "", to = "") {

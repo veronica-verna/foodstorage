@@ -1,3 +1,4 @@
+#' @export
 # sort data, add columns, adapt product names, etc ####
 
 startup.settings <- function(table, importPRODUCTS, reduce = TRUE) {

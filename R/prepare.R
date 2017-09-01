@@ -1,3 +1,4 @@
+#' @export
 prepare <- function(name.of.product,
                     what.plotting = "regression",
                     from = "",
@@ -12,7 +13,9 @@ prepare <- function(name.of.product,
   ##### at first: check if the input is correct! ####
   if (is.data.frame(data) == FALSE)
     stop("data must be a data frame with 10 columns. For details type help(prepare).")
-  dates <- data$Datum
+  if ("Datum" %in% colnames(data)) {
+    dates <- data$Datum
+  } else stop("prepare function is using wrong 'kornumsatz'")
   products <- data$Produkt
   comul.change <- data$MengeKum
   food.storage <- data$Bestand_Einheit

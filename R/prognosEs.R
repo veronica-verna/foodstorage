@@ -1,3 +1,4 @@
+#' @export
 #### function for calculating regressions for groups ####
 
 prognosEs <- function(group, table = kornumsatz, from = "", to = "", list = FALSE, filter = TRUE, weeks = 4, errors = FALSE) {

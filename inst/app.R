@@ -1,13 +1,13 @@
 ######################################################################
 ###################### read kornumsatz ###############################
 ######################################################################
-data("kornumsatz_demo")
-kornumsatz <- kornumsatz_demo
-#rm(kornumsatz_demo)
-data("starting_csv")
+data("kornumsatz", package = "foodstorage")
+data("starting_csv", package = "foodstorage")
+print(str(kornumsatz))
 kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 kornumsatz <- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
+print(str(kornumsatz))
 
 #################################### Level 1: Group or product ####################################
 level1st <- list("Zusammenfassung" = 'summary',
@@ -152,6 +152,7 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
 
 
 server <- shinyServer(function(input, output, session){
+  print(str(kornumsatz))
   ############################### Updating Input Settings #########################################
   observeEvent(input$quantity, {
     # Update based on the quantity change event

@@ -1,3 +1,4 @@
+#' @export
 currentStorage <- function(group, 
                            xlab = "Warenbestand in Kilo",
                            mar = c(4,8,1,1),
