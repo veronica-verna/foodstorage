@@ -4,7 +4,7 @@
 multiply <- function(FUN, 
                      group, 
                      par = list(), 
-                     data = kornumsatz, 
+                     data = get("kornumsatz"), 
                      current.storage = TRUE, 
                      reduce = FALSE,
                      test = FALSE) {

@@ -30,6 +30,6 @@ startup.settings <- function(table, importPRODUCTS, reduce = TRUE) {
   
   kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
   # one date, two rows -> reduce them to one
-  if (reduce == TRUE) kornumsatz <- reduceONE(kornumsatz)
+  if (reduce == TRUE) kornumsatz <- reduceONE(get("kornumsatz"))
   return(kornumsatz)
 }

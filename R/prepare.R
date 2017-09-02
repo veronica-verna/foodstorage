@@ -5,7 +5,7 @@ prepare <- function(name.of.product,
                     to = "",
                     correction = 0.05, 
                     more.than = 15,
-                    data = kornumsatz,
+                    data = get("kornumsatz"),
                     current.storage = FALSE,
                     myPlot = FALSE,
                     test = FALSE) {
