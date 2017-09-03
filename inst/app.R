@@ -5,9 +5,9 @@ data("kornumsatz_demo", package = "foodstorage")
 data("starting_csv", package = "foodstorage")
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
 kornumsatz <<- kornumsatz_demo
-kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
+kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
 kornumsatz <<- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
-kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
+kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
 
 #################################### Level 1: Group or product ####################################
 level1st <- list("Zusammenfassung" = 'summary',
@@ -26,7 +26,7 @@ level2nd <- list("ONEprod" = as.character(levels(kornumsatz$Produkt)),
                  "producer2" = deliverers2)
 
 prodBYprod <- list()
-for (i in length(product.group)) {
+for (i in 1:length(product.group)) {
   prodBYprod[[i]] <- as.character(unique(starting_csv[starting_csv$Produktgruppe == product.group[i],]$Produkte_Zusammenfassung))
   names(prodBYprod)[i] <- product.group[i]
 }
@@ -48,7 +48,7 @@ createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = F
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
     if (plot == TRUE) {
-      big.list <- lapply(prodBYprod, currentStorage, summary = TRUE)
+      big.list <- lapply(unlist(prodBYprod, use.names = F), currentStorage, summary = TRUE)
       full <- lapply(big.list, '[[', 1)
       names(full) <- c()
       full <- unlist(full)
@@ -236,7 +236,7 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
 
 server <- shinyServer(function(input, output, session){
   ############################### Updating Input Settings #########################################
-  observeEvent(input$quantity, label = "Update2ndLevel", suspended = TRUE, {
+  observeEvent(input$quantity, label = "Update2ndLevel", {
     # Update based on the quantity change event
     updateSelectInput(session, "product", 
                       label = names(level1st[which(level1st == input$quantity)]),
@@ -287,7 +287,9 @@ server <- shinyServer(function(input, output, session){
   })
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
-  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), label = "renderingOutput[[plotname]]",{
+  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), 
+               label = "renderingOutput[[plotname]]",
+               priority = 1, {
     #local({
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
       print(plotname)
