@@ -138,7 +138,7 @@ createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = F
 ###################################################################################################
 ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                          ##################### Theme settings #####################################
-                         theme = shinytheme("united"),
+                         #theme = shinytheme("united"),
                          # busy-button
                          tags$head(tags$style(type = "text/css", "#loadmessage {
                                                                   position: fixed;
