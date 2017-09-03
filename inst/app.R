@@ -41,7 +41,97 @@ for (i in 1:length(deliverers2)) {
   names(prodBYdel2)[i] <- deliverers2[i]
 }
 
-
+###################################################################################################
+################### function for creating html output for renderUI ################################
+createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = FALSE) {
+  ############################# present plotting ##################################################
+  if (tabs == 1 && quantity == "summary") {
+    if (check == TRUE) return("plot1")
+    if (plot == TRUE) {
+      big.list <- lapply(prodBYprod, currentStorage, summary = TRUE)
+      full <- lapply(big.list, '[[', 1)
+      names(full) <- c()
+      full <- unlist(full)
+      empty <- lapply(big.list, '[[', 2)
+      names(empty) <- c()
+      empty <- unlist(empty)
+      barplot(sort(full, decreasing = TRUE), 
+              horiz = TRUE,
+              las = 1,
+              cex.axis = 0.8,
+              cex.names = 0.8,
+              xlab = "Warenbestand in Kilo")
+      if (length(empty) != 0) { # usual usecase
+        legend("topright", 
+               legend = c("Derzeit vergriffen:", sort(empty, decreasing = TRUE)),
+               pch = c(NA, rep(16, length(empty))))
+      }
+    } else plot_output_list <- list(plotOutput("plot1", height = 1000))
+    # otherwise create a html tag for renderUI
+    
+  }
+  
+  if (tabs == 1 && quantity == "ONEprod") {
+    if (check == TRUE) return("plot2")
+    if (plot == TRUE) {
+      suppressWarnings(plotStorage(prepare(prod, what.plotting = "Warenbestand", myPlot = TRUE)))
+    } else plot_output_list <- list(plotOutput("plot2"))
+    # otherwise create a html tag for renderUI
+    
+  }
+  
+  if (tabs == 1 && quantity == "family") {
+    if (check == TRUE) return("plot3")
+    if (plot == TRUE) {
+      currentStorage(unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F))
+    } else plot_output_list <- list(plotOutput("plot3"))
+    # otherwise create a html tag for renderUI
+    
+  }
+  
+  if (tabs == 1 && quantity == "producer") {
+    if (check == TRUE) return("plot4")
+    if (plot == TRUE) {
+      currentStorage(unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F))
+    } else plot_output_list <- list(plotOutput("plot4"))
+    # otherwise create a html tag for renderUI
+    
+  }
+  
+  ################################### plotting future #############################################
+  
+  if (tabs == 2 && quantity == "summary") {
+    if (check == TRUE) return("plot5")
+    if (plot == TRUE) {
+      prognosEs(levels(kornumsatz$Produkt), weeks = weeks, list = T)
+    } else plot_output_list <- list(dataTableOutput("plot5"))
+  }
+  
+  if (tabs == 2 && quantity == "ONEprod") {
+    if (check == TRUE) return("plot6")
+    if (plot == TRUE) {
+      prognosIs(product = prod, main_header = prod)
+    } else plot_output_list <- list(plotOutput("plot6"))
+  }
+  
+  if (tabs == 2 && quantity == "family") {
+    if (check == TRUE) return("plot7")
+    if (plot == TRUE) {
+      group <- unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F)
+      prognosEs(group, weeks = weeks, list = T)
+    } else plot_output_list <- list(dataTableOutput("plot7"))
+  }
+  
+  if (tabs == 2 && quantity == "producer") {
+    if (check == TRUE) return("plot8")
+    if (plot == TRUE) {
+      group <- unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F)
+      prognosEs(group, weeks = weeks, list = T)
+    } else plot_output_list <- list(dataTableOutput("plot8"))
+  }
+  
+  if (check == FALSE && plot == FALSE) return(plot_output_list)
+}
 
 ###################################################################################################
 ########################################### Shiny UI ##############################################
@@ -133,13 +223,7 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                 ###################################################################################
                 
                 fluidRow(
-                  conditionalPanel(condition = "input.tabs == 1 && input.quantity == 'summary'",
-                                   plotOutput("overview")),
-                  conditionalPanel(condition = "input.tabs == 1 && input.quantity != 'summary' |
-                                                input.tabs == 2 && input.quantity == 'ONEprod'",
-                                   plotOutput("curves")),
-                  conditionalPanel(condition = "input.tabs == 2 && input.quantity != 'ONEprod'",
-                                   DT::dataTableOutput("tables"))
+                  uiOutput("plots")
                 )
     
   ))
@@ -177,71 +261,57 @@ server <- shinyServer(function(input, output, session){
   })
   
   #################################################################################################
+  ########################### what shall be plotted ###############################################
+  current <- reactiveValues(
+    tabs = 1,
+    quantity = "summary",
+    prod = "Allesreiniger",
+    weeks = 4
+  )
+  
+  observeEvent(input$go, {
+    current$tabs <- input$tabs
+    current$quantity <- input$quantity
+    if (input$quantity != "summary") current$prod <- input$product
+    if (exists(input$weeks)) current$weeks <- input$weeks
+  })
+  
+  #################################################################################################
   ########################### generate outputs ####################################################
   #################################################################################################
   
-  observeEvent(input$go, {
-    ################################### present summary ###########################################
-    output$overview <- renderPlot({
-      if (input$tabs == 1 && input$quantity == "summary") {
-        big.list <- lapply(prodBYprod, currentStorage, summary = TRUE)
-        full <- lapply(big.list, '[[', 1)
-        names(full) <- c()
-        full <- unlist(full)
-        empty <- lapply(big.list, '[[', 2)
-        names(empty) <- c()
-        empty <- unlist(empty)
-        barplot(sort(full, decreasing = TRUE), 
-                horiz = TRUE,
-                las = 1,
-                cex.axis = 0.8,
-                cex.names = 0.8,
-                xlab = "Warenbestand in Kilo")
-        if (length(empty) != 0) { # usual usecase
-          legend("topright", 
-                 legend = c("Derzeit vergriffen:", sort(empty, decreasing = TRUE)),
-                 pch = c(NA, rep(16, length(empty))))
-        }
-      }
-    }, height = 1000)
+  output$plots <- renderUI({
+    # Create a list of `plotOutput` objects (depending on current())
+    plot_output_list <- createShinyList(tabs = current$tabs, quantity = current$quantity)
     
-    #################### rest of present & future ONEprod #########################################
-    output$curves <- renderPlot({
-      if (input$tabs == 1 && input$quantity == "ONEprod") {
-        suppressWarnings(plotStorage(prepare(input$product, what.plotting = "Warenbestand", myPlot = TRUE)))
+    # Place the plot output inside a shiny `tagList()`
+    do.call(tagList, plot_output_list)
+  })
+  
+  # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
+  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), {
+    local({
+      plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
+      
+      if (plotname == "plot1") {
+        output[[plotname]] <- renderPlot({
+          createShinyList(current$tabs, current$quantity, plot = TRUE)
+        })
       }
-      if (input$tabs == 1 && input$quantity == "family") {
-        currentStorage(unlist(prodBYprod[which(names(prodBYprod) == input$product)], use.names = F))
+      
+      if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
+        output[[plotname]] <- renderPlot({
+          createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
+        })
       }
-      if (input$tabs == 1 && input$quantity == "producer") {
-        currentStorage(unlist(prodBYdel1[which(names(prodBYdel1) == input$product)], use.names = F))
-      }
-      if (input$tabs == 2 && input$quantity == 'ONEprod') {
-        prognosIs(product = input$product, main_header = input$product)
-      }
-    })
-    
-    ################################ rest of future ###############################################
-    output$tables <- DT::renderDataTable({
-      if (input$tabs == 2 && input$quantity == 'summary') {
-        prognosEs(levels(kornumsatz$Produkt), weeks = input$weeks, list = T)
-      }
-      if (input$tabs == 2 && input$quantity == 'family') {
-        group <- unlist(prodBYprod[which(names(prodBYprod) == input$product)], use.names = F)
-        prognosEs(group, weeks = input$weeks, list = T)
-      }
-      if (input$tabs == 2 && input$quantity == 'producer') {
-        group <- unlist(prodBYdel1[which(names(prodBYdel1) == input$product)], use.names = F)
-        prognosEs(group, weeks = input$weeks, list = T)
+      
+      if (plotname %in% c("plot5", "plot7", "plot8")) {
+        output[[plotname]] <- DT::renderDataTable({
+          createShinyList(current$tabs, current$quantity, current$prod, current$weeks, plot = TRUE)
+        })
       }
     })
   })
-  
-  ##########################################################################################
-  ############################# rendering outputs ##########################################
-  ##########################################################################################
-  
-  
   
 })
 
