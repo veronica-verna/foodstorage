@@ -9,21 +9,21 @@ kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
 kornumsatz <<- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
-#################################### Level 1: Group or product ####################################
+########################## Level 1 = Input 1: Group or product ####################################
 level1st <- list("Zusammenfassung" = 'summary',
                  "Einzelnes Produkt" = 'ONEprod',
                  "Produktgruppe (Familie)" = 'family',
                  "Lieferanten" = 'producer')
 
-##################################### Level 2: product groups #####################################
+########################### Level 2 = Input 2: product groups #####################################
 product.group <- as.character(unique(starting_csv$Produktgruppe))
 deliverers <- as.character(unique(starting_csv$Lieferant))
-deliverers2 <- as.character(unique(starting_csv$Lieferant2))
-deliverers2 <- deliverers2[which(deliverers2 != "")]
-level2nd <- list("ONEprod" = as.character(levels(kornumsatz$Produkt)),
-                 "family" = product.group,
-                 "producer" = deliverers,
-                 "producer2" = deliverers2)
+# deliverers2 <- as.character(unique(starting_csv$Lieferant2))
+# deliverers2 <- deliverers2[which(deliverers2 != "")]
+level2nd <- list("ONEprod" = as.character(levels(kornumsatz$Produkt)), # 'Einzelnes Produkt' in UI
+                 "family" = product.group, # 'Produktgruppe (Familie)' in UI
+                 "producer" = deliverers) #, 'Lieferanten' in UI
+                 # "producer2" = deliverers2)
 
 prodBYprod <- list()
 for (i in 1:length(product.group)) {
@@ -35,11 +35,11 @@ for (i in 1:length(deliverers)) {
   prodBYdel1[[i]] <- as.character(unique(starting_csv[starting_csv$Lieferant == deliverers[i],]$Produkte_Zusammenfassung))
   names(prodBYdel1)[i] <- deliverers[i]
 }
-prodBYdel2 <- list()
-for (i in 1:length(deliverers2)) {
-  prodBYdel2[[i]] <- as.character(unique(starting_csv[starting_csv$Lieferant2 == deliverers2[i],]$Produkte_Zusammenfassung))
-  names(prodBYdel2)[i] <- deliverers2[i]
-}
+# prodBYdel2 <- list()
+# for (i in 1:length(deliverers2)) {
+#   prodBYdel2[[i]] <- as.character(unique(starting_csv[starting_csv$Lieferant2 == deliverers2[i],]$Produkte_Zusammenfassung))
+#   names(prodBYdel2)[i] <- deliverers2[i]
+# }
 
 ###################################################################################################
 ################### function for creating html output for renderUI ################################
@@ -266,11 +266,12 @@ server <- shinyServer(function(input, output, session){
     weeks = 4
   )
   
-  observeEvent(input$go, suspended = TRUE,label = "UpdatingCurrent", {
+  observeEvent(input$go,label = "UpdatingCurrent", {
     current$tabs <- input$tabs
     current$quantity <- input$quantity
     current$prod <- input$product
-    if (exists(input$weeks)) current$weeks <- input$weeks
+    #if (exists(input$weeks)) current$weeks <- input$weeks
+    print(c(current$tabs, current$quantity, current$prod))
   })
   
   #################################################################################################
@@ -279,15 +280,13 @@ server <- shinyServer(function(input, output, session){
   
   output$plots <- renderUI({
     # Create a list of `plotOutput` objects (depending on current())
-    plot_output_list <- createShinyList(tabs = current$tabs, quantity = current$quantity)
-    print(plot_output_list)
+    plot_output_list <- createShinyList(tabs = current$tabs, quantity = current$quantity, plot=F)
     # Place the plot output inside a shiny `tagList()`
     do.call(tagList, plot_output_list)
-    print(do.call(tagList, plot_output_list))
   })
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
-  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), 
+  observeEvent(input$go, 
                label = "renderingOutput[[plotname]]",
                priority = 1, {
     #local({
@@ -300,7 +299,6 @@ server <- shinyServer(function(input, output, session){
       }
       
       if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
-        print(exists(output[[plotname]]))
         output[[plotname]] <- renderPlot({
           print(current)
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
