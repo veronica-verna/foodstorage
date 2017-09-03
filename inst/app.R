@@ -3,12 +3,12 @@
 ######################################################################
 data("kornumsatz_demo", package = "foodstorage")
 data("starting_csv", package = "foodstorage")
-print(str(kornumsatz_demo))
-kornumsatz <- kornumsatz_demo
-kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
-kornumsatz <- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
-kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
-print(str(kornumsatz))
+# '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
+kornumsatz <<- kornumsatz_demo
+kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
+kornumsatz <<- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
+kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
+
 #################################### Level 1: Group or product ####################################
 level1st <- list("Zusammenfassung" = 'summary',
                  "Einzelnes Produkt" = 'ONEprod',
@@ -56,7 +56,6 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                                                                   left: 0;
                                                                   width: 100%;
                                                                   padding: 5px 0px 5px 0px;
-                                                                  text-align: center;
                                                                   font-weight: bold;
                                                                   font-size: 100%;
                                                                   color: #000000;
