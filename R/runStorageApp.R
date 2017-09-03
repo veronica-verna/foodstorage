@@ -4,11 +4,11 @@
 #' 
 #'
 #' @export
-runStorageApp <- function() {
+runStorageApp <- function(display.mode = "normal") {
   appDir <- system.file(package = "foodstorage")
   if (appDir == "") {
     stop("Could not find example directory. Try re-installing `foodstorage`.", call. = FALSE)
   }
   
-  shiny::runApp(appDir, display.mode = "normal")
+  shiny::runApp(appDir, display.mode = display.mode)
 }

@@ -236,7 +236,7 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
 
 server <- shinyServer(function(input, output, session){
   ############################### Updating Input Settings #########################################
-  observeEvent(input$quantity, {
+  observeEvent(input$quantity, label = "Update2ndLevel", suspended = TRUE, {
     # Update based on the quantity change event
     updateSelectInput(session, "product", 
                       label = names(level1st[which(level1st == input$quantity)]),
@@ -245,14 +245,11 @@ server <- shinyServer(function(input, output, session){
   })
   
   ############################# reset inputs when tabs are changed ################################
-  observeEvent(input$tabs, {
+  observeEvent(input$tabs, label = "resetQuantity", {
     # Reset quantity input when tab is changed
     updateSelectInput(session, "quantity", "Einzelnes Produkt oder Gruppe?",
                       choices = level1st)
-  })
-  
-  ############################# text of action button depends on input$tabs #######################
-  observeEvent(input$tabs, {
+    # text of action button depends on input$tabs
     if (input$tabs == 1) {
       updateActionButton(session, "go", "Nachschlagen")
     } else {
@@ -269,10 +266,10 @@ server <- shinyServer(function(input, output, session){
     weeks = 4
   )
   
-  observeEvent(input$go, {
+  observeEvent(input$go, suspended = TRUE,label = "UpdatingCurrent", {
     current$tabs <- input$tabs
     current$quantity <- input$quantity
-    if (input$quantity != "summary") current$prod <- input$product
+    current$prod <- input$product
     if (exists(input$weeks)) current$weeks <- input$weeks
   })
   
@@ -283,16 +280,17 @@ server <- shinyServer(function(input, output, session){
   output$plots <- renderUI({
     # Create a list of `plotOutput` objects (depending on current())
     plot_output_list <- createShinyList(tabs = current$tabs, quantity = current$quantity)
-    
+    print(plot_output_list)
     # Place the plot output inside a shiny `tagList()`
     do.call(tagList, plot_output_list)
+    print(do.call(tagList, plot_output_list))
   })
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
-  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), {
-    local({
+  observeEvent(c(current$tabs, current$quantity, current$prod, current$weeks), label = "renderingOutput[[plotname]]",{
+    #local({
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
-      
+      print(plotname)
       if (plotname == "plot1") {
         output[[plotname]] <- renderPlot({
           createShinyList(current$tabs, current$quantity, plot = TRUE)
@@ -300,7 +298,9 @@ server <- shinyServer(function(input, output, session){
       }
       
       if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
+        print(exists(output[[plotname]]))
         output[[plotname]] <- renderPlot({
+          print(current)
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
@@ -310,7 +310,7 @@ server <- shinyServer(function(input, output, session){
           createShinyList(current$tabs, current$quantity, current$prod, current$weeks, plot = TRUE)
         })
       }
-    })
+    #})
   })
   
 })

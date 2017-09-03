@@ -8,5 +8,5 @@ License: GPL
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Import: lubridate (>= 1.6.0), shiny (>= 1.0.0), DT (>= 0.2), shinyjs (>= 0.9), shinythemes (>= 1.1.1), colourpicker (>= 0.3), data.table (>= 1.10.4), 
+Import: lubridate (>= 1.6.0), shiny (>= 1.0.0), DT (>= 0.2), shinyjs (>= 0.9), shinythemes, colourpicker (>= 0.3), data.table (>= 1.10.4), 
 Suggests: testthat
