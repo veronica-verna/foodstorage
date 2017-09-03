@@ -137,6 +137,7 @@ createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
 ########################################### Shiny UI ##############################################
 ###################################################################################################
 ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
+                         useShinyjs(),
                          ##################### Theme settings #####################################
                          #theme = shinytheme("united"),
                          # busy-button
@@ -180,7 +181,7 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                          br(),
                          fluidRow(
                            conditionalPanel(condition="$('html').hasClass('shiny-busy') && input.tabs==2 
-                                            && input.quantityFut == 'summary'",
+                                            && input.quantity != 'ONEprod'",
                                             tags$div(h1("Puh - Rechnen ist anstrengend..."), id="loadmessage"))
                          )
                          
@@ -271,7 +272,7 @@ server <- shinyServer(function(input, output, session){
     current$prod <- input$product
     # print(c(current$tabs, current$quantity, current$prod))
   })
-  
+
   #################################################################################################
   ########################### generate outputs ####################################################
   #################################################################################################
@@ -286,7 +287,7 @@ server <- shinyServer(function(input, output, session){
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
   observeEvent(input$go, 
                label = "renderingOutput[[plotname]]",{
-    #local({
+    
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
       # print(plotname) # for debugging
       if (plotname == "plot1") {
@@ -307,7 +308,6 @@ server <- shinyServer(function(input, output, session){
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
-    #})
   })
   
 })
