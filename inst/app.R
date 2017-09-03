@@ -5,9 +5,9 @@ data("kornumsatz_demo", package = "foodstorage")
 data("starting_csv", package = "foodstorage")
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
 kornumsatz <<- kornumsatz_demo
-kornumsatz$Produkt <- as.character(kornumsatz$Produkt)
+kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
 kornumsatz <<- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
-kornumsatz$Produkt <- as.factor(kornumsatz$Produkt)
+kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
 #################################### Level 1: Group or product ####################################
 level1st <- list("Zusammenfassung" = 'summary',
