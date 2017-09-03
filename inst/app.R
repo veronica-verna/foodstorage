@@ -266,7 +266,7 @@ server <- shinyServer(function(input, output, session){
     weeks = 4
   )
   
-  observeEvent(input$go,label = "UpdatingCurrent", {
+  observeEvent(input$go,label = "UpdatingCurrent", priority = 1, {
     current$tabs <- input$tabs
     current$quantity <- input$quantity
     current$prod <- input$product
@@ -287,8 +287,7 @@ server <- shinyServer(function(input, output, session){
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
   observeEvent(input$go, 
-               label = "renderingOutput[[plotname]]",
-               priority = 1, {
+               label = "renderingOutput[[plotname]]",{
     #local({
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
       print(plotname)
