@@ -303,6 +303,7 @@ server <- shinyServer(function(input, output, session){
       
       if (plotname %in% c("plot5", "plot7", "plot8")) {
         output[[plotname]] <- DT::renderDataTable({
+          input$go
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
