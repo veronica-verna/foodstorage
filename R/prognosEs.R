@@ -14,7 +14,7 @@ prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list
                               Noch4Wochen = as.Date(character()), 
                               Ende = as.Date(character()), 
                               LetzterDatenpunkt = as.Date(character()))
-    big.list <- lapply(group, product.is.over, from = from, to = to)
+    big.list <- lapply(as.character(group), product.is.over, from = from, to = to)
     all.errors <- vector("list", length = 0)
     # seperate 'works' from 'errors'
     for (i in 1:len) {
@@ -24,39 +24,42 @@ prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list
         all.errors[[length(all.errors) +1]] <- big.list[[i]] 
       }
     }
-    # Let's filter table.works
+    
+    # beginning from last data point, show all products which will be over in the next '4' weeks
+    last.data.point <- max(table.works$LetzterDatenpunkt)
+    
+    # Let's filter table.works (optional)
     if (filter == TRUE) {
       # beginning from last data point, show all products which will be over in the next '4' weeks
-      last.data.point <- max(table.works$LetzterDatenpunkt)
       referre.date <- last.data.point + weeks(weeks)
       table.works <- table.works[table.works$Ende <= referre.date,]
       table.works <- table.works[with(table.works, order(Ende)), ] # sorting data decreasing end date
-      
-      # now seperate: which product is completely over?
-      if (nrow(table.works[table.works$Ende <= last.data.point,]) >= 1) {
-        table.works.over <- table.works[table.works$Ende <= last.data.point,]
-        if (nrow(table.works.over) >= 1) {
-          already.over <- data.frame(Produkt = table.works.over$Produkt, 
-                                     Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
-                                     Datum = as.character(table.works.over$Ende),
-                                     Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
-                                     Anzahl = as.integer(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
-                                                        units = "days"),
-                                     Einheit = rep("Tage", nrow(table.works.over)),
-                                     check.names = FALSE)
-        }
-        table.works.over.soon <- table.works[table.works$Ende > last.data.point, ]
-        if (nrow(table.works.over.soon) >= 1) {
-          will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
-                                          Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
-                                          Datum = as.character(table.works.over.soon$Ende),
-                                          Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
-                                          Anzahl = as.integer(table.works.over.soon$Ende - last.data.point, units = "days"),
-                                          Einheit = rep("Tage", len = nrow(table.works.over.soon)),
-                                          check.names = FALSE)
-        }
-      } # only if there is a 'already-finished-product'
-    }
+    }  
+    # now seperate: which product is completely over?
+    if (nrow(table.works[table.works$Ende <= last.data.point,]) >= 1) {
+      table.works.over <- table.works[table.works$Ende <= last.data.point,]
+      if (nrow(table.works.over) >= 1) {
+        already.over <- data.frame(Produkt = table.works.over$Produkt, 
+                                   Bezeichnung = rep("ist leer seit", len = nrow(table.works.over)),
+                                   Datum = as.character(table.works.over$Ende),
+                                   Bezeichnung = rep("und hielt für", len = nrow(table.works.over)),
+                                   Anzahl = as.integer(table.works.over$Ende - table.works.over$LetztesAuffuellen, 
+                                                       units = "days"),
+                                   Einheit = rep("Tage", nrow(table.works.over)),
+                                   check.names = FALSE)
+      }
+      table.works.over.soon <- table.works[table.works$Ende > last.data.point, ]
+      if (nrow(table.works.over.soon) >= 1) {
+        will.be.over.soon <- data.frame(Produkt = table.works.over.soon$Produkt,
+                                        Bezeichnung = rep("wird leer sein am", len = nrow(table.works.over.soon)),
+                                        Datum = as.character(table.works.over.soon$Ende),
+                                        Bezeichnung = rep("also in", len = nrow(table.works.over.soon)),
+                                        Anzahl = as.integer(table.works.over.soon$Ende - last.data.point, units = "days"),
+                                        Einheit = rep("Tage", len = nrow(table.works.over.soon)),
+                                        check.names = FALSE)
+      }
+    } # only if there is a 'already-finished-product'
+    
     
     if (exists("already.over") == TRUE && 
         exists("will.be.over.soon") == TRUE && 

@@ -1,3 +1,4 @@
+#' @export
 ## fun_reg in tryCatch
 
 product.is.over <- function(product, from = "", to = "") {

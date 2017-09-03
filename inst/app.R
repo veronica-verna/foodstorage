@@ -43,7 +43,7 @@ for (i in 1:length(deliverers)) {
 
 ###################################################################################################
 ################### function for creating html output for renderUI ################################
-createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = FALSE) {
+createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
   ############################# present plotting ##################################################
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
@@ -103,8 +103,8 @@ createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = F
   if (tabs == 2 && quantity == "summary") {
     if (check == TRUE) return("plot5")
     if (plot == TRUE) {
-      prognosEs(levels(kornumsatz$Produkt), weeks = weeks, list = T)
-    } else plot_output_list <- list(dataTableOutput("plot5"))
+      return(prognosEs(as.character(levels(kornumsatz$Produkt)), filter = FALSE, list = T))
+    } else plot_output_list <- list(DT::dataTableOutput("plot5"))
   }
   
   if (tabs == 2 && quantity == "ONEprod") {
@@ -118,16 +118,16 @@ createShinyList <- function(tabs, quantity, prod, weeks, check = FALSE, plot = F
     if (check == TRUE) return("plot7")
     if (plot == TRUE) {
       group <- unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F)
-      prognosEs(group, weeks = weeks, list = T)
-    } else plot_output_list <- list(dataTableOutput("plot7"))
+      return(prognosEs(as.character(group), filter = FALSE, list = T))
+    } else plot_output_list <- list(DT::dataTableOutput("plot7"))
   }
   
   if (tabs == 2 && quantity == "producer") {
     if (check == TRUE) return("plot8")
     if (plot == TRUE) {
       group <- unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F)
-      prognosEs(group, weeks = weeks, list = T)
-    } else plot_output_list <- list(dataTableOutput("plot8"))
+      return(prognosEs(group, filter = FALSE, list = T))
+    } else plot_output_list <- list(DT::dataTableOutput("plot8"))
   }
   
   if (check == FALSE && plot == FALSE) return(plot_output_list)
@@ -201,12 +201,12 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                                                       choices = c("Bitte wählen" = "", level2nd$ONEprod)
                                                       #options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['), maxItems = 1))
                                           )
-                         ),
-                  column(4,
-                         conditionalPanel(condition = "input.quantity != 'ONEprod' && input.tabs == 2",
-                                          numericInput("weeks",
-                                                       "Wochen", value = 4, min = 1, max = 30))
-                         )
+                         ) # ,
+                  # column(4,
+                  #        conditionalPanel(condition = "input.quantity != 'ONEprod' && input.tabs == 2",
+                  #                         numericInput("weeks",
+                  #                                      "Wochen", value = 4, min = 1, max = 30))
+                  #        )
                   )
                 ),
                 
@@ -262,16 +262,14 @@ server <- shinyServer(function(input, output, session){
   current <- reactiveValues(
     tabs = 1,
     quantity = "summary",
-    prod = "Allesreiniger",
-    weeks = 4
+    prod = "Allesreiniger"
   )
   
   observeEvent(input$go,label = "UpdatingCurrent", priority = 1, {
     current$tabs <- input$tabs
     current$quantity <- input$quantity
     current$prod <- input$product
-    #if (exists(input$weeks)) current$weeks <- input$weeks
-    print(c(current$tabs, current$quantity, current$prod))
+    # print(c(current$tabs, current$quantity, current$prod))
   })
   
   #################################################################################################
@@ -280,7 +278,7 @@ server <- shinyServer(function(input, output, session){
   
   output$plots <- renderUI({
     # Create a list of `plotOutput` objects (depending on current())
-    plot_output_list <- createShinyList(tabs = current$tabs, quantity = current$quantity, plot=F)
+    plot_output_list <- createShinyList(current$tabs, current$quantity)
     # Place the plot output inside a shiny `tagList()`
     do.call(tagList, plot_output_list)
   })
@@ -290,7 +288,7 @@ server <- shinyServer(function(input, output, session){
                label = "renderingOutput[[plotname]]",{
     #local({
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
-      print(plotname)
+      # print(plotname) # for debugging
       if (plotname == "plot1") {
         output[[plotname]] <- renderPlot({
           createShinyList(current$tabs, current$quantity, plot = TRUE)
@@ -299,14 +297,13 @@ server <- shinyServer(function(input, output, session){
       
       if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
         output[[plotname]] <- renderPlot({
-          print(current)
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
       
       if (plotname %in% c("plot5", "plot7", "plot8")) {
         output[[plotname]] <- DT::renderDataTable({
-          createShinyList(current$tabs, current$quantity, current$prod, current$weeks, plot = TRUE)
+          createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
     #})
