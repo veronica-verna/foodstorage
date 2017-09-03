@@ -48,7 +48,7 @@ for (i in 1:length(deliverers2)) {
 ###################################################################################################
 ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                          ##################### Theme settings #####################################
-                         theme = shinytheme("united"),
+                         #theme = shinytheme("united"),
                          # busy-button
                          tags$head(tags$style(type = "text/css", "#loadmessage {
                                                                   position: fixed;
