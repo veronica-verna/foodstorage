@@ -137,7 +137,6 @@ createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
 ########################################### Shiny UI ##############################################
 ###################################################################################################
 ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
-                         useShinyjs(),
                          ##################### Theme settings #####################################
                          #theme = shinytheme("united"),
                          # busy-button
