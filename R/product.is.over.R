@@ -1,7 +1,7 @@
 #' @export
 ## fun_reg in tryCatch
 
-product.is.over <- function(product, from = "", to = "") {
+product.is.over <- function(product, from = Sys.Date() - months(6), to = Sys.Date()) {
   out <- tryCatch(
     {
       # Just to highlight: if you want to use more than one 

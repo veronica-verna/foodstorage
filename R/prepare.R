@@ -137,7 +137,7 @@ prepare <- function(name.of.product,
       from <- table$Datum[nrow(table)] %m-% months(6)
       table <- table[table$Datum >= from, ]
     } else { 
-      if (is.character(from) == FALSE) stop("'From' must be a character string in format 'yyyy-mm-dd'")
+      if (!is.character(from)) stop("'From' must be a character string in format 'yyyy-mm-dd'")
       from <- as.Date(from, origin = "1970-01-01")
       if (from > table$Datum[nrow(table)]) { # if from is 'newer' than the newest date in table
         stop("'From' must be a date inside the date range of your data")
@@ -145,8 +145,8 @@ prepare <- function(name.of.product,
         table <- table[table$Datum >= from,]
       }
     }
-    if (to != Sys.Date()) {
-      if (is.character(to) == FALSE) stop("'To' must be a character string in format 'yyyy-mm-dd'")
+    if (to != c(Sys.Date())) {
+      if (!is.character(to)) stop("'To' must be a character string in format 'yyyy-mm-dd'")
       if (to > table$Datum[nrow(table)]) stop("'To' must be a date inside the date range of your data")
       to <- as.Date(to, origin = "1970-01-01")
       if (from > to) stop("'From' must be before 'to'")

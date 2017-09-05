@@ -1,7 +1,7 @@
 #' @export
 #### function for calculating regressions for groups ####
 
-prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list = FALSE, filter = TRUE, weeks = 4, errors = FALSE) {
+prognosEs <- function(group, table = get("kornumsatz"), from = Sys.Date() - months(6), to = Sys.Date(), list = FALSE, filter = TRUE, before = Sys.Date() +  weeks(4), errors = FALSE) {
   
   len <- length(group)
   
@@ -30,9 +30,8 @@ prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list
     
     # Let's filter table.works (optional)
     if (filter == TRUE) {
-      # beginning from last data point, show all products which will be over in the next '4' weeks
-      referre.date <- last.data.point + weeks(weeks)
-      table.works <- table.works[table.works$Ende <= referre.date,]
+      # filter table.works: only data before 'before'
+      table.works <- table.works[table.works$Ende <= before,]
       table.works <- table.works[with(table.works, order(Ende)), ] # sorting data decreasing end date
     }  
     # now seperate: which product is completely over?

@@ -43,12 +43,12 @@ for (i in 1:length(deliverers)) {
 
 ###################################################################################################
 ################### function for creating html output for renderUI ################################
-createShinyList <- function(tabs, quantity, prod, from, to, filter, check = FALSE, plot = FALSE) {
+createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALSE, plot = FALSE) {
   ############################# present plotting ##################################################
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
     if (plot == TRUE) {
-      big.list <- lapply(unlist(prodBYprod, use.names = F), currentStorage, summary = TRUE)
+      big.list <- lapply(prodBYprod, currentStorage, summary = TRUE)
       full <- lapply(big.list, '[[', 1)
       names(full) <- c()
       full <- unlist(full)
@@ -103,7 +103,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, filter, check = FALS
   if (tabs == 2 && quantity == "summary") {
     if (check == TRUE) return("plot5")
     if (plot == TRUE) {
-      return(prognosEs(as.character(levels(kornumsatz$Produkt)), filter = FALSE, list = T))
+      return(prognosEs(as.character(levels(kornumsatz$Produkt)), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot5"))
   }
   
@@ -118,7 +118,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, filter, check = FALS
     if (check == TRUE) return("plot7")
     if (plot == TRUE) {
       group <- unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F)
-      return(prognosEs(as.character(group), filter = FALSE, list = T))
+      return(prognosEs(as.character(group), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot7"))
   }
   
@@ -126,7 +126,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, filter, check = FALS
     if (check == TRUE) return("plot8")
     if (plot == TRUE) {
       group <- unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F)
-      return(prognosEs(group, filter = FALSE, list = T))
+      return(prognosEs(group, before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot8"))
   }
   
@@ -324,7 +324,7 @@ server <- shinyServer(function(input, output, session){
       if (plotname %in% c("plot5", "plot7", "plot8")) {
         output[[plotname]] <- DT::renderDataTable({
           input$go # I don't know why but this command is necessary - otherwise dt doesn't appear
-          datatable(createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE), 
+          datatable(createShinyList(current$tabs, current$quantity, current$prod, before = current$filter, plot = TRUE), 
                     options = list(pageLength = 50, language = list(search = "Filter:"))) %>%
             formatDate("Datum")
         })

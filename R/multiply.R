@@ -3,7 +3,7 @@
 
 multiply <- function(FUN, 
                      group, 
-                     par = list(what.plotting = "Warenbestand", from = Sys.Date() - months(6), to = Sys.Date, more.than = 15, correction = 0.05), 
+                     par = list(what.plotting = "Warenbestand", from = Sys.Date() - months(6), to = Sys.Date(), more.than = 15, correction = 0.05), 
                      data = get("kornumsatz"), 
                      current.storage = TRUE, 
                      reduce = FALSE,
@@ -34,7 +34,7 @@ multiply <- function(FUN,
   #if (fun.name == "prepare") {
     # check, if prepare gets all necessary parameter
   necessary <- c("what.plotting", "from", "to", "more.than", "correction")
-  if (!(names(par) %in% necessary)) 
+  if (!isTRUE(unique(names(par) %in% necessary))) 
     stop("par must be a list consisting of following arguments: what.plotting, from, to, more.than, correction")
     
     if (par$what.plotting == "Warenbestand") {
