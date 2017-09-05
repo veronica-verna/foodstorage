@@ -43,7 +43,7 @@ for (i in 1:length(deliverers)) {
 
 ###################################################################################################
 ################### function for creating html output for renderUI ################################
-createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
+createShinyList <- function(tabs, quantity, prod, from, to, filter, check = FALSE, plot = FALSE) {
   ############################# present plotting ##################################################
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
@@ -74,7 +74,7 @@ createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
   if (tabs == 1 && quantity == "ONEprod") {
     if (check == TRUE) return("plot2")
     if (plot == TRUE) {
-      suppressWarnings(plotStorage(prepare(prod, what.plotting = "Warenbestand", myPlot = TRUE)))
+      suppressWarnings(plotStorage(prepare(prod, what.plotting = "Warenbestand", myPlot = TRUE, from = from, to = to)))
     } else plot_output_list <- list(plotOutput("plot2"))
     # otherwise create a html tag for renderUI
     
@@ -110,7 +110,7 @@ createShinyList <- function(tabs, quantity, prod, check = FALSE, plot = FALSE) {
   if (tabs == 2 && quantity == "ONEprod") {
     if (check == TRUE) return("plot6")
     if (plot == TRUE) {
-      prognosIs(product = prod, main_header = prod)
+      prognosIs(prod, main_header = prod, from = from, to = to)
     } else plot_output_list <- list(plotOutput("plot6"))
   }
   
@@ -203,24 +203,21 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                       )
                     ),
                     conditionalPanel(
-                      condition = "input.tabs == 1 && input.quantity != 'summary' || input.tabs == 2",
+                      condition = "input.tabs == 1 && input.quantity == 'ONEprod' || input.tabs == 2",
                       checkboxInput("options", "Erweiterte Optionen")
                     )
                   ),
                   column(4,
                     # more options
                     conditionalPanel(
-                      condition = "input.options == true && input.tabs == 1 && input.quantity != 'summary'||
+                      condition = "input.options == true && input.tabs == 1 && input.quantity == 'ONEprod'||
                       input.options == true && input.tabs == 2 && input.quantity == 'ONEprod'",
                       dateRangeInput("range", "Zeitraum", start = Sys.Date() - months(6), end = Sys.Date(), language = "de")
                     ),
                     conditionalPanel(
                       condition = "input.options == true && input.tabs == 2 && input.quantity != 'ONEprod'",
                       dateInput("filter", "Geht aus am", value = Sys.Date() + weeks(4), min = Sys.Date() + weeks(1),
-                                language = "de")
-                    ),
-                    conditionalPanel(
-                      condition = "input.options == true && input.tabs == 2 && input.quantity != 'ONEprod'",
+                                language = "de"),
                       helpText("Es werden nur noch Produkte angezeigt, die bis zum angegebenen Datum ausgehen werden.")
                     )
                   )
@@ -319,7 +316,7 @@ server <- shinyServer(function(input, output, session){
       # ONEprod, family, deliverer of 'Warenbestand' & ONEprod of 'Zukunftsprognose'
       if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
         output[[plotname]] <- renderPlot({
-          createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
+          createShinyList(current$tabs, current$quantity, current$prod, current$range[1], current$range[2], plot = TRUE)
         })
       }
       

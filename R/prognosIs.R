@@ -28,8 +28,8 @@
 #'
 #' @export
 prognosIs <- function(product,
-                      from = "",
-                      to = "",
+                      from = Sys.Date() - months(6),
+                      to = Sys.Date(),
                       graphics = TRUE,
                       type = "p",
                       col_points = "grey",

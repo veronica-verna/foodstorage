@@ -3,7 +3,7 @@
 
 multiply <- function(FUN, 
                      group, 
-                     par = list(), 
+                     par = list(what.plotting = "Warenbestand", from = Sys.Date() - months(6), to = Sys.Date, more.than = 15, correction = 0.05), 
                      data = get("kornumsatz"), 
                      current.storage = TRUE, 
                      reduce = FALSE,
@@ -32,13 +32,10 @@ multiply <- function(FUN,
     stop("Vector of products has to contain ALL name.of.product[s]")
    
   #if (fun.name == "prepare") {
-    if (length(par) == 0) {
-      par <- list(what.plotting = "Warenbestand", from = "", to = "", more.than = 15, correction = 0.05)
-    } else {
-      necessary <- c("what.plotting", "from", "to", "more.than", "correction")
-      if (!(names(par) %in% necessary)) 
-        stop("par must be a list consisting of following arguments: what.plotting, from, to, more.than, correction")
-    }
+    # check, if prepare gets all necessary parameter
+  necessary <- c("what.plotting", "from", "to", "more.than", "correction")
+  if (!(names(par) %in% necessary)) 
+    stop("par must be a list consisting of following arguments: what.plotting, from, to, more.than, correction")
     
     if (par$what.plotting == "Warenbestand") {
       for (i in 1:group_size) {
