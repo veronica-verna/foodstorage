@@ -202,21 +202,26 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                                   #options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['), maxItems = 1))
                       )
                     ),
-                    checkboxInput("options", "Erweiterte Optionen")
+                    conditionalPanel(
+                      condition = "input.tabs == 1 && input.quantity != 'summary' || input.tabs == 2",
+                      checkboxInput("options", "Erweiterte Optionen")
+                    )
                   ),
                   column(4,
                     # more options
                     conditionalPanel(
-                      condition = "input.options == TRUE ",
-                      dateInput("date1", "Von", 
-                                value = Sys.Date() - months(6), 
-                                max = Sys.Date())
+                      condition = "input.options == true && input.tabs == 1 && input.quantity != 'summary'||
+                      input.options == true && input.tabs == 2 && input.quantity == 'ONEprod'",
+                      dateRangeInput("range", "Zeitraum", start = Sys.Date() - months(6), end = Sys.Date(), language = "de")
                     ),
                     conditionalPanel(
-                      condition = "input.tabs = 1 && input.quantity != 'summary'",
-                      dateInput("date2", "Bis",
-                                value = Sys.Date(),
-                                max = Sys.Date())
+                      condition = "input.options == true && input.tabs == 2 && input.quantity != 'ONEprod'",
+                      dateInput("filter", "Geht aus am", value = Sys.Date() + weeks(4), min = Sys.Date() + weeks(1),
+                                language = "de")
+                    ),
+                    conditionalPanel(
+                      condition = "input.options == true && input.tabs == 2 && input.quantity != 'ONEprod'",
+                      helpText("Es werden nur noch Produkte angezeigt, die bis zum angegebenen Datum ausgehen werden.")
                     )
                   )
                 ),
@@ -273,14 +278,18 @@ server <- shinyServer(function(input, output, session){
   current <- reactiveValues(
     tabs = 1,
     quantity = "summary",
-    prod = "Allesreiniger"
+    prod = "Allesreiniger",
+    range = as.Date(c("2017-03-05", "2017-09-05")),
+    filter = as.Date("2017-10-03")
   )
   
   observeEvent(input$go,label = "UpdatingCurrent", priority = 1, {
     current$tabs <- input$tabs
     current$quantity <- input$quantity
     current$prod <- input$product
-    # print(c(current$tabs, current$quantity, current$prod))
+    current$range <- as.character(input$range)
+    current$filter <- as.character(input$filter)
+    print(c(current$tabs, current$quantity, current$prod, current$range, current$filter))
   })
 
   #################################################################################################

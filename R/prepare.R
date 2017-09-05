@@ -21,7 +21,6 @@ prepare <- function(name.of.product,
   food.storage <- data$Bestand_Einheit
   VPE <- data$VPE
   
-    require(lubridate)
     # for is.Date; cheeck if dates is a Date
     if (is.Date(dates) == FALSE) 
       stop("Your vector of Dates has to be in format as.Date()")
@@ -86,8 +85,7 @@ prepare <- function(name.of.product,
     if (what.plotting == "regression") VPE <- VPE[sortbypos$Position][1]
     
     #### join daily change to sortbypos ####
-    # merge sortbypos and sortbydays, by days of course
-    require(data.table) # v1.9.5+
+    # merge sortbypos and sortbydays, by days of course, data.table package necessary
     sortbydays <- merge(sortbydays, sortbypos, by='Datum', all=T)
     
     # fill NAs with numbers
