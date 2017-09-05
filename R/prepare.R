@@ -1,8 +1,8 @@
 #' @export
 prepare <- function(name.of.product,
                     what.plotting = "regression",
-                    from = "",
-                    to = "",
+                    from = Sys.Date() - months(6),
+                    to = Sys.Date(),
                     correction = 0.05, 
                     more.than = 15,
                     data = get("kornumsatz"),
@@ -133,16 +133,21 @@ prepare <- function(name.of.product,
     }
     
     #### check if from/to is set ####
-    if (from == "") { # means: standard/usual case
+    if (from == c(Sys.Date() - months(6))) { # means: standard/usual case
       from <- table$Datum[nrow(table)] %m-% months(6)
       table <- table[table$Datum >= from, ]
     } else { 
       if (is.character(from) == FALSE) stop("'From' must be a character string in format 'yyyy-mm-dd'")
       from <- as.Date(from, origin = "1970-01-01")
-      table <- table[table$Datum >= from,]
+      if (from > table$Datum[nrow(table)]) { # if from is 'newer' than the newest date in table
+        stop("'From' must be a date inside the date range of your data")
+      } else {
+        table <- table[table$Datum >= from,]
+      }
     }
-    if (to != "") {
+    if (to != Sys.Date()) {
       if (is.character(to) == FALSE) stop("'To' must be a character string in format 'yyyy-mm-dd'")
+      if (to > table$Datum[nrow(table)]) stop("'To' must be a date inside the date range of your data")
       to <- as.Date(to, origin = "1970-01-01")
       if (from > to) stop("'From' must be before 'to'")
       table <- table[table$Datum <= to,]
