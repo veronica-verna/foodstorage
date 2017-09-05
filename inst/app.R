@@ -285,26 +285,30 @@ server <- shinyServer(function(input, output, session){
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
   observeEvent(input$go, 
-               label = "renderingOutput[[plotname]]",{
+               label = "renderingOutput[[plotname]]",{ # label only for debugging
     
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
       # print(plotname) # for debugging
+      # summary of 'Warenbestand'
       if (plotname == "plot1") {
         output[[plotname]] <- renderPlot({
           createShinyList(current$tabs, current$quantity, plot = TRUE)
         })
       }
       
+      # ONEprod, family, deliverer of 'Warenbestand' & ONEprod of 'Zukunftsprognose'
       if (plotname %in% c("plot2", "plot3", "plot4", "plot6")) {
         output[[plotname]] <- renderPlot({
           createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
         })
       }
       
+      # summary, family and deliverer of 'Zukunftsprognose'
       if (plotname %in% c("plot5", "plot7", "plot8")) {
         output[[plotname]] <- DT::renderDataTable({
-          input$go
-          createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE)
+          input$go # I don't know why but this command is necessary - otherwise dt doesn't appear
+          datatable(createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE), options = list(pageLength = 50, language = list(search = "Filter:"))) %>%
+            formatDate("Datum")
         })
       }
   })

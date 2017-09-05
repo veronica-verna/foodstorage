@@ -63,16 +63,26 @@ prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list
     
     if (exists("already.over") == TRUE && 
         exists("will.be.over.soon") == TRUE && 
-        length(all.errors) == 0) 
+        length(all.errors) == 0) {
+      already.over$Datum <- as.Date(already.over$Datum)
+      will.be.over.soon <- as.Date(will.be.over.soon$Datum)
       return(rbind(already.over, will.be.over.soon))
+    }
+      
     if (exists("already.over") == FALSE && 
         exists("will.be.over.soon") == TRUE && 
-        length(all.errors) == 0) 
+        length(all.errors) == 0) {
+      will.be.over.soon <- as.Date(will.be.over.soon$Datum)
       return(will.be.over.soon)
+    }
+      
     if (exists("already.over") == TRUE && 
         exists("will.be.over.soon") == FALSE && 
-        length(all.errors) == 0) 
+        length(all.errors) == 0) {
+      already.over$Datum <- as.Date(already.over$Datum)
       return(already.over)
+    } 
+      
     
              
     # next step: which different errors do we have and give each of them a number
@@ -127,15 +137,30 @@ prognosEs <- function(group, table = get("kornumsatz"), from = "", to = "", list
     
     ### creating one big data frame for shiny
     if (exists("already.over") == TRUE &&
-        exists("will.be.over.soon") == TRUE) 
-      return(rbind(already.over, will.be.over.soon, table.errors))
+        exists("will.be.over.soon") == TRUE) {
+      data <- rbind(already.over, will.be.over.soon, table.errors)
+      data$Datum <- as.Date(data$Datum)
+      return(data)
+    }
+      
     if (exists("already.over") == FALSE &&
-        exists("will.be.over.soon") == TRUE)
-      return(rbind(will.be.over.soon, table.errors))
+        exists("will.be.over.soon") == TRUE) {
+      data <- rbind(will.be.over.soon, table.errors)
+      data$Datum <- as.Date(data$Datum)
+      return(data)
+    }
+      
     if (exists("already.over") == TRUE &&
-        exists("will.be.over.soon") == FALSE)
-      return(rbind(already.over, table.errors))
-    if (!exists("already.over") && !exists("will.be.over.soon")) return (table.errors)
+        exists("will.be.over.soon") == FALSE) {
+      data <- rbind(already.over, table.errors)
+      data$Datum <- as.Date(data$Datum)
+      return(data)
+    }
+      
+    if (!exists("already.over") && !exists("will.be.over.soon")) {
+      table.errors$Datum <- as.Date(table.errors$Datum)
+      return(table.errors)
+    } 
   }
   
   ############################ if result should be plots ##############################
