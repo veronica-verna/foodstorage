@@ -64,14 +64,14 @@ prognosEs <- function(group, table = get("kornumsatz"), from = Sys.Date() - mont
         exists("will.be.over.soon") == TRUE && 
         length(all.errors) == 0) {
       already.over$Datum <- as.Date(already.over$Datum)
-      will.be.over.soon <- as.Date(will.be.over.soon$Datum)
+      will.be.over.soon$Datum <- as.Date(will.be.over.soon$Datum)
       return(rbind(already.over, will.be.over.soon))
     }
       
     if (exists("already.over") == FALSE && 
         exists("will.be.over.soon") == TRUE && 
         length(all.errors) == 0) {
-      will.be.over.soon <- as.Date(will.be.over.soon$Datum)
+      will.be.over.soon$Datum <- as.Date(will.be.over.soon$Datum)
       return(will.be.over.soon)
     }
       

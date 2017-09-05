@@ -126,7 +126,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
     if (check == TRUE) return("plot8")
     if (plot == TRUE) {
       group <- unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F)
-      return(prognosEs(group, before = before, list = T))
+      return(prognosEs(as.character(group), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot8"))
   }
   
@@ -286,7 +286,8 @@ server <- shinyServer(function(input, output, session){
     current$prod <- input$product
     current$range <- as.character(input$range)
     current$filter <- as.character(input$filter)
-    print(c(current$tabs, current$quantity, current$prod, current$range, current$filter))
+    # for debugging:
+    # print(c(current$tabs, current$quantity, current$prod, current$range, current$filter)) 
   })
 
   #################################################################################################
