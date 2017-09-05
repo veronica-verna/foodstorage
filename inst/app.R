@@ -194,19 +194,30 @@ ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
                                      choices = level1st)
                   ),
                   column(4,
-                         # Which product?
-                         conditionalPanel(condition = "input.quantity != 'summary'",
-                                          selectInput("product",
-                                                      "Produkt",
-                                                      choices = c("Bitte wählen" = "", level2nd$ONEprod)
-                                                      #options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['), maxItems = 1))
-                                          )
-                         ) # ,
-                  # column(4,
-                  #        conditionalPanel(condition = "input.quantity != 'ONEprod' && input.tabs == 2",
-                  #                         numericInput("weeks",
-                  #                                      "Wochen", value = 4, min = 1, max = 30))
-                  #        )
+                    # Which product?
+                    conditionalPanel(
+                      condition = "input.quantity != 'summary'",
+                      selectInput("product","Produkt",
+                                  choices = c("Bitte wählen" = "", level2nd$ONEprod)
+                                  #options = list(placeholder = lapply(levels(kornumsatz$Produkt), '['), maxItems = 1))
+                      )
+                    ),
+                    checkboxInput("options", "Erweiterte Optionen")
+                  ),
+                  column(4,
+                    # more options
+                    conditionalPanel(
+                      condition = "input.options == TRUE ",
+                      dateInput("date1", "Von", 
+                                value = Sys.Date() - months(6), 
+                                max = Sys.Date())
+                    ),
+                    conditionalPanel(
+                      condition = "input.tabs = 1 && input.quantity != 'summary'",
+                      dateInput("date2", "Bis",
+                                value = Sys.Date(),
+                                max = Sys.Date())
+                    )
                   )
                 ),
                 
@@ -307,7 +318,8 @@ server <- shinyServer(function(input, output, session){
       if (plotname %in% c("plot5", "plot7", "plot8")) {
         output[[plotname]] <- DT::renderDataTable({
           input$go # I don't know why but this command is necessary - otherwise dt doesn't appear
-          datatable(createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE), options = list(pageLength = 50, language = list(search = "Filter:"))) %>%
+          datatable(createShinyList(current$tabs, current$quantity, current$prod, plot = TRUE), 
+                    options = list(pageLength = 50, language = list(search = "Filter:"))) %>%
             formatDate("Datum")
         })
       }
