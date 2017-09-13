@@ -6,7 +6,7 @@ data("starting_csv", package = "foodstorage")
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
 kornumsatz <<- kornumsatz_demo
 kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
-kornumsatz <<- startup.settings(kornumsatz, importPRODUCTS = starting_csv)
+kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
 ########################## Level 1 = Input 1: Group or product ####################################
@@ -48,7 +48,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
     if (plot == TRUE) {
-      big.list <- lapply(prodBYprod, currentStorage, summary = TRUE)
+      big.list <- lapply(prodBYprod, foodstorage::currentStorage, summary = TRUE)
       full <- lapply(big.list, '[[', 1)
       names(full) <- c()
       full <- unlist(full)
@@ -74,7 +74,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 1 && quantity == "ONEprod") {
     if (check == TRUE) return("plot2")
     if (plot == TRUE) {
-      suppressWarnings(plotStorage(prepare(prod, what.plotting = "Warenbestand", myPlot = TRUE, from = from, to = to)))
+      suppressWarnings(foodstorage::plotStorage(foodstorage::prepare(prod, what.plotting = "Warenbestand", myPlot = TRUE, from = from, to = to)))
     } else plot_output_list <- list(plotOutput("plot2"))
     # otherwise create a html tag for renderUI
     
@@ -83,7 +83,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 1 && quantity == "family") {
     if (check == TRUE) return("plot3")
     if (plot == TRUE) {
-      currentStorage(unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F))
+      foodstorage::currentStorage(unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F))
     } else plot_output_list <- list(plotOutput("plot3"))
     # otherwise create a html tag for renderUI
     
@@ -92,7 +92,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 1 && quantity == "producer") {
     if (check == TRUE) return("plot4")
     if (plot == TRUE) {
-      currentStorage(unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F))
+      foodstorage::currentStorage(unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F))
     } else plot_output_list <- list(plotOutput("plot4"))
     # otherwise create a html tag for renderUI
     
@@ -103,14 +103,14 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 2 && quantity == "summary") {
     if (check == TRUE) return("plot5")
     if (plot == TRUE) {
-      return(prognosEs(as.character(levels(kornumsatz$Produkt)), before = before, list = T))
+      return(foodstorage::prognosEs(as.character(levels(kornumsatz$Produkt)), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot5"))
   }
   
   if (tabs == 2 && quantity == "ONEprod") {
     if (check == TRUE) return("plot6")
     if (plot == TRUE) {
-      prognosIs(prod, main_header = prod, from = from, to = to)
+      foodstorage::prognosIs(prod, main_header = prod, from = from, to = to)
     } else plot_output_list <- list(plotOutput("plot6"))
   }
   
@@ -118,7 +118,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
     if (check == TRUE) return("plot7")
     if (plot == TRUE) {
       group <- unlist(prodBYprod[which(names(prodBYprod) == prod)], use.names = F)
-      return(prognosEs(as.character(group), before = before, list = T))
+      return(foodstorage::prognosEs(as.character(group), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot7"))
   }
   
@@ -126,7 +126,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
     if (check == TRUE) return("plot8")
     if (plot == TRUE) {
       group <- unlist(prodBYdel1[which(names(prodBYdel1) == prod)], use.names = F)
-      return(prognosEs(as.character(group), before = before, list = T))
+      return(foodstorage::prognosEs(as.character(group), before = before, list = T))
     } else plot_output_list <- list(DT::dataTableOutput("plot8"))
   }
   
