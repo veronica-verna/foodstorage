@@ -45,7 +45,7 @@ sudo docker build . -t foodstorage_img
 ``` 
 With the image you can run a container which gets the name *storage-app*
 ```
-sudo docker run -d --name storage-app -v inst/:/srv/shiny-server/ -p 3838:3838 foodstorage_img
+sudo docker run -d --name storage-app -v $PWD/inst/:/srv/shiny-server/ -p 3838:3838 foodstorage_img
 ```
 The app can be accessed by calling [localhost](http://0.0.0.0:3838) in your browser.
  
