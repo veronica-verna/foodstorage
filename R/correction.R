@@ -5,8 +5,9 @@
 correction <- function(sub.df, VPE, correction = 0.05, more.than = 15) {
   if (findInterval(correction, c(0,0.2)) == 0) stop("A correction for more than twenty percent isn't realistic")
   Prozent5 <- correction * VPE
+  sub.df <- cbind(sub.df, Prozent5)
   # evaluating candidates for 'correcting operation': storage below 'correction' percent (--> probably booking error)
-  candidates <- sub.df[abs(sub.df$Bestand_Einheit) < Prozent5,]
+  candidates <- sub.df[abs(sub.df$Bestand_Einheit) < sub.df$Prozent5,]
   
   # how many candidates do we have?
   candidates_dif <- unique(candidates$Bestand_Einheit)

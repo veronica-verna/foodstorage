@@ -31,8 +31,8 @@ prepare <- function(name.of.product,
   
   ########################################## subset dataframe #####################################
   # create dataframe only with one product
-  sub.df <- subset(data, Produkt == name.of.product) # %>%
-  #  correction(VPE) -> sub.df
+  sub.df <- subset(data, Produkt == name.of.product)  %>%
+   correction(VPE[1]) -> sub.df
   if (class.of.product == "character") sub.df$Produkt <- as.character(sub.df$Produkt)
   
   ################ start correction
