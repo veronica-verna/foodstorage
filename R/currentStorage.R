@@ -1,30 +1,35 @@
 #' @export
-currentStorage <- function(group, 
-                           xlab = "Warenbestand in Kilo",
-                           mar = c(4,8,1,1),
-                           las = 1,
-                           horiz = T,
-                           col = "grey",
-                           cex.axis = 0.8,
-                           cex.names = 0.8,
-                           decreasing = TRUE, 
-                           summary = FALSE) {
+currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE) {
   
-  par(mar = mar)
-  group.stock <- multiply(prepare, group)
-  ### for the 'summary-case'
-  if (summary == TRUE) return(list(group.stock$Warenbestand, group.stock$Leer))
+  big.list <- lapply(group, FUN = prepare, result = "current")
+  big.df <- do.call(rbind, big.list)
+  big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = T),]
+  if (plot == FALSE) return(big.df)
+  # create ordered factor
+  big.df$Produkt <- factor(big.df$Produkt, levels = big.df$Produkt)
   
-  barplot(sort(group.stock$Warenbestand, decreasing = decreasing), 
-          horiz = horiz,
-          las = las,
-          cex.axis = cex.axis,
-          cex.names = cex.names,
-          xlab = xlab)
-  if (length(group.stock$Leer) != 0) { # usual usecase
-    legend("topright", 
-           legend = c("Derzeit vergriffen:", group.stock$Leer),
-           pch = c(NA, rep(16, length(group.stock$Leer))))
-    }
-  par(mar = c(5, 4, 4, 2) + 0.1)
+  # coloured bars or black-white: create ggplot object
+  if (fill == TRUE) {
+    plotcur <- ggplot(big.df, aes(x = factor(Produkt), y = Bestand_Einheit, fill = factor(Produkt))) +
+      theme(plot.title = element_text(hjust = 0.5)) # to center title
+  } else {
+    plotcur <- ggplot(big.df, aes(x = factor(Produkt), y = Bestand_Einheit)) +
+      theme(plot.title = element_text(hjust = 0.5)) # to center title
+  }
+  # horizontal or vertical
+  if (horiz == TRUE) {
+    plotcur + 
+      geom_col() + 
+      labs(title = "Aktueller Warenbestand", x= "Produkte", y = "Warenbestand in Kilo") + 
+      # theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + 
+      coord_flip() +
+      guides(fill = FALSE) 
+  } else {
+    plotcur + 
+      geom_col() + 
+      labs(title = "Aktueller Warenbestand", x= "Produkte", y = "Warenbestand in Kilo") + 
+      theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + 
+      guides(fill = FALSE) +
+      coord_cartesian(ylim = c(0,max(big.df$Bestand_Einheit))) 
+  }
 }
