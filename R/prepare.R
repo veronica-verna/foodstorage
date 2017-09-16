@@ -3,6 +3,7 @@ prepare <- function(name.of.product,
                     data = get("kornumsatz"),
                     result = "timespan",
                     class.of.product = "character",
+                    correction = 0.05,
                     test = FALSE) {
   
   ##### at first: check if the input is correct! ####
@@ -30,9 +31,12 @@ prepare <- function(name.of.product,
   
   ########################################## subset dataframe #####################################
   # create dataframe only with one product
-  sub.df <- subset(data, Produkt == name.of.product)
+  sub.df <- subset(data, Produkt == name.of.product) # %>%
+  #  correction(VPE) -> sub.df
   if (class.of.product == "character") sub.df$Produkt <- as.character(sub.df$Produkt)
   
+  ################ start correction
+
   # only current storage is interesting...
   if (result == "current") sub.df <- sub.df[nrow(sub.df), ]
     

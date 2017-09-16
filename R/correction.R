@@ -1,10 +1,13 @@
+#' @export
+
 ### function for correcting the trading stock
 
-correction <- function(sortbydays, VPE, correction = 0.05, more.than = 15) {
+correction <- function(sub.df, VPE, correction = 0.05, more.than = 15) {
   if (findInterval(correction, c(0,0.2)) == 0) stop("A correction for more than twenty percent isn't realistic")
   Prozent5 <- correction * VPE
   # evaluating candidates for 'correcting operation': storage below 'correction' percent (--> probably booking error)
-  candidates <- sortbydays[abs(sortbydays$Bestand_Einheit) < Prozent5,]
+  candidates <- sub.df[abs(sub.df$Bestand_Einheit) < Prozent5,]
+  
   # how many candidates do we have?
   candidates_dif <- unique(candidates$Bestand_Einheit)
   # only filter those who stay at the same food storage for 'more.than' 15 (default) days
@@ -26,9 +29,9 @@ correction <- function(sortbydays, VPE, correction = 0.05, more.than = 15) {
       # case: storage was refilled, but too less --> MengeKum gets bigger
       # case: storage was cleared, but too much
       # case: storage was cleared, but too less
-      sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
-      sortbydays[which(sortbydays$Datum %in% dates & sortbydays$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
+      sub.df[which(sub.df$Datum %in% dates & sub.df$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
+      sub.df[which(sub.df$Datum %in% dates & sub.df$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
     }
   }
-  return(sortbydays)
+  return(sub.df)
 }
