@@ -4,7 +4,7 @@ prepare <- function(name.of.product,
                     result = "timespan",
                     class.of.product = "character",
                     correction = 0.05,
-                    test = FALSE) {
+                    test_correction = FALSE) {
   
   ##### at first: check if the input is correct! ####
   if (is.data.frame(data) == FALSE)
@@ -31,8 +31,9 @@ prepare <- function(name.of.product,
   
   ########################################## subset dataframe #####################################
   # create dataframe only with one product
-  sub.df <- subset(data, Produkt == name.of.product)  %>%
-   correction(VPE[1]) -> sub.df
+  sub.df <- subset(data, Produkt == name.of.product)
+  if (isTRUE(test_correction)) return(sub.df) # for debuggin with test_that
+  # sub.df <- correction(sub.df, sub.df$VPE[1])
   if (class.of.product == "character") sub.df$Produkt <- as.character(sub.df$Produkt)
   
   ################ start correction

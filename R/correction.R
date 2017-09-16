@@ -2,37 +2,28 @@
 
 ### function for correcting the trading stock
 
-correction <- function(sub.df, VPE, correction = 0.05, more.than = 15) {
+correction <- function(sub.df, 
+                       VPE, 
+                       correction = 0.05, 
+                       more.than = 15,
+                       test_candidates = FALSE,
+                       test_equal_candidates = FALSE) {
+  
   if (findInterval(correction, c(0,0.2)) == 0) stop("A correction for more than twenty percent isn't realistic")
+  empty <- data.frame() # an empty data.frame for containing empty 'storages'
   Prozent5 <- correction * VPE
   sub.df <- cbind(sub.df, Prozent5)
   # evaluating candidates for 'correcting operation': storage below 'correction' percent (--> probably booking error)
-  candidates <- sub.df[abs(sub.df$Bestand_Einheit) < sub.df$Prozent5,]
+  candidates <- sub.df[sub.df$Bestand_Einheit < sub.df$Prozent5,]
+  if (isTRUE(test_candidates)) return(candidates) # for debugging with test_that
   
-  # how many candidates do we have?
-  candidates_dif <- unique(candidates$Bestand_Einheit)
-  # only filter those who stay at the same food storage for 'more.than' 15 (default) days
-  dates <- as.Date(character())
-  for (i in 1:length(candidates_dif)) {
-    if (nrow(candidates[candidates$Bestand_Einheit == candidates_dif[i],]) > more.than) {
-      dates_new <- candidates[candidates$Bestand_Einheit == candidates_dif[i],]$Datum
-      dates <- c(dates, dates_new)
-    }
+  # comparison...
+  candidates_eval <- sub.df[which(sub.df$Position %in% candidates$Position)+1, ]
+  if (TRUE %in% is.na(candidates_eval$Position)) {
+    candidates_eval <- candidates_eval[which(!is.na(candidates_eval$Position)),] 
+    empty <- candidates[nrow(candidates), ]
+    candidates <- candidates[-nrow(candidates),] # clean ...
   }
-  # and how many different candidates do we have now?
-  dif.storage <- unique(candidates[which(candidates$Datum %in% dates),]$Bestand_Einheit)
-  if (length(dif.storage) != 0) {
-    for (i in 1:length(dif.storage)) {
-      MengeKum <- candidates[which(candidates$Datum %in% dates & candidates$Bestand_Einheit == dif.storage[i]) ,]$MengeKum[1]
-      
-      # 4 possibilities, but result is the same
-      # case: storage was refilled, but too much -> MengeKum gets smaller
-      # case: storage was refilled, but too less --> MengeKum gets bigger
-      # case: storage was cleared, but too much
-      # case: storage was cleared, but too less
-      sub.df[which(sub.df$Datum %in% dates & sub.df$Bestand_Einheit == dif.storage[i]),]$MengeKum[1] <- MengeKum - dif.storage[i]
-      sub.df[which(sub.df$Datum %in% dates & sub.df$Bestand_Einheit == dif.storage[i]),]$Bestand_Einheit <- 0
-    }
-  }
-  return(sub.df)
+  if (isTRUE(test_equal_candidates)) return(nrow(candidates) - nrow(candidates_eval))
+  # date_dif <- 
 }
