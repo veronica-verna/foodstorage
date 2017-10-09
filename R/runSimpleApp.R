@@ -4,8 +4,8 @@
 #' 
 #'
 #' @export
-runStorageApp <- function(display.mode = "normal", port = 3838) {
-  appDir <- system.file("fullVersion", package = "foodstorage")
+runSimpleApp <- function(display.mode = "normal", port = 3838) {
+  appDir <- system.file("smallVersion", package = "foodstorage")
   if (appDir == "") {
     stop("Could not find example directory. Try re-installing `foodstorage`.", call. = FALSE)
   }
