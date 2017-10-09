@@ -1,10 +1,25 @@
 #' @export
-currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE, decreasing = TRUE) {
+currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE, decreasing = TRUE, rawlist = FALSE, empty = 0.05, test_separating = FALSE) {
   
   big.list <- lapply(group, FUN = prepare, result = "current")
   big.df <- do.call(rbind, big.list)
   big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = decreasing),]
+  if (rawlist == TRUE) return(big.df)
+  
+  # separate list: products which are (almost) empty shall not be plotted
+  big.df$Prozent5 <- empty * big.df$VPE
   if (plot == FALSE) return(big.df)
+  
+  empty.prods <- big.df[big.df$Bestand_Einheit == 0, ]
+  probably.empty <- big.df[big.df$Bestand_Einheit < big.df$Prozent5 & big.df$Bestand_Einheit != 0, ]
+  big.df <- big.df[big.df$Bestand_Einheit >= big.df$Prozent5, ]
+  
+  # if separating big.df works the number of rows shall be the same. Following for test_that
+  if (test_separating == TRUE) {
+    rows <- nrow(empty.prods) + nrow(probably.empty) + nrow(big.df)
+    return(rows)
+  }
+  
   # create ordered factor which is necessary for ggplot2
   big.df$Produkt <- factor(big.df$Produkt, levels = big.df$Produkt)
   
