@@ -5,7 +5,7 @@ currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE, decre
   big.df <- do.call(rbind, big.list)
   big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = decreasing),]
   if (plot == FALSE) return(big.df)
-  # create ordered factor
+  # create ordered factor which is necessary for ggplot2
   big.df$Produkt <- factor(big.df$Produkt, levels = big.df$Produkt)
   
   # create ggplot object

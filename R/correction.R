@@ -1,6 +1,6 @@
 #' @export
 
-### function for correcting the trading stock
+### function for correcting the trading stock - but hopefully it becomes unnecessary with ggplot...
 
 correction <- function(sub.df, 
                        VPE, 
@@ -19,11 +19,20 @@ correction <- function(sub.df,
   
   # compare candidates with the next entry/row of sub.df and check their dates
   candidates_eval <- sub.df[which(sub.df$Position %in% candidates$Position)+1, ]
-  # if (TRUE %in% is.na(candidates_eval$Position)) {
-  #   candidates_eval <- candidates_eval[which(!is.na(candidates_eval$Position)),] 
-  #   empty <- candidates[nrow(candidates), ]
-  #   candidates <- candidates[-nrow(candidates),] # clean ...
-  # }
+  
+  # NA exists if a candidate is the last row of sub.df
+  if (TRUE %in% is.na(candidates_eval$Position)) { 
+    # delete row consisting of NAs
+    candidates_eval <- candidates_eval[which(!is.na(candidates_eval$Position)),]
+    # create a vector for candidates which are treaten as empty
+    empty <- candidates[nrow(candidates), ] 
+    # there is one candidate less...
+    candidates <- candidates[-nrow(candidates),]
+  }
+  # check if candidates and candidates to evaluate have same number of rows
   if (isTRUE(test_equal_candidates)) return(nrow(candidates) - nrow(candidates_eval))
-  # date_dif <- 
+  
+  
+  # now let's check the candidates...
+  dates_dif <- candidates_eval$Datum - candidates$Datum
 }
