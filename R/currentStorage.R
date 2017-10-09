@@ -6,14 +6,14 @@ currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE, decre
   big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = decreasing),]
   if (rawlist == TRUE) return(big.df)
   
-  # separate list: products which are (almost) empty shall not be plotted
-  big.df$Prozent5 <- empty * big.df$VPE
-  if (plot == FALSE) return(big.df)
-  
-  empty.prods <- big.df[big.df$Bestand_Einheit == 0, ]
-  probably.empty <- big.df[big.df$Bestand_Einheit < big.df$Prozent5 & big.df$Bestand_Einheit != 0, ]
-  big.df <- big.df[big.df$Bestand_Einheit >= big.df$Prozent5, ]
-  
+  # # separate list: products which are (almost) empty shall not be plotted
+  # big.df$Prozent5 <- empty * big.df$VPE
+  # if (plot == FALSE) return(big.df)
+  # 
+  # empty.prods <- big.df[big.df$Bestand_Einheit == 0, ]
+  # probably.empty <- big.df[big.df$Bestand_Einheit < big.df$Prozent5 & big.df$Bestand_Einheit != 0, ]
+  # big.df <- big.df[big.df$Bestand_Einheit >= big.df$Prozent5, ]
+  # 
   # if separating big.df works the number of rows shall be the same. Following for test_that
   if (test_separating == TRUE) {
     rows <- nrow(empty.prods) + nrow(probably.empty) + nrow(big.df)

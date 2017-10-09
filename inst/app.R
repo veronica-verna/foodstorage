@@ -48,24 +48,7 @@ createShinyList <- function(tabs, quantity, prod, from, to, before, check = FALS
   if (tabs == 1 && quantity == "summary") {
     if (check == TRUE) return("plot1")
     if (plot == TRUE) {
-      big.list <- lapply(prodBYprod, foodstorage::currentStorage, summary = TRUE)
-      full <- lapply(big.list, '[[', 1)
-      names(full) <- c()
-      full <- unlist(full)
-      empty <- lapply(big.list, '[[', 2)
-      names(empty) <- c()
-      empty <- unlist(empty)
-      barplot(sort(full, decreasing = TRUE), 
-              horiz = TRUE,
-              las = 1,
-              cex.axis = 0.8,
-              cex.names = 0.8,
-              xlab = "Warenbestand in Kilo")
-      if (length(empty) != 0) { # usual usecase
-        legend("topright", 
-               legend = c("Derzeit vergriffen:", sort(empty, decreasing = TRUE)),
-               pch = c(NA, rep(16, length(empty))))
-      }
+      foodstorage::currentStorage(levels(kornumsatz$Produkt))
     } else plot_output_list <- list(plotOutput("plot1", height = 1000))
     # otherwise create a html tag for renderUI
     
@@ -306,7 +289,8 @@ server <- shinyServer(function(input, output, session){
                label = "renderingOutput[[plotname]]",{ # label only for debugging
     
       plotname <- createShinyList(current$tabs, current$quantity, check = TRUE)
-      # print(plotname) # for debugging
+      print(plotname) # for debugging
+      print(current$prod)
       # summary of 'Warenbestand'
       if (plotname == "plot1") {
         output[[plotname]] <- renderPlot({
