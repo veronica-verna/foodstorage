@@ -42,7 +42,24 @@ ui <- shinyUI(
       "Warenbestand", 
       value = 1, 
       # Header
-      h2("Du willst wissen, was in der Kornkammer gerade vorrätig ist?")
+      h2("Du willst wissen, was in der Kornkammer gerade vorrätig ist?"),
+      # select input ...
+      fluidRow(
+        selectInput(
+          "choice",
+          "Auswahl",
+          choices = list("tabellarisch" = "dt",
+                         "grafisch" = "plot")
+        ),
+        actionButton("go", "Warenbestand anzeigen")
+      ),
+      br(),
+      
+      # Main Panel 
+      
+      fluidRow(
+        uiOutput("plots")
+      )
     ),
     
     ############################# new data ########################################################
@@ -204,27 +221,8 @@ ui <- shinyUI(
         actionButton("entry_bulk", "VPE eintragen", icon = icon("send"))
       )
       
-    ),
-                
-    fluidRow(
-      selectInput(
-        "choice",
-        "Auswahl",
-        choices = list("tabellarisch" = "dt",
-                       "grafisch" = "plot")
-      ),
-      actionButton("go", "Warenbestand anzeigen")
-    ),
-    br(),
-    
-    ###############################################################################################
-    ############################# Main Panel ######################################################
-    ###############################################################################################
-    
-    fluidRow(
-      uiOutput("plots")
     )            
-                
+    # end of tab 'neuen Daten abgleichen'
     
   ))
 

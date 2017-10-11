@@ -6,8 +6,8 @@ equalise <- function(oldData, newData, startingCSV) {
   
   # check out which products are new
   newproducts <- levels(newData$Produkt)[-which(levels(newData$Produkt) %in% levels(oldData$Produkt))]
-  len <- length(newproducts)
-  # make a data.frame consisting of the new products...
+  len <- length(newproducts) # number of new products
+  # make an empty data.frame consisting of the new products...
   addStartingCSV <- data.frame(newproducts, factor(rep("", len)), factor(rep("", len)), 
                                factor(rep("", len)), factor(rep("", len)), numeric(len))
   colnames(addStartingCSV) <- colnames(startingCSV)
