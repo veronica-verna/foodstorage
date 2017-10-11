@@ -9,6 +9,13 @@ kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
 kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
+# check new data
+data("kornumsatz_new")
+addStartingCSV <<- equalise(oldData = kornumsatz_demo,
+                            newData = kornumsatz_new,
+                            startingCSV = starting_csv)
+
+
 createShinyList <- function(what = "dt", check = FALSE) {
   if (what == "dt") {
     if (check == TRUE) return("plot1")
