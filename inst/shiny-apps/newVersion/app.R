@@ -50,16 +50,10 @@ ui <- shinyUI(
           "Auswahl",
           choices = list("tabellarisch" = "dt",
                          "grafisch" = "plot")
-        ),
-        actionButton("go", "Warenbestand anzeigen")
+        )
       ),
-      br(),
+      br()
       
-      # Main Panel 
-      
-      fluidRow(
-        uiOutput("plots")
-      )
     ),
     
     ############################# new data ########################################################
@@ -221,9 +215,27 @@ ui <- shinyUI(
         actionButton("entry_bulk", "VPE eintragen", icon = icon("send"))
       )
       
-    )            
+    ),            
     # end of tab 'neuen Daten abgleichen'
     
+    #################################### Input for every tab ######################################
+    fluidRow(
+      column(2), # just for a better look
+      column(4,
+             conditionalPanel(
+               condition = "input.tabs == 1 || 
+                          input.tabs == 2 && input.bulksize != ''",
+               actionButton("go", "Nachschlagen")
+             )
+      )
+    ),
+    # Main Panel 
+    fluidRow(
+      conditionalPanel(
+        condition = "input.tabs == 1",
+        uiOutput("plots")
+      )
+    )
   ))
 
 
@@ -233,6 +245,16 @@ ui <- shinyUI(
 
 
 server <- shinyServer(function(input, output, session){
+  
+  ############################# reset inputs when tabs are changed ################################
+  observeEvent(input$tabs, label = "resetQuantity", {
+    # # Reset quantity input when tab is changed
+    # updateSelectInput(session, "quantity", "Einzelnes Produkt oder Gruppe?",
+    #                   choices = level1st)
+    # text of action button depends on input$tabs
+    if (input$tabs == 1) updateActionButton(session, "go", "Nachschlagen")
+    if (input$tabs == 2) updateActionButton(session, "go", "Daten eintragen", icon = icon("send"))
+  })
   
   output$plots <- renderUI({
     # Create a list of `plotOutput` objects (depending on current())
