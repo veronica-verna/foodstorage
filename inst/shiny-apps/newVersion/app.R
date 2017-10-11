@@ -25,32 +25,199 @@ createShinyList <- function(what = "dt", check = FALSE) {
 ###################################################################################################
 ########################################### Shiny UI ##############################################
 ###################################################################################################
-ui <- shinyUI(navbarPage("Kornkammer", id = "tabs", selected=1,
-                         
-                ################################ Warenbestand #####################################
-                tabPanel("Warenbestand", value = 1, 
-                         ########################### Header #######################################
-                         h2("Du willst wissen, was in der Kornkammer gerade vorrätig ist?")
-                ),
+ui <- shinyUI(
+  navbarPage(
+    "Kornkammer", 
+    id = "tabs", 
+    selected=1,
+    #################################### Warenbestand #############################################
+    tabPanel(
+      "Warenbestand", 
+      value = 1, 
+      # Header
+      h2("Du willst wissen, was in der Kornkammer gerade vorrätig ist?")
+    ),
+    
+    ############################# new data ########################################################
+    tabPanel(
+      "Neuen Datensatz abgleichen", 
+      value = 2, 
+      icon = icon("upload"),
+      # Header 
+      h2("Hier kannst du einen neuen Datensatz auf Konsistenz überprüfen"),
+      h5(em("Falls es seit dem letzten Datensatz neue Produkte gegeben hat, wirst du hier durch eine Benutzeroberfläche geleitet, mittels derer du die neuen Produkte einer Produktgruppe und einem Lieferanten zuordnen kannst.")),
+      br(),
+      # first row is for name of product in the FoodCoApp and how the product shall be called in future
+      fluidRow(
+        column(
+          4,
+          selectizeInput(
+            "newproducts", "Produktname in der App",
+            choices = c("Bitte wählen" = "",
+                        levels(addStartingCSV$Produkte_App))
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != ''",
+            selectizeInput(
+              "prodsummary", "Unter folgendem Namem zusammengefasst",
+              choices = c("Bitte wählen" = "",
+                          levels(starting_csv$Produkte_Zusammenfassung),
+                          "neues Produkt")
+            ),
+            helpText("Wähle 'neues Produkt' wenn wir es wirklich noch nie in der KoKa hatten und nicht in der Liste zu finden ist.")
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != '' && input.prodsummary == 'neues Produkt'",
+            actionButton("go_prod", "Neues Produkt eintragen", icon = icon("send"))
+          )
+        )
+      ),
+      # 2nd row is for deliverers
+      fluidRow(
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            selectizeInput(
+              "deliverer", "Lieferant Nr. 1",
+              choices = c("Bitte wählen" = "",
+                          levels(starting_csv$Lieferant),
+                          "neuer Lieferant")
+            ),
+            helpText("Wähle 'neuer Lieferant', um einen neuen Lieferanten hinzuzufügen, bei dem zukünftig dieses Produkt bestellt werden soll.")
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            selectizeInput(
+              "deliverer2", "Lieferant Nr. 2 (optional)",
+              choices = c("Bitte wählen" = "",
+                          levels(starting_csv$Lieferant),
+                          "neuer Lieferant")
+            ),
+            helpText("Wähle nichts aus, wenn es keinen zweiten, alternativen Lieferanten für dieses Produkt gibt oder füge einen neuen zweiten Lieferanten für dieses Produkt hinzu.")
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.deliverer == 'neuer Lieferant' || input.deliverer2 == 'neuer Lieferant'",
+            actionButton("go_deliv", "neue(n) Lieferanten eintragen", icon = icon("send"))
+          )
+        )
+      ),
+      # 3rd row is for product group
+      fluidRow(
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            selectizeInput(
+              "prodgroup", "Produktgruppe",
+              choices = c("Bitte wählen" = "",
+                          levels(starting_csv$Produktgruppe),
+                          "neue Produktgruppe")
+            ),
+            helpText("Wähle 'neue Produktgruppe', um eine neue Produktgruppe hinzuzufügen.")
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.prodgroup == 'neue Produktgruppe'",
+            actionButton("go_group", "neue Produktgruppe hinzufügen", icon = icon("send"))
+          )
+        )
+      ),
+      # 4th row is for bulk size
+      fluidRow(
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            selectInput(
+              "bulksize", "Verpackungseinheit",
+              choices = c("Bitte wählen" = "",
+                          sort(unique(starting_csv$Verpackungseinheit)),
+                          "neue VPE")
+            ),
+            helpText("Wähle 'neue VPE', um eine neue Größe einzugeben.")
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.bulksize == 'neue VPE'",
+            actionButton("go_bulk", "neue VPE eintragen", icon = icon("send"))
+          )
+        )
+      ),
+      ############################### create modals #################################################
+      bsModal(
+        "newprodMOD", "Neuen Produktnamen eintragen",
+        trigger = "go_prod",
+        textInput("newprod", "zukünftiger Produktname"),
+        helpText("Bevor du auf 'eintragen' klickst, vergewissere dich, dass der Name tatsächlich richtig (geschrieben) ist. Danach gibt's kein zurück."),
+        actionButton("entry_prod", "Produktname eintragen", icon = icon("send"))
+      ),
+      bsModal(
+        "newdelivMOD", "Neue(n) Lieferanten hinzufügen",
+        trigger = "go_deliv",
+        conditionalPanel(
+          condition = "input.deliverer == 'neuer Lieferant'",
+          textInput("newdeliv", "zukünftiger Lieferant Nr.1", value = NULL)
+        ),
+        conditionalPanel(
+          condition = "input.deliverer2 == 'neuer Lieferant'",
+          textInput("newdeliv2", "zukünftiger Lieferant Nr. 2 (optional)", value = NULL)
+        ),
+        helpText("Bevor du auf 'eintragen' klickst, vergewissere dich, dass der Name tatsächlich richtig (geschrieben) ist. Danach gibt's kein zurück."),
+        actionButton("entry_deliv", "Lieferanten eintragen", icon = icon("send"))
+      ),
+      bsModal(
+        "newgroupMOD", "Neue Produktgruppe hinzufügen",
+        trigger = "go_group",
+        textInput("newgroup", "zukünftige Produktgruppe"),
+        helpText("Bevor du auf 'eintragen' klickst, vergewissere dich, dass der Name tatsächlich richtig (geschrieben) ist. Danach gibt's kein zurück."),
+        actionButton("entry_group", "Produktgruppe eintragen", icon = icon("send"))
+      ),
+      bsModal(
+        "newbulkMOD", "Neue VPE hinzufügen",
+        trigger = "go_bulk",
+        numericInput("newbulk", "zukünftige VPE", min = 0.1, max = 25, step = 0.1, value = 25),
+        helpText("Bevor du auf 'eintragen' klickst, vergewissere dich, dass der Name tatsächlich richtig (geschrieben) ist. Danach gibt's kein zurück."),
+        actionButton("entry_bulk", "VPE eintragen", icon = icon("send"))
+      )
+      
+    ),
                 
-                fluidRow(
-                  selectInput(
-                    "choice",
-                    "Auswahl",
-                    choices = list("tabellarisch" = "dt",
-                                   "grafisch" = "plot")
-                  ),
-                  actionButton("go", "Warenbestand anzeigen")
-                ),
-                br(),
+    fluidRow(
+      selectInput(
+        "choice",
+        "Auswahl",
+        choices = list("tabellarisch" = "dt",
+                       "grafisch" = "plot")
+      ),
+      actionButton("go", "Warenbestand anzeigen")
+    ),
+    br(),
+    
+    ###############################################################################################
+    ############################# Main Panel ######################################################
+    ###############################################################################################
+    
+    fluidRow(
+      uiOutput("plots")
+    )            
                 
-                ###################################################################################
-                ############################# Main Panel ##########################################
-                ###################################################################################
-                
-                fluidRow(
-                  uiOutput("plots")
-                )
     
   ))
 
@@ -88,6 +255,126 @@ server <- shinyServer(function(input, output, session){
       }
     }
   )
+  
+  #################################################################################################
+  ############################ update 'updating starting_csv UI' ##################################
+  
+  # update all inputs after newproducts when some newproducts changes
+  observeEvent(input$newproducts, {
+    updateSelectizeInput(
+      session, "prodsummary", "Unter folgendem Namen zusammengefasst",
+      choices = c("Bitte wählen" = "",
+                  levels(starting_csv$Produkte_Zusammenfassung),
+                  "neues Produkt")
+    )
+    updateSelectizeInput(
+      session, "deliverer", "Lieferant Nr. 1",
+      choices = c("Bitte wählen" = "",
+                  levels(starting_csv$Lieferant),
+                  "neuer Lieferant")
+    )
+    updateSelectizeInput(
+      session, "deliverer2", "Lieferant Nr. 2",
+      choices = c("Bitte wählen" = "",
+                  levels(starting_csv$Lieferant))
+    )
+    updateSelectizeInput(
+      session, "prodgroup", "Produktgruppe",
+      choices = c("Bitte wählen" = "",
+                  levels(starting_csv$Produktgruppe),
+                  "neue Produktgruppe")
+    )
+    updateSelectInput(
+      session, "bulksize", "Verpackungseinheit",
+      choices = c("Bitte wählen" = "",
+                  sort(unique(starting_csv$Verpackungseinheit)),
+                  "neue VPE")
+    )
+  })
+  
+  # observe go_... butons
+  observeEvent(input$entry_prod, {
+    toggleModal(session, "newprodMOD", toggle = "close")
+    updateSelectizeInput(
+      session, "prodsummary", "Unter folgendem Namen zusammengefasst",
+      choices = sort(c(levels(starting_csv$Produkte_Zusammenfassung), input$newprod)),
+      selected = input$newprod
+    )
+  })
+  observeEvent(input$entry_deliv, {
+    toggleModal(session, "newdelivMOD", toggle = "close")
+    if (!is.null(input$newdeliv)) {
+      updateSelectizeInput(
+        session, "deliverer", "Lieferant Nr. 1",
+        choices = sort(c(levels(starting_csv$Lieferant), input$newdeliv)),
+        selected = input$newdeliv
+      )
+    }
+    if (!is.null(input$newdeliv2)) {
+      updateSelectizeInput(
+        session, "deliverer2", "Lieferant Nr. 2 (optional)",
+        choices = sort(c(levels(starting_csv$Lieferant), input$newdeliv2)),
+        selected = input$newdeliv2
+      )
+    }
+  })
+  observeEvent(input$entry_group, {
+    toggleModal(session, "newgroupMOD", toggle = "close")
+    updateSelectizeInput(
+      session, "prodgroup", "Produktgruppe",
+      choices = sort(c(levels(starting_csv$Produktgruppe), input$newgroup)),
+      selected = input$newgroup
+    )
+  })
+  observeEvent(input$entry_bulk, {
+    toggleModal(session, "newbulkMOD", toggle = "close")
+    updateSelectInput(
+      session, "bulksize", "Verpackungseinheit",
+      choices = sort(c(unique(starting_csv$Verpackungseinheit), input$newbulk)),
+      selected = input$newbulk
+    )
+  })
+  
+  # eventReactive: get information about deliverers etc. from starting_csv, if input$prodsummary != 'neues Produkt' 
+  prodINFO <- eventReactive(input$prodsummary, {
+    if (!input$prodsummary %in% c('neues Produkt', '')) {
+      df <- starting_csv[starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
+      # print(df)
+      return(df)
+    }
+  })
+  
+  # update of deliverer, deliverer2, prodgroup and bulksize when prodsummary is already known
+  observeEvent(prodINFO(), {
+    if (!input$prodsummary %in% c('neues Produkt', '')) {
+      df <- prodINFO()
+      # print(df$Lieferant[1])
+      # print(levels(starting_csv$Lieferant))
+      updateSelectizeInput(
+        session, "deliverer", "Lieferant Nr. 1", 
+        choices = c(levels(starting_csv$Lieferant),
+                    "neuer Lieferant"),
+        selected = df$Lieferant[1]
+      )
+      updateSelectizeInput(
+        session, "deliverer2", "Lieferant Nr. 2 (optional)",
+        choices = levels(starting_csv$Lieferant),
+        selected = df$Lieferant2[1]
+      )
+      updateSelectizeInput(
+        session, "prodgroup", "Produktgruppe",
+        choices = c(levels(starting_csv$Produktgruppe),
+                    "neue Produktgruppe"),
+        selected = df$Produktgruppe
+      )
+      updateSelectInput(
+        session, "bulksize", "Verpackungseinheit",
+        choices = c(sort(unique(starting_csv$Verpackungseinheit)),
+                    "neue VPE"),
+        selected = df$Verpackungseinheit
+      )
+    }
+  })
   
 })
 
