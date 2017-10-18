@@ -81,7 +81,7 @@ ui <- shinyUI(
           selectizeInput(
             "newproducts", "Produktname in der App",
             choices = c("Bitte wählen" = "",
-                        levels(addStartingCSV$Produkte_App))
+                        addStartingCSV)
           )
         ),
         column(
@@ -387,6 +387,35 @@ server <- shinyServer(function(input, output, session){
     }
   })
   
+  # enter contant in starting_csv
+  enterContant <- eventReactive(input$go2, {
+    newrow <- data.frame(
+      "Produkte_App" = factor(input$newproducts), 
+      "Produkte_Zusammenfassung" = factor(input$prodsummary),
+      "Lieferant" = factor(input$deliverer),
+      "Lieferant2" = factor(input$deliverer2),
+      "Produktgruppe" = factor(input$prodgroup),
+      "Verpackungseinheit" = as.numeric(input$bulksize)
+    )
+    return(newrow)
+  })
+  
+  observeEvent(enterContant(), {
+    newrow <- enterContant()
+    print(str(starting_csv))
+    print(str(newrow))
+    # add the new row to starting_csv
+    starting_csv <<- rbind(starting_csv, newrow)
+    # delete row from addStartingCSV where ProdukteApp == input$newproducts
+    addStartingCSV <<- addStartingCSV[which(addStartingCSV != input$newproducts)]
+    
+    # update selectizeInput of newproducts
+    updateSelectizeInput(
+      session, "newproducts", "Produktname in der App",
+      choices = c("Bitte wählen" = "",
+                  addStartingCSV)
+    )
+  })
 })
 
 ####################################### shiny app executing ################################################
