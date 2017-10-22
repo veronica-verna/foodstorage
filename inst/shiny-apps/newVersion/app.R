@@ -1,13 +1,11 @@
 ###################################################################################################
 ###################### read kornumsatz ############################################################
 ###################################################################################################
-data("kornumsatz_demo", package = "foodstorage")
-data("starting_csv", package = "foodstorage")
+path <- "/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage"
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
-kornumsatz <<- kornumsatz_demo
-kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
-kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
-kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
+starting_csv <- read.csv(paste0(path, "/data/starting_csv.csv"), sep = ";")
+kornumsatz <- read.csv(paste0(path, "/data/kornumsatz_demo.csv"), sep = ";")
+kornumsatz <- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 
 # check new data
 data("kornumsatz_new")
@@ -402,8 +400,6 @@ server <- shinyServer(function(input, output, session){
   
   observeEvent(enterContant(), {
     newrow <- enterContant()
-    print(str(starting_csv))
-    print(str(newrow))
     # add the new row to starting_csv
     starting_csv <<- rbind(starting_csv, newrow)
     # delete row from addStartingCSV where ProdukteApp == input$newproducts
