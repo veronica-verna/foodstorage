@@ -5,7 +5,7 @@ path <- "/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage"
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
 starting_csv <- read.csv(paste0(path, "/data/starting_csv.csv"), sep = ";")
 kornumsatz <- read.csv(paste0(path, "/data/kornumsatz_demo.csv"), sep = ";")
-kornumsatz <- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
+
 
 # check new data
 data("kornumsatz_new")
@@ -13,6 +13,7 @@ addStartingCSV <<- equalise(oldData = kornumsatz_demo,
                             newData = kornumsatz_new,
                             startingCSV = starting_csv)
 
+kornumsatz <- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
 
 createShinyList <- function(what = "dt", check = FALSE) {
   if (what == "dt") {

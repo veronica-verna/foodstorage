@@ -1,11 +1,9 @@
 #' @export
 
-equalise <- function(oldData, newData, startingCSV) {
-  # equalise colnames of data
-  colnames(newData) <- colnames(oldData)
+equalise <- function(data, startingCSV) {
   
   # check out which products are new
-  newproducts <- levels(newData$Produkt)[-which(levels(newData$Produkt) %in% levels(oldData$Produkt))]
+  newproducts <- levels(data$Produkt)[-which(levels(data$Produkt) %in% levels(startingCSV$Produkte_App))]
   return(newproducts)
   
   
