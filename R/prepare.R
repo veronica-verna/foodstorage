@@ -40,6 +40,25 @@ prepare <- function(name.of.product,
 
   # only current storage is interesting...
   if (result == "current") sub.df <- sub.df[nrow(sub.df), ]
+  
+  # only members' shopping
+  if (result == "shopping") {
+    from = dates[1]
+    to = dates[length(dates)]
+    Einheit = sub.df[1, ]$Einheit
+    sub.df <- sub.df[sub.df$MengeKum < 0, ]
+    sub.df <- data.frame(
+      "Von" = from,
+      "Bis" = to,
+      "Produkt" = name.of.product,
+      "Verbrauch" = ifelse(
+        nrow(sub.df) == 0,
+        yes = 0, # nothing was bought
+        no = abs(sum(sub.df$MengeKum)) # sum.shopping
+      ), 
+      "Einheit" = Einheit
+    )
+  }
     
   return(sub.df)
 }  

@@ -1,9 +1,9 @@
 #' @export
-currentStorage <- function(group, plot = TRUE, horiz = FALSE, fill = TRUE, decreasing = TRUE, rawlist = FALSE, empty = 0.05, test_separating = FALSE) {
+currentStorage <- function(group, horiz = FALSE, fill = TRUE, order.storage = TRUE, rawlist = FALSE, empty = 0.05, result = "current", test_separating = FALSE) {
   
-  big.list <- lapply(group, FUN = prepare, result = "current")
+  big.list <- lapply(group, FUN = prepare, result = result)
   big.df <- do.call(rbind, big.list)
-  big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = decreasing),]
+  if (isTRUE(order.storage)) big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = TRUE),]
   if (rawlist == TRUE) return(big.df)
   
   # # separate list: products which are (almost) empty shall not be plotted
