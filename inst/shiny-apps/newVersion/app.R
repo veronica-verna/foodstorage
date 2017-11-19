@@ -92,9 +92,9 @@ ui <- shinyUI(
               "prodsummary", "Unter folgendem Namem zusammengefasst",
               choices = c("Bitte wählen" = "",
                           levels(starting_csv$Produkte_Zusammenfassung),
-                          "neues Produkt")
+                          "nicht beachten", "neues Produkt")
             ),
-            helpText("Wähle 'neues Produkt' wenn wir es wirklich noch nie in der KoKa hatten und nicht in der Liste zu finden ist.")
+            helpText("Wähle 'neues Produkt' wenn wir es wirklich noch nie in der KoKa hatten und nicht in der Liste zu finden ist. Wähle 'nicht beachten', wenn man das Produkt später nicht im Warenbestandsverlauf sehen können soll.")
           )
         ),
         column(
@@ -110,7 +110,7 @@ ui <- shinyUI(
         column(
           4,
           conditionalPanel(
-            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt' && input.prodsummary != 'nicht beachten'",
             selectizeInput(
               "deliverer", "Lieferant Nr. 1",
               choices = c("Bitte wählen" = "",
@@ -123,7 +123,7 @@ ui <- shinyUI(
         column(
           4,
           conditionalPanel(
-            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt' && input.prodsummary != 'nicht beachten'",
             selectizeInput(
               "deliverer2", "Lieferant Nr. 2 (optional)",
               choices = c("Bitte wählen" = "",
@@ -146,7 +146,7 @@ ui <- shinyUI(
         column(
           4,
           conditionalPanel(
-            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt' && input.prodsummary != 'nicht beachten'",
             selectizeInput(
               "prodgroup", "Produktgruppe",
               choices = c("Bitte wählen" = "",
@@ -169,7 +169,7 @@ ui <- shinyUI(
         column(
           4,
           conditionalPanel(
-            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt'",
+            condition = "input.newproducts != '' && input.prodsummary != '' && input.prodsummary != 'neues Produkt' && input.prodsummary != 'nicht beachten'",
             selectInput(
               "bulksize", "Verpackungseinheit",
               choices = c("Bitte wählen" = "",
@@ -189,7 +189,26 @@ ui <- shinyUI(
       ),
       # 5th row is for action button
       fluidRow(
-        actionButton("go2", "Eintragen", icon = icon("send"))
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.bulksize != '' || input.prodsummary == 'nicht beachten'",
+            actionButton("go2", "Eintragen", icon = icon("send"))
+          )
+        ),
+        column(
+          4,
+          checkboxInput(
+            "options", "Erweiterte Optionen"
+          )
+        ),
+        column(
+          4,
+          conditionalPanel(
+            condition = "input.options == true",
+            actionButton("go3", "Starting_CSV exportieren", icon = icon("send"))
+          )
+        )
       ),
       ############################### create modals #################################################
       bsModal(
@@ -249,7 +268,7 @@ server <- shinyServer(function(input, output, session){
   
   # Every time a plot changes (button is clicked), re-generate the render functions for all the plots
   observeEvent(
-    input$go,
+    input$go1,
     label = "renderingPlots", {
       plotname <- createShinyList(input$choice, check = T)
       
@@ -276,7 +295,7 @@ server <- shinyServer(function(input, output, session){
       session, "prodsummary", "Unter folgendem Namen zusammengefasst",
       choices = c("Bitte wählen" = "",
                   levels(starting_csv$Produkte_Zusammenfassung),
-                  "neues Produkt")
+                  "neues Produkt", "nicht beachten")
     )
     updateSelectizeInput(
       session, "deliverer", "Lieferant Nr. 1",
@@ -303,7 +322,7 @@ server <- shinyServer(function(input, output, session){
     )
   })
   
-  # observe go_... butons
+  # observe go_... buttons & close bsModals
   observeEvent(input$entry_prod, {
     toggleModal(session, "newprodMOD", toggle = "close")
     updateSelectizeInput(
@@ -348,7 +367,7 @@ server <- shinyServer(function(input, output, session){
   
   # eventReactive: get information about deliverers etc. from starting_csv, if input$prodsummary != 'neues Produkt' 
   prodINFO <- eventReactive(input$prodsummary, {
-    if (!input$prodsummary %in% c('neues Produkt', '')) {
+    if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
       df <- starting_csv[starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
       # print(df)
       return(df)
@@ -357,7 +376,7 @@ server <- shinyServer(function(input, output, session){
   
   # update of deliverer, deliverer2, prodgroup and bulksize when prodsummary is already known
   observeEvent(prodINFO(), {
-    if (!input$prodsummary %in% c('neues Produkt', '')) {
+    if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
       df <- prodINFO()
       # print(df$Lieferant[1])
       # print(levels(starting_csv$Lieferant))
@@ -389,21 +408,36 @@ server <- shinyServer(function(input, output, session){
   
   # enter contant in starting_csv
   enterContant <- eventReactive(input$go2, {
-    newrow <- data.frame(
-      "Produkte_App" = factor(input$newproducts), 
-      "Produkte_Zusammenfassung" = factor(input$prodsummary),
-      "Lieferant" = factor(input$deliverer),
-      "Lieferant2" = factor(input$deliverer2),
-      "Produktgruppe" = factor(input$prodgroup),
-      "Verpackungseinheit" = as.numeric(input$bulksize)
-    )
+    # collect information about the product for further analysis
+    if (input$prodsummary != 'nicht beachten') {
+      newrow <- data.frame(
+        "Produkte_App" = factor(input$newproducts), 
+        "Produkte_Zusammenfassung" = factor(input$prodsummary),
+        "Lieferant" = factor(input$deliverer),
+        "Lieferant2" = factor(input$deliverer2),
+        "Produktgruppe" = factor(input$prodgroup),
+        "Verpackungseinheit" = as.numeric(input$bulksize)
+      )
+    }
+    # ignore the product for further analysis
+    if (input$prodsummary == 'nicht beachten') {
+      newrow <- data.frame(
+        "Produkte_App" = factor(input$newproducts), 
+        "Produkte_Zusammenfassung" = "NI",
+        "Lieferant" = "NI",
+        "Lieferant2" = "NI",
+        "Produktgruppe" = "NI",
+        "Verpackungseinheit" = 0
+      )
+    }
     return(newrow)
   })
   
   observeEvent(enterContant(), {
     newrow <- enterContant()
-    print(str(starting_csv))
-    print(str(newrow))
+    ## for debugging:
+    # print(str(starting_csv))
+    # print(str(newrow))
     # add the new row to starting_csv
     starting_csv <<- rbind(starting_csv, newrow)
     # delete row from addStartingCSV where ProdukteApp == input$newproducts
@@ -414,6 +448,14 @@ server <- shinyServer(function(input, output, session){
       session, "newproducts", "Produktname in der App",
       choices = c("Bitte wählen" = "",
                   addStartingCSV)
+    )
+  })
+  
+  # observe go3-Button: export starting_csv
+  observeEvent(input$go3, {
+    write.csv(
+      x = starting_csv,
+      file = "/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage/data/starting_csvNEW.csv"
     )
   })
 })
