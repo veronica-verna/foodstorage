@@ -11,7 +11,7 @@ kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
 # check new data
 data("kornumsatz_new")
-addStartingCSV <<- equalise(oldData = kornumsatz_demo,
+addProducts <<- equalise(oldData = kornumsatz_demo,
                             newData = kornumsatz_new,
                             startingCSV = starting_csv)
 
@@ -81,7 +81,7 @@ ui <- shinyUI(
           selectizeInput(
             "newproducts", "Produktname in der App",
             choices = c("Bitte wählen" = "",
-                        addStartingCSV)
+                        addProducts)
           )
         ),
         column(
@@ -206,7 +206,7 @@ ui <- shinyUI(
           4,
           conditionalPanel(
             condition = "input.options == true",
-            actionButton("go3", "Starting_CSV exportieren", icon = icon("send"))
+            downloadButton("download", "Starting_CSV exportieren", icon = icon("send"))
           )
         )
       ),
@@ -259,6 +259,13 @@ ui <- shinyUI(
 
 server <- shinyServer(function(input, output, session){
   
+  # first at all: make starting_csv reactive
+  rV <- reactiveValues(
+    starting_csv = get("starting_csv"),
+    addProducts = get("addProducts")
+    # print(head(get("starting_csv")))
+  )
+  
   output$plots <- renderUI({
     # Create a list of `plotOutput` objects (depending on current())
     plot_output_list <- createShinyList(input$choice)
@@ -291,6 +298,7 @@ server <- shinyServer(function(input, output, session){
   
   # update all inputs after newproducts when some newproducts changes
   observeEvent(input$newproducts, {
+    starting_csv <- rV$starting_csv
     updateSelectizeInput(
       session, "prodsummary", "Unter folgendem Namen zusammengefasst",
       choices = c("Bitte wählen" = "",
@@ -324,6 +332,7 @@ server <- shinyServer(function(input, output, session){
   
   # observe go_... buttons & close bsModals
   observeEvent(input$entry_prod, {
+    starting_csv <- rf$starting_csv
     toggleModal(session, "newprodMOD", toggle = "close")
     updateSelectizeInput(
       session, "prodsummary", "Unter folgendem Namen zusammengefasst",
@@ -332,6 +341,7 @@ server <- shinyServer(function(input, output, session){
     )
   })
   observeEvent(input$entry_deliv, {
+    starting_csv <- rf$starting_csv
     toggleModal(session, "newdelivMOD", toggle = "close")
     if (!is.null(input$newdeliv)) {
       updateSelectizeInput(
@@ -349,6 +359,7 @@ server <- shinyServer(function(input, output, session){
     }
   })
   observeEvent(input$entry_group, {
+    starting_csv <- rf$starting_csv
     toggleModal(session, "newgroupMOD", toggle = "close")
     updateSelectizeInput(
       session, "prodgroup", "Produktgruppe",
@@ -357,6 +368,7 @@ server <- shinyServer(function(input, output, session){
     )
   })
   observeEvent(input$entry_bulk, {
+    starting_csv <- rf$starting_csv
     toggleModal(session, "newbulkMOD", toggle = "close")
     updateSelectInput(
       session, "bulksize", "Verpackungseinheit",
@@ -368,7 +380,7 @@ server <- shinyServer(function(input, output, session){
   # eventReactive: get information about deliverers etc. from starting_csv, if input$prodsummary != 'neues Produkt' 
   prodINFO <- eventReactive(input$prodsummary, {
     if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
-      df <- starting_csv[starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
+      df <- rf$starting_csv[rf$starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
       # print(df)
       return(df)
     }
@@ -376,6 +388,7 @@ server <- shinyServer(function(input, output, session){
   
   # update of deliverer, deliverer2, prodgroup and bulksize when prodsummary is already known
   observeEvent(prodINFO(), {
+    starting_csv <- rf$starting_csv
     if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
       df <- prodINFO()
       # print(df$Lieferant[1])
@@ -439,25 +452,28 @@ server <- shinyServer(function(input, output, session){
     # print(str(starting_csv))
     # print(str(newrow))
     # add the new row to starting_csv
-    starting_csv <<- rbind(starting_csv, newrow)
-    # delete row from addStartingCSV where ProdukteApp == input$newproducts
-    addStartingCSV <<- addStartingCSV[which(addStartingCSV != input$newproducts)]
+    rV$starting_csv <- rbind(rV$starting_csv, newrow)
+    # delete row from addProducts where ProdukteApp == input$newproducts
+    rV$addProducts <<- rV$addProducts[which(rV$addProducts != input$newproducts)]
     
     # update selectizeInput of newproducts
     updateSelectizeInput(
       session, "newproducts", "Produktname in der App",
       choices = c("Bitte wählen" = "",
-                  addStartingCSV)
+                  rV$addProducts)
     )
   })
   
-  # observe go3-Button: export starting_csv
-  observeEvent(input$go3, {
-    write.csv(
-      x = starting_csv,
-      file = "/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage/data/starting_csvNEW.csv"
+  # render DownloadButton: export starting_csv
+  output$download <- downloadHandler(
+      filename = function() {
+        paste('starting_csv-', Sys.Date(), '.csv', sep='')
+      },
+      content = function(file) {
+        # print(rV$starting_csv)
+        write.csv(rV$starting_csv, file)
+      }
     )
-  })
 })
 
 ####################################### shiny app executing ################################################
