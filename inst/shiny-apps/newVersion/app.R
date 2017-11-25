@@ -1,19 +1,19 @@
 ###################################################################################################
 ###################### read kornumsatz ############################################################
 ###################################################################################################
-data("kornumsatz_demo", package = "foodstorage")
-data("starting_csv", package = "foodstorage")
+data("kornumsatz_new", package = "foodstorage")
+starting_csv <<- read.csv("/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage/data/starting_csv_20171125.csv")
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
-kornumsatz <<- kornumsatz_demo
+kornumsatz <<- kornumsatz_new
 kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
-kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = starting_csv)
+kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = get("starting_csv"))
 kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
 
 # check new data
 data("kornumsatz_new")
 addProducts <<- equalise(oldData = kornumsatz_demo,
-                            newData = kornumsatz_new,
-                            startingCSV = starting_csv)
+                         newData = kornumsatz_new,
+                         startingCSV = starting_csv)
 
 
 createShinyList <- function(what = "dt", check = FALSE) {
@@ -332,7 +332,7 @@ server <- shinyServer(function(input, output, session){
   
   # observe go_... buttons & close bsModals
   observeEvent(input$entry_prod, {
-    starting_csv <- rf$starting_csv
+    starting_csv <- rV$starting_csv
     toggleModal(session, "newprodMOD", toggle = "close")
     updateSelectizeInput(
       session, "prodsummary", "Unter folgendem Namen zusammengefasst",
@@ -341,7 +341,7 @@ server <- shinyServer(function(input, output, session){
     )
   })
   observeEvent(input$entry_deliv, {
-    starting_csv <- rf$starting_csv
+    starting_csv <- rV$starting_csv
     toggleModal(session, "newdelivMOD", toggle = "close")
     if (!is.null(input$newdeliv)) {
       updateSelectizeInput(
@@ -359,7 +359,7 @@ server <- shinyServer(function(input, output, session){
     }
   })
   observeEvent(input$entry_group, {
-    starting_csv <- rf$starting_csv
+    starting_csv <- rV$starting_csv
     toggleModal(session, "newgroupMOD", toggle = "close")
     updateSelectizeInput(
       session, "prodgroup", "Produktgruppe",
@@ -368,7 +368,7 @@ server <- shinyServer(function(input, output, session){
     )
   })
   observeEvent(input$entry_bulk, {
-    starting_csv <- rf$starting_csv
+    starting_csv <- rV$starting_csv
     toggleModal(session, "newbulkMOD", toggle = "close")
     updateSelectInput(
       session, "bulksize", "Verpackungseinheit",
@@ -380,7 +380,7 @@ server <- shinyServer(function(input, output, session){
   # eventReactive: get information about deliverers etc. from starting_csv, if input$prodsummary != 'neues Produkt' 
   prodINFO <- eventReactive(input$prodsummary, {
     if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
-      df <- rf$starting_csv[rf$starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
+      df <- rV$starting_csv[rV$starting_csv$Produkte_Zusammenfassung == input$prodsummary, ]
       # print(df)
       return(df)
     }
@@ -388,7 +388,7 @@ server <- shinyServer(function(input, output, session){
   
   # update of deliverer, deliverer2, prodgroup and bulksize when prodsummary is already known
   observeEvent(prodINFO(), {
-    starting_csv <- rf$starting_csv
+    starting_csv <- rV$starting_csv
     if (!input$prodsummary %in% c('neues Produkt', 'nicht beachten', '')) {
       df <- prodINFO()
       # print(df$Lieferant[1])

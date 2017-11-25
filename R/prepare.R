@@ -7,14 +7,14 @@ prepare <- function(name.of.product,
                     test_correction = FALSE) {
   
   ##### at first: check if the input is correct! ####
-  if (is.data.frame(data) == FALSE)
+  if (!is.data.frame(data))
     stop("data must be a data frame with 10 columns. For details type help(prepare).")
-  if ("Datum" %in% colnames(data)) {
-    dates <- data$Datum
+  if ("Tag" %in% colnames(data)) {
+    dates <- data$Tag
   } else stop("prepare function is using wrong 'kornumsatz'")
   products <- data$Produkt
-  comul.change <- data$MengeKum
-  food.storage <- data$Bestand_Einheit
+  comul.change <- data$Menge
+  food.storage <- data$Bestand.Einheit
   VPE <- data$VPE
   
   # for is.Date; cheeck if dates is a Date
@@ -46,7 +46,7 @@ prepare <- function(name.of.product,
     from = dates[1]
     to = dates[length(dates)]
     Einheit = sub.df[1, ]$Einheit
-    sub.df <- sub.df[sub.df$MengeKum < 0, ]
+    sub.df <- sub.df[sub.df$Menge < 0, ]
     sub.df <- data.frame(
       "Von" = from,
       "Bis" = to,

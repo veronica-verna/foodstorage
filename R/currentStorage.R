@@ -1,9 +1,18 @@
 #' @export
-currentStorage <- function(group, horiz = FALSE, fill = TRUE, order.storage = TRUE, rawlist = FALSE, empty = 0.05, result = "current", test_separating = FALSE) {
+currentStorage <- function(
+  group, 
+  horiz = FALSE, 
+  fill = TRUE, 
+  order.storage = TRUE, 
+  rawlist = FALSE, 
+  empty = 0.05, 
+  result = "current", 
+  test_separating = FALSE
+) {
   
   big.list <- lapply(group, FUN = prepare, result = result)
   big.df <- do.call(rbind, big.list)
-  if (isTRUE(order.storage)) big.df <- big.df[order(big.df$Bestand_Einheit, decreasing = TRUE),]
+  if (isTRUE(order.storage)) big.df <- big.df[order(big.df$Bestand.Einheit, decreasing = TRUE),]
   if (rawlist == TRUE) return(big.df)
   
   # # separate list: products which are (almost) empty shall not be plotted
@@ -24,7 +33,7 @@ currentStorage <- function(group, horiz = FALSE, fill = TRUE, order.storage = TR
   big.df$Produkt <- factor(big.df$Produkt, levels = big.df$Produkt)
   
   # create ggplot object
-  pplot <- ggplot(big.df, aes(x = factor(Produkt), y = Bestand_Einheit)) +
+  pplot <- ggplot(big.df, aes(x = factor(Produkt), y = Bestand.Einheit)) +
     theme(plot.title = element_text(hjust = 0.5)) + # to center title
     geom_col() + 
     labs(title = "Aktueller Warenbestand", x= "Produkte", y = "Warenbestand in Kilo") +
@@ -38,7 +47,7 @@ currentStorage <- function(group, horiz = FALSE, fill = TRUE, order.storage = TR
     else {
       pplot <- pplot + 
         theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) + 
-        coord_cartesian(ylim = c(0,max(big.df$Bestand_Einheit)))
+        coord_cartesian(ylim = c(0,max(big.df$Bestand.Einheit)))
     }
   
   # renderPlot...
