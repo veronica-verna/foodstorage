@@ -43,7 +43,7 @@ prepare <- function(name.of.product,
   
   # only members' shopping
   if (result == "shopping") {
-    from = dates[1]
+    from = sub.df[which(sub.df$Menge > 0), ]$Tag[1]
     to = dates[length(dates)]
     Einheit = sub.df[1, ]$Einheit
     sub.df <- sub.df[sub.df$Menge < 0, ]
@@ -54,7 +54,7 @@ prepare <- function(name.of.product,
       "Verbrauch" = ifelse(
         nrow(sub.df) == 0,
         yes = 0, # nothing was bought
-        no = abs(sum(sub.df$MengeKum)) # sum.shopping
+        no = abs(sum(sub.df$Menge)) # sum.shopping
       ), 
       "Einheit" = Einheit
     )

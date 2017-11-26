@@ -4,7 +4,7 @@
 \alias{runStorageApp}
 \title{function for loading the storage-app}
 \usage{
-runStorageApp()
+runStorageApp(version, display.mode = "normal", port = 3838)
 }
 \value{
 This function is the only exported function of the foodstorage package. The package was built for analyzing a Food Co-ops' consumption. The results are represented in the shiny 'storage-app' which you can run by this function!

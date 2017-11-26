@@ -1,7 +1,6 @@
 ### one date, two rows -> reduce them to one row
 
 reduceONE <- function(table, pro) {
-  require(lubridate)
   #naming vectors
   if (!is.data.frame(table)) stop("table has to be a data frame")
   dates <- table$Tag
@@ -12,7 +11,8 @@ reduceONE <- function(table, pro) {
   
   # look for each product, if there exists more than one row for one date
   for (pro in 1:len) {
-    tf <- table[table$Produkt == dif.products[pro], ]
+    # print(dif.products[pro])
+    tf <- table[table$proukt == dif.products[pro], ]
     # create a table which contains duplicates
     double.dates <- tf[duplicated(tf$Tag), ]$Tag
     if (length(double.dates) == 0) next
@@ -52,6 +52,7 @@ reduceONE <- function(table, pro) {
     storage.price <- round(storage.unit * tf[rows.replacement,]$Preis, 2)
     table[table$Position %in% pos.to.replace, c(8,9)] <- cbind(storage.unit, storage.price)
     # everything worked for Basmati, but not every storage value is correct because of different prices for the same product
+    
   }
   return(table)
   

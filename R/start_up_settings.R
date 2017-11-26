@@ -18,11 +18,14 @@ startup.settings <- function(table, importPRODUCTS, reduce = TRUE) {
   starting.csv$Produkte_App <- as.character(starting.csv$Produkte_App)
   starting.csv$Produkte_Zusammenfassung <- as.character(starting.csv$Produkte_Zusammenfassung)
   starting.csv$Verpackungseinheit <- as.numeric(starting.csv$Verpackungseinheit)
+
   for (i in 1:nrow(starting.csv)) {
-    kornumsatz[kornumsatz$Produkt == starting.csv[i,1],]$Produkt <- 
-      rep(starting.csv[i,2], nrow(kornumsatz[kornumsatz$Produkt == starting.csv[i,1], ]))
-    kornumsatz[kornumsatz$Produkt == starting.csv[i,2],]$VPE <- 
-      rep(starting.csv[i,6], nrow(kornumsatz[kornumsatz$Produkt == starting.csv[i,2], ]))
+    kornumsatz[kornumsatz$Produkt == starting.csv[i,"Produkte_App"],]$Produkt <- 
+      rep(starting.csv[i,"Produkte_Zusammenfassung"], 
+          nrow(kornumsatz[kornumsatz$Produkt == starting.csv[i,"Produkte_App"], ]))
+    kornumsatz[kornumsatz$Produkt == starting.csv[i,"Produkte_Zusammenfassung"], ]$VPE <- 
+      rep(starting.csv[i,"Verpackungseinheit"], 
+          nrow(kornumsatz[kornumsatz$Produkt == starting.csv[i,"Produkte_Zusammenfassung"], ]))
   }
   
   # correction for beans

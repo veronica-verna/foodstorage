@@ -4,12 +4,13 @@
 \alias{prognosIs}
 \title{function for calculating a regression}
 \usage{
-prognosIs(product, from = "", to = "", graphics = TRUE, type = "p",
-  col_points = "grey", pch = 16, main_header = "",
-  ylab = "Warenbestand in Kilo", xlab = "", las = 1, col_reg = "grey",
-  col_conv = "lightgrey", col_20 = "red", col_past = "black",
-  smoother = "loess", span = 0.1, degree = 1, lwd = c(2, 2, 1),
-  lty = c(1, 1, 2), nec.dates = 10, more.than = 15, test = FALSE)
+prognosIs(product, from = Sys.Date() - months(6), to = Sys.Date(),
+  graphics = TRUE, type = "p", col_points = "grey", pch = 16,
+  main_header = "", ylab = "Warenbestand in Kilo", xlab = "", las = 1,
+  col_reg = "grey", col_conv = "lightgrey", col_20 = "red",
+  col_past = "black", smoother = "loess", span = 0.1, degree = 1,
+  lwd = c(2, 2, 1), lty = c(1, 1, 2), nec.dates = 10, more.than = 15,
+  test = FALSE)
 }
 \arguments{
 \item{product}{Need to be a character string}
