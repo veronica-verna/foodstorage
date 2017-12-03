@@ -2,12 +2,16 @@
 ###################### read kornumsatz ############################################################
 ###################################################################################################
 data("kornumsatz_new", package = "foodstorage")
-starting_csv <<- read.csv("/home/simon/Documents/Studium/Bachelor-Arbeit/R-paket/foodstorage/data/starting_csv_20171125.csv")
+starting_csv <<- read.csv("/Users/Nele/Documents/Kornkammer/foodstorage/foodstorage/data/starting_csv_20171125.csv")
 # '<<-' important because kornumsatz must be in globalenv() that it can be found by functions in server UI
 kornumsatz <<- kornumsatz_new
 kornumsatz$Produkt <<- as.character(kornumsatz$Produkt)
 kornumsatz <<- foodstorage::startup.settings(kornumsatz, importPRODUCTS = get("starting_csv"))
 kornumsatz$Produkt <<- as.factor(kornumsatz$Produkt)
+
+# only for test case
+nudeln.types <- c("Nudeln Dinkel", "Nudeln vom Grosshandel", "Spaghetti Dinkel", "Spaghetti vom Grosshandel")
+tomaten <- c("Rundkornreis")
 
 # check new data
 data("kornumsatz_new")
@@ -247,8 +251,16 @@ ui <- shinyUI(
         actionButton("entry_bulk", "VPE eintragen", icon = icon("send"))
       )
       
-    )            
+    ),            
     # end of tab 'neuen Daten abgleichen'
+    tabPanel(
+      title = "Infotabelle Bestand",
+      value = 3,
+      selectInput("testproduct", "Welches Produkt willst du plotten?",
+                  choices = c(nudeln.types, tomaten)),
+      actionButton("goPlot", "Tabelle generieren"),
+      DT::dataTableOutput("table")
+    )
   ))
 
 
@@ -474,6 +486,18 @@ server <- shinyServer(function(input, output, session){
         write.csv(rV$starting_csv, file)
       }
     )
+  
+  
+  #########################################################################################################
+  ###################################### Tab 3 ############################################################
+  currentData <- eventReactive(input$goPlot, {
+    nudeln <- currentStorage(input$testproduct, rawlist = T, order.storage = F, result = "result")
+    return(nudeln)
+  })
+  
+  output$table <- DT::renderDataTable({
+    currentData()
+  })
 })
 
 ####################################### shiny app executing ################################################
