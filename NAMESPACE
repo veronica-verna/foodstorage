@@ -3,6 +3,7 @@
 export(correction)
 export(currentStorage)
 export(equalise)
+export(level2ndFUN)
 export(multiply)
 export(plotStorage)
 export(plotgg)
