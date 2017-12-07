@@ -256,8 +256,8 @@ ui <- shinyUI(
     tabPanel(
       title = "Infotabelle Bestand",
       value = 3,
-      selectInput("testproduct", "Welches Produkt willst du plotten?",
-                  choices = c(nudeln.types, tomaten)),
+      selectInput("was", "Welches Produkt willst du plotten?",
+                  choices = c("alles", "gibts", "leer")),
       actionButton("goPlot", "Tabelle generieren"),
       DT::dataTableOutput("table")
     )
@@ -491,12 +491,13 @@ server <- shinyServer(function(input, output, session){
   #########################################################################################################
   ###################################### Tab 3 ############################################################
   currentData <- eventReactive(input$goPlot, {
-    nudeln <- currentStorage(input$testproduct, rawlist = T, order.storage = F, result = "result")
+    nudeln <- currentStorage(input$was, rawlist = T, order.storage = F, result = "result")
     return(nudeln)
   })
   
   output$table <- DT::renderDataTable({
-    currentData()
+    #currentStorage(levels(kornumsatz$Produkt), rawlist = TRUE)
+    TabelleB(kornumsatz, was=input$was)
   })
 })
 
