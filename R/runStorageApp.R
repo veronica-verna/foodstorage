@@ -4,11 +4,26 @@
 #' 
 #'
 #' @export
-runStorageApp <- function(display.mode = "normal", port = 3838) {
-  appDir <- system.file(package = "foodstorage")
-  if (appDir == "") {
-    stop("Could not find example directory. Try re-installing `foodstorage`.", call. = FALSE)
+runStorageApp <- function(version, display.mode = "normal", port = 3838) {
+  # locate all the shiny app examples that exist
+  validApps <- list.files(system.file("shiny-apps", package = "foodstorage"))
+
+  validAppsMsg <-
+    paste0(
+      "Valid apps are: '",
+      paste(validApps, collapse = "', '"),
+      "'")
+
+  # if an invalid example is given, throw an error
+  if (missing(version) || !nzchar(version) ||
+      !version %in% validApps) {
+    stop(
+      'Please run `runStorageApp()` with a valid app as an argument.\n',
+      validAppsMsg,
+      call. = FALSE)
   }
-  
+
+  # find and launch the app
+  appDir <- system.file("shiny-apps", version, package = "foodstorage")
   shiny::runApp(appDir, display.mode = display.mode, port = port)
 }

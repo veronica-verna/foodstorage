@@ -1,30 +1,33 @@
+#' @title filters the current food storage
+#' @description This function filters the current food storage. It looks for 
+#' the last storage's change for each product and filters them. Optionally
+#' one can give a \code{group} as input, which is a character strings 
+#' containing product names. If this is given, the function will filter
+#' the dataset by these product names.
+#' @param dataset kornumsatz as a result from \code{startupSettings()}
+#' @param group optional character vector which contians product names
+#' @return A dataframe will be returned.
 #' @export
-currentStorage <- function(group, 
-                           xlab = "Warenbestand in Kilo",
-                           mar = c(4,8,1,1),
-                           las = 1,
-                           horiz = T,
-                           col = "grey",
-                           cex.axis = 0.8,
-                           cex.names = 0.8,
-                           decreasing = TRUE, 
-                           summary = FALSE) {
+
+currentStorage <- function(dataset, group) {
   
-  par(mar = mar)
-  group.stock <- multiply(prepare, group)
-  ### for the 'summary-case'
-  if (summary == TRUE) return(list(group.stock$Warenbestand, group.stock$Leer))
   
-  barplot(sort(group.stock$Warenbestand, decreasing = decreasing), 
-          horiz = horiz,
-          las = las,
-          cex.axis = cex.axis,
-          cex.names = cex.names,
-          xlab = xlab)
-  if (length(group.stock$Leer) != 0) { # usual usecase
-    legend("topright", 
-           legend = c("Derzeit vergriffen:", group.stock$Leer),
-           pch = c(NA, rep(16, length(group.stock$Leer))))
-    }
-  par(mar = c(5, 4, 4, 2) + 0.1)
+  if (!missing(group)) {
+    stopifnot(is.character(group))
+    
+    data <- dataset %>%
+      filter(Produkt_Zusammenfassung %in% group) %>%
+      group_by(Produkt_Zusammenfassung) %>%
+      filter(Tag == last(Tag)) %>%
+      ungroup() 
+    
+  } else {
+    data <- dataset %>%
+      group_by(Produkt_Zusammenfassung) %>%
+      filter(Tag == last(Tag)) %>%
+      ungroup()
+  }
+  
+  return(data)
+  
 }
