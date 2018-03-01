@@ -14,12 +14,30 @@ con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
 #dbWriteTable(con, "producerAdress", produzenten)
 
 dbListTables(con)
+dbListFields(con, "kornumsatz_origin")
 dbListFields(con, "productInfo")
 dbListFields(con, "producerAdress")
 
 productInfo <- dbGetQuery(con, "SELECT * FROM productInfo")
-#kopf
-#kopf[2,4]
+producerAdress <- dbGetQuery(con, "SELECT * FROM producerAdress")
+
+kornumsatz <- dbGetQuery(con, "SELECT * FROM kornumsatz_origin")
+kornumsatz %>% 
+  filter(Menge > 0) %>% 
+  group_by(Produkt) %>% 
+  group_by()
+  summarise(Umsatz = sum(Menge))
+ 
+year(kornumsatz$Tag)
+## pro Jahr
+## nur positive Mengen!
+
+dbSendQuery(con, "ALTER TABLE producerAdress ADD geometry geometry")
+
+#productOrigin <- read.csv2("../productOrigin.csv")
+#dbWriteTable(con, "productOrigin", productOrigin)
+
+#dbSendQuery(con, "UPDATE producerAdress SET geometry=MakePoint(xCoord, yCoord, 3857)")
 
 producers <- dbGetQuery(con, "SELECT * FROM producerAdress")
 producers$xCoord <- as.numeric(producers$xCoord)
@@ -60,7 +78,7 @@ leaflet(producersExist) %>%
   addTiles() %>% 
   addCircleMarkers(radius = 6,
                    stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
-                   popup = producersExist$Lieferant) %>% 
+                   popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
   addLegend("bottomright", 
             pal = pal, values = ~producersExist$Lieferantentyp,
             title = "Lieferantentyp",
