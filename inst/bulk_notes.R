@@ -1,30 +1,48 @@
+## Missing: function von Miri, die die Coordinaten berechnet.
 
 
-#produzenten <- read.csv2("data/Produzenten.csv")
-#dbWriteTable(con, "producerAdress", produzenten)
+## replace or write tables into database kornInfo.sqlite:
+replaceTableDB <- function(connection, tablename, newtable){
+  if(tablename %in% dbListTables(connection)){dbRemoveTable(con, tablename)}
+  dbWriteTable(con, tablename, newtable)
+}
+
+#con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
 
 
-#Kornkammer <- data.table(Name = "Kornkammer", Strasse = "Höheweg 3", PLZ= "79104", Ort = "Freiburg")
-#Kornkammer[1, xCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[1]]
-#Kornkammer[1, yCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[2]]
-#dbWriteTable(con, "AdresseKornkammer", Kornkammer)
+################ update AdressseKornkammer table ###################
 
+Kornkammer <- data.table(Name = "Kornkammer", Strasse = "Höheweg 3", PLZ= "79104", Ort = "Freiburg")
+Kornkammer[1, xCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[1]]
+Kornkammer[1, yCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[2]]
 
-#producersExist$EntfernungKK <- spDistsN1(producersExist, Kornkammer, longlat = T)
-#Distances <- data.table(Lieferant = producersExist$Lieferant, EntfernungKK = producersExist$EntfernungKK)
+replaceTableDB(con, "AdresseKornkammer", Kornkammer)
 
-#producers <- as.data.table(left_join(producers, Distances, by="Lieferant"))
+############## update producerAdress table #################
+
+produzenten <- read.csv2("data/Produzenten.csv")
+replaceTableDB(con, "producerAdress", produzenten)
+
+################## calculation of the distances in the producerAdress table:
+# write distances to the kornkammer into the database table "producerAdress"
+producersExist$EntfernungKK <- spDistsN1(producersExist, Kornkammer, longlat = T)
+Distances <- data.table(Lieferant = producersExist$Lieferant, EntfernungKK = producersExist$EntfernungKK)
+
+producers <- as.data.table(left_join(producers, Distances, by="Lieferant"))
 # write Distance to KK into the database table producerAdress
-#dbWriteTable(con, "producerAdress", producers)
 
-#productOrigin <- read.csv2("../productOrigin.csv")
-#dbWriteTable(con, "productOrigin", productOrigin)
+replaceTableDB(con, "producerAdress", producers)
+
+############## update productOrigin table ###############
+productOrigin <- read.csv2("../productOrigin.csv")
+replaceTableDB(con, "productOrigin", productOrigin)
 
 #dbSendQuery(con, "UPDATE producerAdress SET geometry=MakePoint(xCoord, yCoord, 3857)")
 
-#con <- dbConnect(SQLite(), "../foodstorage/data/kornInfo.sqlite")
 
 ##########################################
+#create template for productOrigin table (as productOrigin.csv)
+
 producers <- as.data.table(producers)
 Zwischenhaendler <- producers[Lieferantentyp=="Zwischenhaendler", Lieferant]
 
@@ -41,12 +59,7 @@ productOrigin <- unique(bind_rows(pI1, pI2))[order(Lieferant),]
 
 write.csv2(productOrigin, "../productOrigin.csv")
 
-##########################################
-Lex <- dbGetQuery(con, "SELECT * FROM productInfo WHERE Lieferant == 'Biohof Lex' AND Produkte_Zusammenfassung IN DISTINCT Produkte_Zusammenfassung")
-Lex
-
-
-########### original database ################
+########### get informations about original database ################
 korn <- dbConnect(SQLite(), "data/Backup_example.BAK")
 
 dbListTables(korn)
