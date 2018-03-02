@@ -1,0 +1,44 @@
+---
+title: "The origin of FoodCoop products"
+author: "Nele, Anna and Miri"
+date: "2 März 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+- importance of transportation distances of food
+- explain the Kornkammer
+- purpose: inform Kornkammer users (?)
+
+# Methods
+- data acquisition 
+  - name of country only coordinates of center ...
+- explain R-function we wrote (??)
+
+- shiny-app
+
+# Results
+- statistics of distances
+- statistics of quantities
+
+- plots 
+- maps
+
+
+# Discussion
+
+- uncertainties of data acquisition
+- missing data
+
+- further analytics
+
+## Conclusion
+
+
+
+

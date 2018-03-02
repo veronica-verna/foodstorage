@@ -1,63 +1,14 @@
-library(RSQLite)
-library(readr)
-library(data.table)
-library(sf)
-library(ggplot2)
-library(tmap)
-library(rgdal)
-library(dplyr)
-library(raster)
 
-con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
 
 #produzenten <- read.csv2("data/Produzenten.csv")
 #dbWriteTable(con, "producerAdress", produzenten)
 
-dbListTables(con)
-dbListFields(con, "kornumsatz_origin")
-dbListFields(con, "productInfo")
-dbListFields(con, "producerAdress")
-
-productInfo <- dbGetQuery(con, "SELECT * FROM productInfo")
-producerAdress <- dbGetQuery(con, "SELECT * FROM producerAdress")
-
-kornumsatz <- dbGetQuery(con, "SELECT * FROM kornumsatz_origin")
-kornumsatz %>% 
-  filter(Menge > 0) %>% 
-  group_by(Produkt) %>% 
-  group_by()
-  summarise(Umsatz = sum(Menge))
- 
-year(kornumsatz$Tag)
-## pro Jahr
-## nur positive Mengen!
-
-dbSendQuery(con, "ALTER TABLE producerAdress ADD geometry geometry")
-
-#productOrigin <- read.csv2("../productOrigin.csv")
-#dbWriteTable(con, "productOrigin", productOrigin)
-
-#dbSendQuery(con, "UPDATE producerAdress SET geometry=MakePoint(xCoord, yCoord, 3857)")
-
-producers <- dbGetQuery(con, "SELECT * FROM producerAdress")
-producers$xCoord <- as.numeric(producers$xCoord)
-producers$yCoord <- as.numeric(producers$yCoord)
-
-producersExist <- producers[-which(is.na(producers$xCoord)),]
-
-# convert producers to spatialpointsdataframe
-coordinates(producersExist) <- ~xCoord + yCoord
 
 #Kornkammer <- data.table(Name = "Kornkammer", Strasse = "Höheweg 3", PLZ= "79104", Ort = "Freiburg")
 #Kornkammer[1, xCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[1]]
 #Kornkammer[1, yCoord := geocode(paste0(Strasse, ", ", PLZ, " ", Ort))[2]]
 #dbWriteTable(con, "AdresseKornkammer", Kornkammer)
 
-Kornkammer <- dbGetQuery(con, "SELECT * from AdresseKornkammer")
-coordinates(Kornkammer) <- ~xCoord + yCoord
-crs(Kornkammer) <-  "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
-
-crs(producersExist) <- "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
 
 #producersExist$EntfernungKK <- spDistsN1(producersExist, Kornkammer, longlat = T)
 #Distances <- data.table(Lieferant = producersExist$Lieferant, EntfernungKK = producersExist$EntfernungKK)
@@ -66,27 +17,12 @@ crs(producersExist) <- "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 
 # write Distance to KK into the database table producerAdress
 #dbWriteTable(con, "producerAdress", producers)
 
-dbDisconnect(con)
+#productOrigin <- read.csv2("../productOrigin.csv")
+#dbWriteTable(con, "productOrigin", productOrigin)
 
-##################
+#dbSendQuery(con, "UPDATE producerAdress SET geometry=MakePoint(xCoord, yCoord, 3857)")
 
-library(leaflet)
-
-pal <- colorFactor(c("green", "orange", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
-
-leaflet(producersExist) %>% 
-  addTiles() %>% 
-  addCircleMarkers(radius = 6,
-                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
-                   popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
-  addLegend("bottomright", 
-            pal = pal, values = ~producersExist$Lieferantentyp,
-            title = "Lieferantentyp",
-            opacity = 1
-  ) %>% 
-  addMarkers(Kornkammer, lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2], 
-             popup= "Kornkammer")
-
+#con <- dbConnect(SQLite(), "../foodstorage/data/kornInfo.sqlite")
 
 ##########################################
 producers <- as.data.table(producers)
@@ -129,4 +65,5 @@ sequenceTop <- dbGetQuery(korn, "SELECT * FROM sqlite_sequence LIMIT 100")
 transprodTop <- dbGetQuery(korn, "SELECT * FROM transaction_products LIMIT 10")
 
 transactionsTop <- dbGetQuery(korn, "SELECT * FROM transactions LIMIT 10")
+
 
