@@ -1,5 +1,3 @@
-## Missing: function von Miri, die die Coordinaten berechnet.
-
 
 ## replace or write tables into database kornInfo.sqlite:
 replaceTableDB <- function(connection, tablename, newtable){
@@ -34,7 +32,22 @@ producers <- as.data.table(left_join(producers, Distances, by="Lieferant"))
 replaceTableDB(con, "producerAdress", producers)
 
 ############## update productOrigin table ###############
-productOrigin <- read.csv2("../productOrigin.csv")
+productOrigin <- read.csv2("../Produktherkunft.csv", sep = ",")
+names(productOrigin)[4] <- "Herkunftsgenauigkeit"
+names(productOrigin)[5] <- "Kommentar"
+productOrigin$xCoord <- as.numeric(NA)
+productOrigin$yCoord <- as.numeric(NA)
+productOrigin$Ort <- as.character(productOrigin$Ort)
+
+prOrig <- getCoordinates(prOrig)
+
+productOrigin <- data.frame(Lieferant = prOrig$Lieferant, 
+                            Produkte_Zusammenfassung = prOrig$Produkte_Zusammenfassung,
+                            Ort = prOrig$Ort,
+                            Herkunftsgenauigkeit = prOrig$Herkunftsgenauigkeit, 
+                            Kommentar = prOrig$Kommentar, 
+                            xCoord = unlist(prOrig$xCoord), 
+                            yCoord = unlist(prOrig$yCoord))
 replaceTableDB(con, "productOrigin", productOrigin)
 
 #dbSendQuery(con, "UPDATE producerAdress SET geometry=MakePoint(xCoord, yCoord, 3857)")

@@ -9,7 +9,7 @@ library(dplyr)
 library(raster)
 library(tidyr)
 library(foodstorage)
-
+library(ggmap)
 
 ############
 con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
