@@ -3,10 +3,11 @@ library(dplyr)
 library(ggplot2)
 library(leaflet)
 # der Datesatz totalDistances muss schon eingelesen sein
+pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
 
 pal2 <- colorNumeric(
-  palette = "Spectral",
-  domain = producersInfoStraight$avg.turnover, n = 10, reverse = T)
+  palette = "viridis",
+  domain = producersInfoStraight$avg.turnover, n = 10, reverse = F)
 
 # Erstellen der beiden Datensätze, zwischen denen gewählt werden kann
 turnOver2016 <- totalDistances %>%
@@ -23,9 +24,11 @@ ui <- fluidPage(
    
    sidebarLayout(
       sidebarPanel(
-         selectInput("Selection", "Selection", c("Alle Produktgruppen", unique(producersInfo$Produktgruppe), selected = "Grundnahrungsmittel")),
-        selectInput("Produkt", "Produkt", 
-                    c("Alle Produkte", unique(producersInfo$Produkte_Zusammenfassung)))
+         selectInput("Selection", "Selection", c("Alle Produktgruppen", unique(producersInfo$Produktgruppe), selected = "Alle Produktgruppen")),
+         hr(),
+         uiOutput("ui")#,
+        #selectInput("Produkt", "Produkt", 
+         #           c("Alle Produkte", unique(producersInfo$Produkte_Zusammenfassung)))
       ),
       
       mainPanel(
@@ -62,23 +65,42 @@ server <- function(input, output, session) {
    
    #############################
    
-   observe({
-     x <- input$Selection
-     
-     # Can use character(0) to remove all choices
-     if (is.null(x))
-       x <- character(0)
-     
-     # Can also set the label and select items
-     updateSelectInput(session, "Produkt",
-                       label = paste("Produkt"), # , length(x)
-                       choices = c("Alle Produkte", unique(prodSel()$producersSel$Produkte_Zusammenfassung)),
-                       selected = input$Produkt)
-   })
+
    
+   # observe({
+   #   x <- input$Selection
+   #   
+   #   # Can use character(0) to remove all choices
+   #   if (is.null(x))
+   #     x <- character(0)
+   #   
+   #   # Can also set the label and select items
+   #   updateSelectInput(session, "Produkt",
+   #                     label = paste("Produkt"), # , length(x)
+   #                     choices = c("Alle Produkte", unique(prodSel()$producersSel$Produkte_Zusammenfassung)),
+   #                     selected = input$Produkt)
+   # })
+   output$ui <- renderUI({
+     Produkte <- unique(subset(producersInfo, Produktgruppe == input$Selection)$Produkte_Zusammenfassung)
+     if (is.null(input$input_type))
+       return(if(input$Selection != "Alle Produktgruppen"){
+         radioButtons("Produkt", "Produkt",
+                            choices = c("Alle Produkte", Produkte))#, selection = "Alle Produkte"
+       } else { radioButtons("Produkt", "Produkt",
+                             choices = c("Alle Produkte"))}
+       )
+     
+  
+   
+
+     
+     # Depending on input$input_type, we'll generate a different
+     # UI component and send it to the client.
+     
+   })
    prodSel <- reactive({
      if(input$Selection == "Alle Produktgruppen"){producersSel <- producersInfo}
-     if(input$Selection != "Alle Produktgruppen" & input$Produkt == "Alle Produkte"){
+     if(input$Selection != "Alle Produktgruppen"){ # & input$Produkt == "Alle Produkte"
        producersSel <- subset(producersInfo, Produktgruppe == input$Selection) 
      } 
      if(input$Selection != "Alle Produktgruppen" & input$Produkt != "Alle Produkte"){
@@ -86,22 +108,28 @@ server <- function(input, output, session) {
      }
      return(list("producersSel" = producersSel))
    })
-   
-
 
    output$mymap <- renderLeaflet({
       prodSelect <- prodSel()$producersSel
       
      leaflet(prodSelect) %>% 
-       addTiles() %>% 
-       addPolylines(weight = 2,
-                    color = ~pal2(producersInfo$avg.turnover),
+       #addTiles() %>% 
+       addProviderTiles(providers$CartoDB.Positron) %>% 
+       addPolylines(weight = ifelse((prodSelect$avg.turnover/15) < 1, 1, (prodSelect$avg.turnover)/15),
+                    color = ~pal2(prodSelect$avg.turnover),#
                     popup = prodSelect$Produkte_Zusammenfassung) %>% 
        addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "avg.turnover",
-                labFormat = labelFormat(suffix = " kg/yr")) #%>% 
-       # addPolylines(data = producersInfo, color =  ~pal2(producersInfo$avg.turnover),
-       #              weight =  1,
-       #              popup = producersInfo$Produkte_Zusammenfassung)
+                labFormat = labelFormat(suffix = " kg/yr")) %>%
+       # addCircleMarkers(data = producersExist, radius = 2,
+       #                  stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
+       #                  popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
+       # addLegend("bottomright",
+       #           pal = pal, values = ~producersExist$Lieferantentyp,
+       #           title = "Lieferantentyp",
+       #           opacity = 1
+       # ) %>%
+       addMarkers(Kornkammer, lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
+                  popup= "Kornkammer")
      
    })
 }
