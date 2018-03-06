@@ -1,7 +1,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
-
+library(leaflet)
 # der Datesatz totalDistances muss schon eingelesen sein
 
 pal2 <- colorNumeric(
@@ -23,24 +23,23 @@ ui <- fluidPage(
    
    sidebarLayout(
       sidebarPanel(
-
-        selectInput("data","Wähle das Jahr", choices = c("2016", "2017")),
-        radioButtons("display", label = "Selection",
-                     c("Alldata", "Selection"), selected = "Alldata"),
-         selectInput("Selection", "Selection", unique(producersInfo$Produktgruppe), selected = "Grundnahrungsmittel")
+         selectInput("Selection", "Selection", c("Alle Produktgruppen", unique(producersInfo$Produktgruppe), selected = "Grundnahrungsmittel")),
+        selectInput("Produkt", "Produkt", 
+                    c("Alle Produkte", unique(producersInfo$Produkte_Zusammenfassung)))
       ),
       
       mainPanel(
         tabsetPanel(
           tabPanel("map", leafletOutput("mymap")),
-          tabPanel("ggplot", plotOutput("distPlot"))
+          tabPanel("ggplot", plotOutput("distPlot"),
+                   selectInput("data","Wähle das Jahr", choices = c("2016", "2017")))
         )
          
       )
    )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
   #den Jahren aus Choices werden die entsprechenden Datensätze zugewiesen
   dataInput <- reactive({
     data <- switch(input$data,
@@ -61,27 +60,48 @@ server <- function(input, output) {
        ggtitle(dataInput()$title)
    })
    
+   #############################
+   
+   observe({
+     x <- input$Selection
+     
+     # Can use character(0) to remove all choices
+     if (is.null(x))
+       x <- character(0)
+     
+     # Can also set the label and select items
+     updateSelectInput(session, "Produkt",
+                       label = paste("Produkt"), # , length(x)
+                       choices = c("Alle Produkte", unique(prodSel()$producersSel$Produkte_Zusammenfassung)),
+                       selected = input$Produkt)
+   })
+   
    prodSel <- reactive({
-     if(input$display == "Alldata"){producersSel <- producersInfo}
-     if(input$display == "Selection"){
+     if(input$Selection == "Alle Produktgruppen"){producersSel <- producersInfo}
+     if(input$Selection != "Alle Produktgruppen" & input$Produkt == "Alle Produkte"){
        producersSel <- subset(producersInfo, Produktgruppe == input$Selection) 
+     } 
+     if(input$Selection != "Alle Produktgruppen" & input$Produkt != "Alle Produkte"){
+       producersSel <- subset(producersInfo, Produkte_Zusammenfassung == input$Produkt) 
      }
      return(list("producersSel" = producersSel))
    })
    
+
+
    output$mymap <- renderLeaflet({
       prodSelect <- prodSel()$producersSel
       
-     leaflet(producersInfo) %>% 
+     leaflet(prodSelect) %>% 
        addTiles() %>% 
-       addPolylines(weight = 0.4,
+       addPolylines(weight = 2,
                     color = ~pal2(producersInfo$avg.turnover),
-                    popup = producersInfo$Produkte_Zusammenfassung) %>% 
+                    popup = prodSelect$Produkte_Zusammenfassung) %>% 
        addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "avg.turnover",
-                 labFormat = labelFormat(suffix = " kg/yr")) %>% 
-       addPolylines(data = prodSelect, color =  ~pal2(producersInfo$avg.turnover),
-                    weight = (1/producersInfo$Herkunftsgenauigkeit)*6,
-                    popup = producersInfo$Produkte_Zusammenfassung)
+                labFormat = labelFormat(suffix = " kg/yr")) #%>% 
+       # addPolylines(data = producersInfo, color =  ~pal2(producersInfo$avg.turnover),
+       #              weight =  1,
+       #              popup = producersInfo$Produkte_Zusammenfassung)
      
    })
 }
