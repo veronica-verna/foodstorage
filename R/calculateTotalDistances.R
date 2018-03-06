@@ -1,6 +1,9 @@
 #' @title calculate the total distances of the products.
 #' @description 
 #' from the data productOrigin, producersAdress and productInfo a table will be generated that contains the total distances for every product and its producer.
+#' @param origin the table productOrigin with the information ...
+#' @param producers the table producerAdress 
+#' @param productInfo the table productInfo
 #' @export
 
 
@@ -16,7 +19,7 @@ totalDistances <- function(origin = productOrigin, producers = producerAdress, p
   
   # join the originWithDistances to the products table
   products1 <- products %>%
-    left_join(originWithDistances[, c("Lieferant", "Produkte_Zusammenfassung", "Ort", "EntfernungZwischenhaendler")], by=c("Lieferant", "Produkte_Zusammenfassung"))
+    left_join(originWithDistances[, c("Lieferant", "Produkte_Zusammenfassung", "Ort", "EntfernungZwischenhaendler", "Herkunftsgenauigkeit")], by=c("Lieferant", "Produkte_Zusammenfassung"))
   
   # join the Distances to the producer from the producerAdress-table to the products table
   producerAdress$EntfernungKK <- as.numeric(producerAdress$EntfernungKK)

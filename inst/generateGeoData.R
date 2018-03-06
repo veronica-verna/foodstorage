@@ -1,15 +1,14 @@
 library(RSQLite)
-library(readr)
+#library(readr)
 library(data.table)
 library(sf)
 library(ggplot2)
-library(tmap)
 library(rgdal)
 library(dplyr)
 library(raster)
 library(tidyr)
 library(foodstorage)
-library(ggmap)
+#library(ggmap)
 
 ############
 con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
@@ -50,9 +49,6 @@ meanDists <- totalDistances %>%
   group_by(Produktgruppe) %>% 
   summarise(avgDistance = mean(Gesamtentfernung, na.rm=T))
 
-ggplot(meanDists, aes(Produktgruppe, avgDistance, fill= Produktgruppe)) + geom_bar(stat = "identity")
-
-
 ###############################################
 ## prepare data for the plot:
 producerAdress$xCoord <- as.numeric(producerAdress$xCoord)
@@ -83,22 +79,4 @@ crs(productOriginExist) <- crs(producersExist)
 dbDisconnect(con)
 
 ##################
-
-library(leaflet)
-
-pal <- colorFactor(c("green", "orange", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
-
-leaflet(producersExist) %>%
-  addTiles() %>%
-  addCircleMarkers(radius = 6,
-                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
-                   popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
-  addLegend("bottomright",
-            pal = pal, values = ~producersExist$Lieferantentyp,
-            title = "Lieferantentyp",
-            opacity = 1
-  ) %>%
-  addMarkers(Kornkammer, lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
-             popup= "Kornkammer")
-
 
