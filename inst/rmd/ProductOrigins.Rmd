@@ -72,7 +72,9 @@ Kornkammer <- readOGR("../../data/Kornkammer/", "Kornkammer")
 ```
 
 
-For every product that has ever been ordered by the FoodCoop, the transportation route to the last transfer point, can always be calculated. For a product that is ordered directly from the farmer, the last transfer point equals to its origin. Figure ... : ![](../../map1.png) shows the actual driving directions for all products from its last transfer point. 
+For every product that has ever been ordered by the FoodCoop, the transportation route to the last transfer point, can always be calculated. For a product that is ordered directly from the farmer, the last transfer point equals to its origin. Figure ... : 
+![](../../map1.png){width=250px}
+shows the actual driving directions for all products from its last transfer point. 
 
 ```{r, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 library(leaflet)
