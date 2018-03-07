@@ -21,6 +21,8 @@ for(i in 1:nrow(totalDistances)){
 producersL <- SpatialLines(liste, proj4string = crs(producersExist)) #crs(producersExist)
 producersInfo <- SpatialLinesDataFrame(producersL, totalDistances)
 
+#writeSpatialShape(producersInfo, "data/producersInfo.shp")
+
 rm(liste)
 rm(producersL)
 
