@@ -3,6 +3,7 @@ title: "The origin of FoodCoop products"
 author: "Nele, Anna and Miri"
 date: "2 März 2018"
 output: pdf_document
+bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -11,16 +12,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-- importance of transportation distances of food
-- explain the Kornkammer
+- title: Transport routes of the products of a FoodCoop?
+
+The consumption of food has been identified as one of the most energy demanding activities within a household [@vringer1995]. Historically, patterns of food consumption have changed from locally produced food to a diet where the use of fruits, vegetables or spices from far away regions became common [@carlsson1998]. Also the number of stakeholders involved in food production decreased. The majority of food consumed today passes through a complex, indirect network of a few large, centralized producers, processors, transporters and distributors [@hill2008].
+
+The “buylocal” food movement tries to reverse this trend and argues that locally produced food is not only fresher, richer in vitamins and better tasting, but also better for the environment due to shorter distances of transportation and less energy usage during production and transport [@grebitus2013]. The shorter distances food travels, the less fossil fuels are required for transport and the fewer greenhouse gases are emitted [@hill2008].Another advantage of locally produced food is the improvement of the economic situation of (especially small scale) farmers as they are able to reap a greater profit by the removement of brokers from the distribution chain [@hill2008]. However, several studies have questioned the economic benefits of local foods by stating that buying locally unaware of economic laws and principles is promoting a future characterized by less food security [e.g. @desrochers2012]. Other authors identified some shortcomings that emerge from relying solely on economic logic - for example the focus on efficiency (making the pie bigger) rather than distribution (dividing up the pie fairly) [@scharber2016]. All in all the idea of buying food directly from farmers and thereby shortening the transportation distance seems convincing. Therefore, the popularity of forming consumer cooperatives (so called foodcoops) has grown rapidly since the 1970s [@marion1975]. 
+
+A foodcoop is the combination of people and households for joint shopping. The idea behind this is to collect large quantities of food directly from the producers, making it worthwhile for farmers to drive into the middle of a city. The same principle can be applied to organic foods from wholesalers.As a result members of a foodcoop can usually shop at a lower price than buying in retail stores. Also packaging of products can be avoided by ordering food in bulk and refilling it to reusable packagings. The foodcoops usually work by means of unpaid distributed work and collective administration [@foodcoopedia].
+
+Such foodcoop were founded in Freiburg as well. There exist five different foodcoops at the moment. The Foodcoop "Kornkammer" was founded in 2015 and comprises about 50 households with more or less 100 members.
 - purpose: inform Kornkammer users (?)
 
 # Methods
-- data acquisition 
-  - name of country only coordinates of center ...
-- explain R-function we wrote (??)
+## data acquisition 
+  -schon vorhandene daten: produkte, lieferanten und umsätze
+  - name of country only coordinates of center(geocode funktion), unsicherheiten kategorisiert...
+  -define produzent, zwischenhändler...
 
-- shiny-app
+## data processing
+- Distanzen berechnen (in die finale totalDistances table) function spDist
+- create points and Lines SpatialPointsDataFrame and SpatialLinesdataFrames that contain attributes of products and transport path information bzw. origin/supplier/FoodCoop locations
+- explain R-function we wrote (??)
+- ? workflow : wie readme
+
+## data visualisation
+- leaflet-maps
+- ggplots
+shiny-app !
 
 # Results
 - statistics of distances
@@ -34,11 +52,30 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - uncertainties of data acquisition
 - missing data
+- transportation of seeds and seedlings/manure/etc. not included
+very few studies have analyzed transportation
+upstream of the farm (e.g., transport of farm equipment and
+supplies to the farm), which may be important for life-cycle
+GHG emissions.
+
+
+Thus, transportation may be one of the main targets when a conventional energy analysis
+is used, but not when greenhouse gas emissions from all sources are accounted for. When
+a conventional energy analysis is used for food, important emissions which affect the climate
+are not included. This may lead to a sub-optimisation of pollution control.
+
+There is some debate on the extent
+to which buying products based solely on the criteria of miles trav-
+eled is actually a good indicator of environmental impact, given that
+many studies show that distance traveled is actually a poor indicator
+of total environmental impact (e.g., see Coley et al., 2009; Mason
+et al., 2002; Teisl, 2011).
 
 - further analytics
 
 ## Conclusion
 
+## References
 
 
 
