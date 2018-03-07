@@ -18,9 +18,15 @@ knitr::opts_chunk$set(echo = TRUE)
 # Methods
 - data acquisition 
   - name of country only coordinates of center ...
+  - the accuracy of the origin of the products is described with 3 levels: 
+    1 = origin exactly known (with adress)
+    2 = region or country of product origin known
+    3 = information about origin not available, therefore only a guess of origin
+
 - explain R-function we wrote (??)
 
 - shiny-app
+
 
 # Results
 - statistics of distances
@@ -36,6 +42,8 @@ knitr::opts_chunk$set(echo = TRUE)
 - missing data
 
 - further analytics
+
+- some products from suppliers come even from sub-suppliers, who get the products form its real origin! (e.g. some products from OBEG are from BYODO)
 
 ## Conclusion
 
