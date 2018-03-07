@@ -2,7 +2,9 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(leaflet)
-# der Datesatz totalDistances muss schon eingelesen sein
+
+totalDistances <- as.data.frame(producersInfo)
+
 pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
 
 pal2 <- colorNumeric(
@@ -10,9 +12,9 @@ pal2 <- colorNumeric(
   domain = producersInfoStraight$avg.turnover, n = 10, reverse = F)
 
 # Erstellen der beiden Datensätze, zwischen denen gewählt werden kann
-turnOver2016 <- totalDistances %>%
+avg.turnOver <- totalDistances %>%
   group_by(Produktgruppe)%>%
-  summarise(Menge = sum(turnover2016, na.rm = T), Distanz = mean(Gesamtentfernung, na.rm = T))
+  summarise(Menge = sum(avg.turnover, na.rm = T), Distanz = mean(Gesamtentfernung, na.rm = T))
 
 turnOver2017 <- totalDistances %>%
   group_by(Produktgruppe)%>%
@@ -36,8 +38,8 @@ ui <- fluidPage(
                    leafletOutput("mymap")),
           tabPanel("Umsatz der Produkte", br(), plotOutput("Mengenplot")),
           tabPanel("Transportdistanz der Produkte",  br(), plotOutput("Distanzplot")),
-          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot"),
-                   selectInput("data","Wähle das Jahr", choices = c("2016", "2017")))
+          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot")
+                   )
         )
          
       )
@@ -46,23 +48,14 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   #den Jahren aus Choices werden die entsprechenden Datensätze zugewiesen
-  dataInput <- reactive({
-    data <- switch(input$data,
-                   "2016" = turnOver2016,
-                   "2017" = turnOver2017)
-    title <- ifelse (input$data == "2016", "Jahresumsatz 2016", 
-                     "Jahresumsatz 2017")
-    return(list("data" = data, "title" = title))
-  })
-   
-   output$distPlot <- renderPlot({
-     turnOverYear <- dataInput()$data
+
+      output$distPlot <- renderPlot({
+     turnOverYear <- avg.turnOver
      
      # Erstellen des Plots
      ggplot(turnOverYear, aes(Distanz, Menge)) + 
        geom_point(aes(color = Produktgruppe, size = 3)) +
-       scale_size(guide = "none") +
-       ggtitle(dataInput()$title)
+       scale_size(guide = "none") 
    })
    
    #############################
