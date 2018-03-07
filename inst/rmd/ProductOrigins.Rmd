@@ -20,8 +20,9 @@ The “buylocal” food movement tries to reverse this trend and argues that loc
 
 A foodcoop is the combination of people and households for joint shopping. The idea behind this is to collect large quantities of food directly from the producers, making it worthwhile for farmers to drive into the middle of a city. The same principle can be applied to organic foods from wholesalers.As a result members of a foodcoop can usually shop at a lower price than buying in retail stores. Also packaging of products can be avoided by ordering food in bulk and refilling it to reusable packagings. The foodcoops usually work by means of unpaid distributed work and collective administration [@foodcoopedia].
 
-Such foodcoop were founded in Freiburg as well. There exist five different foodcoops at the moment. The Foodcoop "Kornkammer" was founded in 2015 and comprises about 50 households with more or less 100 members.
-- purpose: inform Kornkammer users (?)
+Such foodcoop were founded in Freiburg as well resulting in five existing foodcoops at the moment. The foodcoop "Kornkammer" was founded in 2015 and comprises about 50 households with more or less 100 members. The members decide together what kind of products they want to order, communicate with the producers and store the deliveries in a room where all members can purchase small quantities of the groceries.
+
+This study tries to investigate the transport distances of the products consumed by the foodcoop "Kornkammer" and to inform the foodcoop members about the routes their food travels. 
 
 # Methods
 ## data acquisition 
