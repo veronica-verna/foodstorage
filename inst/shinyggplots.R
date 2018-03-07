@@ -3,6 +3,7 @@ library(dplyr)
 library(ggplot2)
 library(leaflet)
 
+
 totalDistances <- as.data.frame(producersInfo)
 
 pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
