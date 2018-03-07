@@ -1,15 +1,14 @@
 library(RSQLite)
-library(readr)
+#library(readr)
 library(data.table)
 library(sf)
 library(ggplot2)
-library(tmap)
 library(rgdal)
 library(dplyr)
 library(raster)
 library(tidyr)
 library(foodstorage)
-library(ggmap)
+#library(ggmap)
 
 ############
 con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
@@ -28,17 +27,27 @@ Kornkammer <- dbGetQuery(con, "SELECT * from AdresseKornkammer")
 productOrigin <- origin
 
 KUperYear <- kornumsatz_perYear(kornumsatz = kornumsatz, productInfo = productInfo)
+KU <- KUperYear %>% 
+  spread(Jahr, Umsatz) %>% 
+  mutate(avg = mean(c(`2016`, `2017`), na.rm = T))
+names(KU) <- c("Produkte_Zusammenfassung", "turnover2015", "turnover2016", "turnover2017", "avg.turnover")
 
 originWithDistances <- SupplierDistance(origin, producerAdress)
 
 totalDistances <- totalDistances(origin = origin, producers = producerAdress, productInfo = productInfo)
 
+## count occurance of every product in the table, to split the turnover of the product to the different occurances.
+totalDistances <- totalDistances %>% 
+  add_count(Produkte_Zusammenfassung) %>% 
+  left_join(KU, by = "Produkte_Zusammenfassung") %>% 
+  mutate(turnover2015 = turnover2015 / n) %>% 
+  mutate(turnover2016 = turnover2016 / n) %>% 
+  mutate(turnover2017 = turnover2017 / n) %>% 
+  mutate(avg.turnover = avg.turnover / n)
+  
 meanDists <- totalDistances %>% 
   group_by(Produktgruppe) %>% 
   summarise(avgDistance = mean(Gesamtentfernung, na.rm=T))
-
-ggplot(meanDists, aes(Produktgruppe, avgDistance, fill= Produktgruppe)) + geom_bar(stat = "identity")
-
 
 ###############################################
 ## prepare data for the plot:
@@ -56,32 +65,18 @@ warning( paste0("The producers " , paste0(producerAdress[which(is.na(producerAdr
 # convert producers to spatialpointsdataframe
 coordinates(producersExist) <- ~xCoord + yCoord
 
+# create productOrigin SpatialPointsDataFrame only with existing origins:
+productOriginExist <- productOrigin[!( is.na(productOrigin$xCoord) | is.na(productOrigin$yCoord)),]
+coordinates(productOriginExist) <- ~xCoord + yCoord
 
 coordinates(Kornkammer) <- ~xCoord + yCoord
 crs(Kornkammer) <-  "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
 
 crs(producersExist) <- "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
 
+crs(productOriginExist) <- crs(producersExist)
 
 dbDisconnect(con)
 
 ##################
-
-library(leaflet)
-
-pal <- colorFactor(c("green", "orange", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
-
-leaflet(producersExist) %>%
-  addTiles() %>%
-  addCircleMarkers(radius = 6,
-                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
-                   popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
-  addLegend("bottomright",
-            pal = pal, values = ~producersExist$Lieferantentyp,
-            title = "Lieferantentyp",
-            opacity = 1
-  ) %>%
-  addMarkers(Kornkammer, lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
-             popup= "Kornkammer")
-
 
