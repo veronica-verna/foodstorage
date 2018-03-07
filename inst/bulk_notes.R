@@ -92,4 +92,15 @@ transprodTop <- dbGetQuery(korn, "SELECT * FROM transaction_products LIMIT 10")
 
 transactionsTop <- dbGetQuery(korn, "SELECT * FROM transactions LIMIT 10")
 
+############################
+# Möglichkeit: Einteilung der Distanzen in 1500 km -Schritten
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung <= 1500] <- "0-1500"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 1500 & newtotalDistances$Gesamtentfernung <= 3000] <- "1500-3000"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 3000 & newtotalDistances$Gesamtentfernung <= 4500] <- "3000-4500"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 4500 & newtotalDistances$Gesamtentfernung <= 6000] <- "4500-6000"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 6000 & newtotalDistances$Gesamtentfernung <= 7500] <- "6000-7500"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 7000 & newtotalDistances$Gesamtentfernung <= 8500] <- "7000-8500"
+newtotalDistances$Kategorie[newtotalDistances$Gesamtentfernung > 8500] <- "> 8500"
+
+
 
