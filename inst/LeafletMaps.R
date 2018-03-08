@@ -50,7 +50,7 @@ dash <- as.factor(dashs)
 
 leaflet(producersInfo) %>% 
   addProviderTiles(providers$CartoDB.Positron) %>% 
-  addPolylines(weight = ifelse((producersInfo$avg.turnover/15) < 1, 1, (producersInfo$avg.turnover)/15),
+  addPolylines(weight = ifelse((producersInfo$avg.turnover/15) < 2, 2, (producersInfo$avg.turnover)/15),
                color = ~pal2(producersInfo$avg.turnover),
                popup = producersInfo$Produkte_Zusammenfassung, dashArray = dash) %>% 
   addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "avg.turnover",

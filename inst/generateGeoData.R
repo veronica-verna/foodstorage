@@ -86,4 +86,4 @@ dbDisconnect(con)
 
 ##################
 
-write.csv2(totalDistances, "data/totalDistances.csv")
+#write.csv2(totalDistances, "data/totalDistances.csv")
