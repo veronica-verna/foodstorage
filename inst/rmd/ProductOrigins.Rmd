@@ -2,12 +2,25 @@
 title: "The origin of FoodCoop products"
 author: "Nele, Anna and Miri"
 date: "2 März 2018"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document: default
 bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(RSQLite)
+#library(readr)
+library(data.table)
+library(sf)
+library(rgdal)
+library(dplyr)
+library(raster)
+library(tidyr)
+library(foodstorage)
+library(rgdal)
 ```
 
 # Introduction
@@ -39,9 +52,12 @@ We decided to devide the suppliers into three categories:
 
 Following, we tried to find out the origin of the products sold by the whole salers. We classified the accuracy of the information we got into three categories: 
 
-- 1 ...
-- 2 ...
-- 3 ...
+
+  - the accuracy of the origin of the products is described with 3 levels: 
+    1 = origin exactly known (with adress)
+    2 = region or country of product origin known
+    3 = information about origin not available, therefore only a guess of origin
+
 
 ## data processing
 In a next step we used the function "geocode" from the package "ggmap" to convert the adresses of our suppliers and the information about the origin of the products from whole salers into coordinates. If we knew only the country of a product's origin the resulting geoposition calculated by the geocode function was located in the middle of the country.
@@ -49,7 +65,9 @@ In a next step we used the function "geocode" from the package "ggmap" to conver
 After that we used the function "spDists" from the package "sp" to calculate the distances from the foodcoop to the suppliers and, if a supplier was a whole saler, the distance from the supplier to the location of the product's origin. The sum of the distances gave the total distance a product traveled.
 
 - create points and Lines SpatialPointsDataFrame and SpatialLinesdataFrames that contain attributes of products and transport path information bzw. origin/supplier/FoodCoop locations
+
 - explain R-functions we wrote (??)
+
 - ? workflow : wie readme
 
 ## data visualisation
@@ -57,7 +75,61 @@ After that we used the function "spDists" from the package "sp" to calculate the
 - ggplots
 shiny-app !
 
+
 # Results
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+producersInfoStraight <- readOGR("../../data/producersInfoStraight/", "producersInfoStraight")
+producersInfo <- readOGR("../../data/producersInfo/", "producersInfo")
+producersRoutes <- readOGR("../../data/producersRoutes/", "producersRoutes")
+producersExist <- readOGR("../../data/producersExist/", "producersExist")
+Kornkammer <- readOGR("../../data/Kornkammer/", "Kornkammer")
+
+```
+
+
+For every product that has ever been ordered by the FoodCoop, the transportation route to the last transfer point, can always be calculated. For a product that is ordered directly from the farmer, the last transfer point equals to its origin. Figure ... : 
+![](../../map1.png){width=250px}
+shows the actual driving directions for all products from its last transfer point. 
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+library(leaflet)
+
+pal <- colorFactor(c("darkgreen", "blue", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
+KKIcon <- iconList(
+  Kornkammer = makeIcon("../../data/icon-2.png", "../../data/icon-2.png", 24, 24)
+)
+
+leaflet(producersExist) %>%
+  addTiles() %>%
+  addCircleMarkers(radius = 6,
+                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lfrntnt),
+                   popup = producersExist$Liefrnt) %>%  #, clusterOptions = markerClusterOptions()
+  addLegend("bottomright",
+            pal = pal, values = ~producersExist$Lfrntnt,
+            title = "Lieferantentyp",
+            opacity = 1
+  ) %>%
+  addMarkers(Kornkammer,
+             lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
+             icon =  ~KKIcon[Kornkammer$Name],
+             popup= "Kornkammer") %>% 
+  addPolylines(data = producersRoutes, color = "black", opacity = 1, weight = 2)
+
+```
+
+For those products, that didn't grow at its last transfer point, the distance from its last transfer poit to its origin can be calculated, in the case that its origin is known.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="The average turnover of kg per year of every product and the total Distance the product has been transported from its origin to the FoodCoop"}
+totalDistances <- read.csv2("../../data/totalDistances.csv")
+totalDistances$Herkunftsgenauigkeit[which(totalDistances$Lieferantentyp=="Erzeuger")] <- 1
+totalDistances$Herkunftsgenauigkeit <- as.factor(totalDistances$Herkunftsgenauigkeit)
+ggplot(totalDistances, aes(Gesamtentfernung, avg.turnover, color = Herkunftsgenauigkeit)) + 
+  geom_point() +
+  xlab("total Distance [km]") + ylab("average turnover per year [kg]") +
+  guides(color=guide_legend(title="Accuracy of origin"))
+
+```
+
 - statistics of distances
 - statistics of quantities
 
@@ -89,6 +161,8 @@ of total environmental impact (e.g., see Coley et al., 2009; Mason
 et al., 2002; Teisl, 2011).
 
 - further analytics
+
+- some products from suppliers come even from sub-suppliers, who get the products form its real origin! (e.g. some products from OBEG are from BYODO)
 
 ## Conclusion
 

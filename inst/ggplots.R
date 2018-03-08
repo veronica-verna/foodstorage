@@ -1,50 +1,5 @@
-library(RSQLite)
-library(readr)
-library(data.table)
-library(sf)
-library(ggplot2)
-library(tmap)
-library(rgdal)
-library(dplyr)
-library(raster)
-library(tidyr)
-library(foodstorage)
-library(ggmap)
-
-############
-con <- dbConnect(SQLite(), "data/kornInfo.sqlite")
-
-#dbListTables(con)
-#dbListFields(con, "kornumsatz_origin")
-#dbListFields(con, "productInfo")
-#dbListFields(con, "producerAdress")
-
-productInfo <- dbGetQuery(con, "SELECT * FROM productInfo")
-producerAdress <- dbGetQuery(con, "SELECT * FROM producerAdress")
-kornumsatz <- dbGetQuery(con, "SELECT * FROM kornumsatz_origin")
-origin <- dbGetQuery(con, "SELECT * FROM productOrigin")
-Kornkammer <- dbGetQuery(con, "SELECT * from AdresseKornkammer")
-
-productOrigin <- origin
-
-KUperYear <- kornumsatz_perYear(kornumsatz = kornumsatz, productInfo = productInfo)
-KU <- KUperYear %>% 
-  spread(Jahr, Umsatz) %>% 
-  mutate(avg = mean(c(`2016`, `2017`), na.rm = T))
-names(KU) <- c("Produkte_Zusammenfassung", "turnover2015", "turnover2016", "turnover2017", "avg.turnover")
-
-originWithDistances <- SupplierDistance(origin, producerAdress)
-
-totalDistances <- totalDistances(origin = origin, producers = producerAdress, productInfo = productInfo)
-
-## count occurance of every product in the table, to split the turnover of the product to the different occurances.
-totalDistances <- totalDistances %>% 
-  add_count(Produkte_Zusammenfassung) %>% 
-  left_join(KU, by = "Produkte_Zusammenfassung") %>% 
-  mutate(turnover2015 = turnover2015 / n) %>% 
-  mutate(turnover2016 = turnover2016 / n) %>% 
-  mutate(turnover2017 = turnover2017 / n) %>% 
-  mutate(avg.turnover = avg.turnover / n)
+# totalDistances muss eingelesen sein
+#--> run generateGeoData
 
 
 meanDists <- totalDistances %>% 
@@ -87,39 +42,13 @@ ggplot(totalDistances, aes(Gesamtentfernung,  fill = Produktgruppe)) + geom_hist
 
 # Datensatz totalDistances muss geladen sein mit Spalten turnover und Gesamtentfernung
 
-View(totalDistances)
-newtotalDistances <- mutate(totalDistances, "Kathegorie" = NA)
-
-# Damit X (= Distanz) diskret wird, unterteilen wir die Daten manuell in Gruppen
-
-# Möglichkeit 1: Einteilung der Distanzen in 1500 km -Schritten
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung <= 1500] <- "0-1500"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 1500 & newtotalDistances$Gesamtentfernung <= 3000] <- "1500-3000"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 3000 & newtotalDistances$Gesamtentfernung <= 4500] <- "3000-4500"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 4500 & newtotalDistances$Gesamtentfernung <= 6000] <- "4500-6000"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 6000 & newtotalDistances$Gesamtentfernung <= 7500] <- "6000-7500"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 7000 & newtotalDistances$Gesamtentfernung <= 8500] <- "7000-8500"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 8500] <- "> 8500"
-
-# Möglichkeit 2: Distanz immer x 2
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung <= 100] <- "0-100"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 100 & newtotalDistances$Gesamtentfernung <= 200] <- "100-200"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 200 & newtotalDistances$Gesamtentfernung <= 400] <- "200-400"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 400 & newtotalDistances$Gesamtentfernung <= 800] <- "400-800"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 800 & newtotalDistances$Gesamtentfernung <= 1600] <- "800-1600"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 1600 & newtotalDistances$Gesamtentfernung <= 3200] <- "1600-3200"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 3200 & newtotalDistances$Gesamtentfernung <= 6400] <- "3200-6400"
-newtotalDistances$Kathegorie[newtotalDistances$Gesamtentfernung > 6400 & newtotalDistances$Gesamtentfernung <= 12800] <- "6400-12800"
-newtotalDistances$Kathegorie[is.na(newtotalDistances$Gesamtentfernung) == TRUE] <- "NA"
-
-
-
-unique(newtotalDistances$Kathegorie)
+newtotalDistances <- createDistanceCategory(totalDistances)
+head(newtotalDistances$Kategorie)
 
 # Finally!!
 positions <- c("0-100", "100-200", "200-400", "400-800", "800-1600", "1600-3200", "3200-6400", "6400-12800", "NA")
 
-ggplot(newtotalDistances, aes(x = Kathegorie, y = avg.turnover, fill = Produktgruppe)) +
+ggplot(newtotalDistances, aes(x = Kategorie, y = avg.turnover, fill = Produktgruppe)) +
   geom_bar(stat = "identity") +
   scale_x_discrete(limits = positions)+
   labs(title = "Konsumierte Produkte nach Distanz", 

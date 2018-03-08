@@ -1,17 +1,33 @@
+
 library(shiny)
 library(dplyr)
 library(ggplot2)
 library(leaflet)
 
+library(rgdal)
+
+Kornkammer <- readOGR("../data/Kornkammer/", "Kornkammer")
+producersInfo <- readOGR("../data/producersInfo/", "producersInfo")
+
+names(producersInfo) <- c('Produkte_App', 'Produkte_Zusammenfassung', 'Produktgruppe', 'Verpackungseinheit', 'Lieferant', 'Ort', 'EntfernungZwischenhaendler', 'Herkunftsgenauigkeit', 'Lieferantentyp', 'EntfernungKK', 'Gesamtentfernung', 'n', 'turnover2015', 'turnover2016', 'turnover2017', 'avg.turnover')
+producersInfo$avg.turnover <- as.numeric(producersInfo$avg.turnover)
+producersInfo$Gesamtentfernung <- as.numeric(producersInfo$Gesamtentfernung)
+producersInfo$turnover2017 <- as.numeric(producersInfo$turnover2017)
+producersInfo$Produktgruppe <- as.character(producersInfo$Produktgruppe)
+producersInfo$Produkte_Zusammenfassung <- as.character(producersInfo$Produkte_Zusammenfassung)
+
 totalDistances <- as.data.frame(producersInfo)
+
+newtotalDistances <- createDistanceCategory(totalDistances)
 
 pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
 
 pal2 <- colorNumeric(
   palette = "viridis",
-  domain = producersInfoStraight$avg.turnover, n = 10, reverse = F)
+  domain = producersInfo$avg.turnover, n = 10, reverse = F)
 
 # Erstellen der beiden Datensätze, zwischen denen gewählt werden kann
+
 avg.turnOver <- totalDistances %>%
   group_by(Produktgruppe)%>%
   summarise(Menge = sum(avg.turnover, na.rm = T), Distanz = mean(Gesamtentfernung, na.rm = T))
@@ -38,7 +54,8 @@ ui <- fluidPage(
                    leafletOutput("mymap")),
           tabPanel("Umsatz der Produkte", br(), plotOutput("Mengenplot")),
           tabPanel("Transportdistanz der Produkte",  br(), plotOutput("Distanzplot")),
-          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot")
+          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot"), br(),
+                   plotOutput("distBarPlot")
                    )
         )
          
@@ -47,16 +64,27 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  #den Jahren aus Choices werden die entsprechenden Datensätze zugewiesen
-
-      output$distPlot <- renderPlot({
-     turnOverYear <- avg.turnOver
+  output$distPlot <- renderPlot({
+    turnOverYear <- avg.turnOver
      
      # Erstellen des Plots
      ggplot(turnOverYear, aes(Distanz, Menge)) + 
        geom_point(aes(color = Produktgruppe, size = 3)) +
        scale_size(guide = "none") 
    })
+  
+  output$distBarPlot <- renderPlot ({
+    positions <- c("0-100", "100-200", "200-400", "400-800",
+                   "800-1600", "1600-3200", "3200-6400", "6400-12800", "NA")
+    
+    ggplot(newtotalDistances, aes(x = Kategorie, y = avg.turnover, 
+                                  fill = Produktgruppe)) +
+      geom_bar(stat = "identity") +
+      scale_x_discrete(limits = positions)+
+      labs(title = "Konsumierte Produkte nach Distanz", 
+           y = "Umsatz in kg bzw. L",
+           x = "Distanz [km]")
+  })
    
    #############################
    
@@ -89,11 +117,12 @@ server <- function(input, output, session) {
       dashs <- prodSelect$Herkunftsgenauigkeit
       dashs[which(dashs == 2)] <- 1
       dashs[which(dashs == 1)] <- 0
+      dashs[which(dashs != 0)] <- 10
       dash <- as.factor(dashs)
      leaflet(prodSelect) %>% 
        #addTiles() %>% 
        addProviderTiles(providers$CartoDB.Positron) %>% 
-       addPolylines(weight = ifelse((prodSelect$avg.turnover/15) < 1, 1, (prodSelect$avg.turnover)/15),
+       addPolylines(weight = ifelse((prodSelect$avg.turnover/20) < 1, 1, (prodSelect$avg.turnover)/20),
                     color = ~pal2(prodSelect$avg.turnover),#
                     popup = prodSelect$Produkte_Zusammenfassung, dashArray = dash) %>% 
        addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "Umsatz pro Jahr",

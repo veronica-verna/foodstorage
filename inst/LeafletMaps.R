@@ -1,22 +1,28 @@
 
 library(leaflet)
 
-pal <- colorFactor(c("green", "orange", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
+pal <- colorFactor(c("darkgreen", "blue", "red"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
+KKIcon <- iconList(
+  Kornkammer = makeIcon("data/icon-2.png", "data/icon-2.png", 24, 24)
+)
 
-leaflet(producersExist) %>%
+map1 <- leaflet(producersExist) %>%
   addTiles() %>%
   addCircleMarkers(radius = 6,
-                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
-                   popup = producersExist$Lieferant) %>%  #, clusterOptions = markerClusterOptions()
+                   stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lfrntnt)) %>%  
+  #, clusterOptions = markerClusterOptions()
   addLegend("bottomright",
-            pal = pal, values = ~producersExist$Lieferantentyp,
+            pal = pal, values = ~producersExist$Lfrntnt,
             title = "Lieferantentyp",
             opacity = 1
   ) %>%
-  addMarkers(Kornkammer, lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
-             popup= "Kornkammer")
+  addMarkers(Kornkammer,
+             lng = coordinates(Kornkammer)[1], lat = coordinates(Kornkammer)[2],
+             icon =  ~KKIcon[Kornkammer$Name]) %>% 
+  addPolylines(data = producersRoutes, color = "black", opacity = 1, weight = 3)
 
-
+library(mapview)
+mapshot(map1, file = "map.pdf")
 
 ########################
 
@@ -28,13 +34,13 @@ pal2 <- colorNumeric(
 
 leaflet(producersRoutes) %>% 
   addTiles() %>% 
-  addPolylines(color = "brown") %>% 
-  addPolylines(data = producersInfoStraight, color = ~pal2(producersInfoStraight$avg.turnover),
-               weight = (1/producersInfoStraight$Herkunftsgenauigkeit)*3,
-               popup = producersInfoStraight$Produkte_Zusammenfassung,
-               smoothFactor = 0.2, fillOpacity = 1) %>% 
-  addLegend(pal = pal2, values = ~producersInfoStraight$avg.turnover, title = "avg.turnover",
-            labFormat = labelFormat(suffix = " kg/yr"))
+  addPolylines(color = "brown") #%>% 
+  # addPolylines(data = producersInfoStraight, color = ~pal2(producersInfoStraight$avg.turnover),
+  #              weight = (1/producersInfoStraight$Herkunftsgenauigkeit)*3,
+  #              popup = producersInfoStraight$Produkte_Zusammenfassung,
+  #              smoothFactor = 0.2, fillOpacity = 1) %>% 
+  # addLegend(pal = pal2, values = ~producersInfoStraight$avg.turnover, title = "avg.turnover",
+  #           labFormat = labelFormat(suffix = " kg/yr"))
 
 
 leaflet(producersInfo) %>% 
