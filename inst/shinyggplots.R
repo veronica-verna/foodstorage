@@ -125,7 +125,7 @@ server <- function(input, output, session) {
        addPolylines(weight = ifelse((prodSelect$avg.turnover/20) < 1, 1, (prodSelect$avg.turnover)/20),
                     color = ~pal2(prodSelect$avg.turnover),#
                     popup = prodSelect$Produkte_Zusammenfassung, dashArray = dash) %>% 
-       addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "Umsatz pro Jahr",
+       addLegend(pal = pal2, values = ~prodSelect$avg.turnover, title = "Umsatz pro Jahr",
                 labFormat = labelFormat(suffix = " kg/yr")) %>%
        # addCircleMarkers(data = producersExist, radius = 2,
        #                  stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
