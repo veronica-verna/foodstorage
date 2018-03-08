@@ -68,15 +68,11 @@ Regarding the inaccuracy about the real distance a product had traveled, the pur
 For every product a Spatial Layer that stores its transport Route was created. The layers of all products are stored in one Shapefile, that contains all informations of the products in its attributes-table.
 
 ## data visualisation
-The Shapefiles that include the transport Routes of all products are visualised using the package leaflet, a tool to create interactive maps.
+The products average turnover per Year is analysed regarding the total distance the product had been transported and the accuracy of its origin.
 
-A map that shows the actual driving distance from the suppliers to the FoodCoop was build.
+The Shapefile that includes the transport Routes of all products is visualised using the package leaflet, a tool to create interactive maps.
 
-- leaflet-maps
-.. display curves on map and straight lines 
-- ggplots
-shiny-app !
-
+Transport Routes are visualised as the actual driving distance, as the shortes distance between the two location on the earth (great circle) and simply as a straight line between the two locations on the map.
 
 # Results
 ```{r, message=FALSE, warning=FALSE, include=FALSE}

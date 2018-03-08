@@ -9,7 +9,7 @@ library(rgdal)
 Kornkammer <- readOGR("../data/Kornkammer/", "Kornkammer")
 producersInfo <- readOGR("../data/producersInfo/", "producersInfo")
 
-names(producersInfo) <- c('Produkte_App', 'Produkte_Zusammenfassung', 'Produktgruppe', 'Verpackungseinheit', 'Lieferant', 'Ort', 'EntfernungZwischenhaendler', 'Herkunftsgenauigkeit', 'Lieferantentyp', 'EntfernungKK', 'Gesamtentfernung', 'n', 'turnover2015', 'turnover2016', 'turnover2017', 'avg.turnover')
+names(producersInfo) <- c('X', 'Produkte_App', 'Produkte_Zusammenfassung', 'Produktgruppe', 'Verpackungseinheit', 'Lieferant', 'Ort', 'EntfernungZwischenhaendler', 'Herkunftsgenauigkeit', 'Lieferantentyp', 'EntfernungKK', 'Gesamtentfernung', 'n', 'turnover2015', 'turnover2016', 'turnover2017', 'avg.turnover')
 producersInfo$avg.turnover <- as.numeric(producersInfo$avg.turnover)
 producersInfo$Gesamtentfernung <- as.numeric(producersInfo$Gesamtentfernung)
 producersInfo$turnover2017 <- as.numeric(producersInfo$turnover2017)
