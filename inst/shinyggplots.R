@@ -3,6 +3,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(leaflet)
+
 library(rgdal)
 
 Kornkammer <- readOGR("../data/Kornkammer/", "Kornkammer")
@@ -17,6 +18,8 @@ producersInfo$Produkte_Zusammenfassung <- as.character(producersInfo$Produkte_Zu
 
 totalDistances <- as.data.frame(producersInfo)
 
+newtotalDistances <- createDistanceCategory(totalDistances)
+
 pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger", "Produzent", "Zwischenhaendler"))
 
 pal2 <- colorNumeric(
@@ -24,6 +27,7 @@ pal2 <- colorNumeric(
   domain = producersInfo$avg.turnover, n = 10, reverse = F)
 
 # Erstellen der beiden Datensätze, zwischen denen gewählt werden kann
+
 avg.turnOver <- totalDistances %>%
   group_by(Produktgruppe)%>%
   summarise(Menge = sum(avg.turnover, na.rm = T), Distanz = mean(Gesamtentfernung, na.rm = T))
@@ -50,7 +54,8 @@ ui <- fluidPage(
                    leafletOutput("mymap")),
           tabPanel("Umsatz der Produkte", br(), plotOutput("Mengenplot")),
           tabPanel("Transportdistanz der Produkte",  br(), plotOutput("Distanzplot")),
-          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot")
+          tabPanel("Transport vs. Umsatz",  br(), plotOutput("distPlot"), br(),
+                   plotOutput("distBarPlot")
                    )
         )
          
@@ -59,16 +64,27 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  #den Jahren aus Choices werden die entsprechenden Datensätze zugewiesen
-
-      output$distPlot <- renderPlot({
-     turnOverYear <- avg.turnOver
+  output$distPlot <- renderPlot({
+    turnOverYear <- avg.turnOver
      
      # Erstellen des Plots
      ggplot(turnOverYear, aes(Distanz, Menge)) + 
        geom_point(aes(color = Produktgruppe, size = 3)) +
        scale_size(guide = "none") 
    })
+  
+  output$distBarPlot <- renderPlot ({
+    positions <- c("0-100", "100-200", "200-400", "400-800",
+                   "800-1600", "1600-3200", "3200-6400", "6400-12800", "NA")
+    
+    ggplot(newtotalDistances, aes(x = Kategorie, y = avg.turnover, 
+                                  fill = Produktgruppe)) +
+      geom_bar(stat = "identity") +
+      scale_x_discrete(limits = positions)+
+      labs(title = "Konsumierte Produkte nach Distanz", 
+           y = "Umsatz in kg bzw. L",
+           x = "Distanz [km]")
+  })
    
    #############################
    
