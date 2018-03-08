@@ -1,8 +1,20 @@
+
 library(shiny)
 library(dplyr)
 library(ggplot2)
 library(leaflet)
-library(readr)
+library(foodstorage)
+library(rgdal)
+
+Kornkammer <- readOGR("../data/Kornkammer/", "Kornkammer")
+producersInfo <- readOGR("../data/producersInfo/", "producersInfo")
+
+names(producersInfo) <- c('Produkte_App', 'Produkte_Zusammenfassung', 'Produktgruppe', 'Verpackungseinheit', 'Lieferant', 'Ort', 'EntfernungZwischenhaendler', 'Herkunftsgenauigkeit', 'Lieferantentyp', 'EntfernungKK', 'Gesamtentfernung', 'n', 'turnover2015', 'turnover2016', 'turnover2017', 'avg.turnover')
+producersInfo$avg.turnover <- as.numeric(producersInfo$avg.turnover)
+producersInfo$Gesamtentfernung <- as.numeric(producersInfo$Gesamtentfernung)
+producersInfo$turnover2017 <- as.numeric(producersInfo$turnover2017)
+producersInfo$Produktgruppe <- as.character(producersInfo$Produktgruppe)
+producersInfo$Produkte_Zusammenfassung <- as.character(producersInfo$Produkte_Zusammenfassung)
 
 totalDistances <- as.data.frame(producersInfo)
 
@@ -12,7 +24,7 @@ pal <- colorFactor(c("darkgreen", "orange", "darkred"), domain = c(  "Erzeuger",
 
 pal2 <- colorNumeric(
   palette = "viridis",
-  domain = producersInfoStraight$avg.turnover, n = 10, reverse = F)
+  domain = producersInfo$avg.turnover, n = 10, reverse = F)
 
 # Erstellen der beiden Datensätze, zwischen denen gewählt werden kann
 
@@ -105,14 +117,15 @@ server <- function(input, output, session) {
       dashs <- prodSelect$Herkunftsgenauigkeit
       dashs[which(dashs == 2)] <- 1
       dashs[which(dashs == 1)] <- 0
+      dashs[which(dashs != 0)] <- 10
       dash <- as.factor(dashs)
      leaflet(prodSelect) %>% 
        #addTiles() %>% 
        addProviderTiles(providers$CartoDB.Positron) %>% 
-       addPolylines(weight = ifelse((prodSelect$avg.turnover/15) < 1, 1, (prodSelect$avg.turnover)/15),
+       addPolylines(weight = ifelse((prodSelect$avg.turnover/20) < 1, 1, (prodSelect$avg.turnover)/20),
                     color = ~pal2(prodSelect$avg.turnover),#
                     popup = prodSelect$Produkte_Zusammenfassung, dashArray = dash) %>% 
-       addLegend(pal = pal2, values = ~producersInfo$avg.turnover, title = "Umsatz pro Jahr",
+       addLegend(pal = pal2, values = ~prodSelect$avg.turnover, title = "Umsatz pro Jahr",
                 labFormat = labelFormat(suffix = " kg/yr")) %>%
        # addCircleMarkers(data = producersExist, radius = 2,
        #                  stroke = FALSE, fillOpacity = 0.8, color=pal(producersExist$Lieferantentyp),
