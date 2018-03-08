@@ -22,18 +22,34 @@ A foodcoop is the combination of people and households for joint shopping. The i
 
 Such foodcoop were founded in Freiburg as well resulting in five existing foodcoops at the moment. The foodcoop "Kornkammer" was founded in 2015 and comprises about 50 households with more or less 100 members. The members decide together what kind of products they want to order, communicate with the producers and store the deliveries in a room where all members can purchase small quantities of the groceries.
 
-This study tries to investigate the transport distances of the products consumed by the foodcoop "Kornkammer" and to inform the foodcoop members about the routes their food travels. 
+This study tries to investigate the transport distances of the products consumed by the foodcoop "Kornkammer" and to inform the foodcoop members about the routes their food travels. A web app was created for this purpose.
 
 # Methods
 ## data acquisition 
-  -schon vorhandene daten: produkte, lieferanten und umsätze
-  - name of country only coordinates of center(geocode funktion), unsicherheiten kategorisiert...
-  -define produzent, zwischenhändler...
+
+The foodcoop "Kornkammer" uses a tablet with an app to manage the inventory of products, to enter deliveries and to process the purchases of the members. The app stores all bookings related to these tasks in an SQLite database. 
+
+We used the database to extract information on the products available in the foodcoop, their suppliers and their turnovers. For the SQL queries and all other computing we used the R software version 3.4.3 [@RCoreTeam]. The SQL queries were done with the R package "RSQLite". Next, we extended the information stored in the database with the adresses of the suppliers. 
+
+We decided to devide the suppliers into three categories: 
+
+- farmers (translation in web app: Erzeuger): A supplier who grows grains/legumes/etc. and directly sells its products to the foodcoop. Beekeepers were also summarized under this category.
+- manufacturers (translation in web app: Produzent): A supplier who produces products like detergent or bread spread which consist of many ingredients. 
+- whole salers (Translation in web app: Zwischenhändler): A supplier who bought products from growers or even other intermediate agents. Assosiations which support cooperatives by purchasing olive oil, cashew nuts or spices directly from the cooperatives were also summarized under this category.
+
+Following, we tried to find out the origin of the products sold by the whole salers. We classified the accuracy of the information we got into three categories: 
+
+- 1 ...
+- 2 ...
+- 3 ...
 
 ## data processing
-- Distanzen berechnen (in die finale totalDistances table) function spDist
+In a next step we used the function "geocode" from the package "ggmap" to convert the adresses of our suppliers and the information about the origin of the products from whole salers into coordinates. If we knew only the country of a product's origin the resulting geoposition calculated by the geocode function was located in the middle of the country.
+
+After that we used the function "spDists" from the package "sp" to calculate the distances from the foodcoop to the suppliers and, if a supplier was a whole saler, the distance from the supplier to the location of the product's origin. The sum of the distances gave the total distance a product traveled.
+
 - create points and Lines SpatialPointsDataFrame and SpatialLinesdataFrames that contain attributes of products and transport path information bzw. origin/supplier/FoodCoop locations
-- explain R-function we wrote (??)
+- explain R-functions we wrote (??)
 - ? workflow : wie readme
 
 ## data visualisation
